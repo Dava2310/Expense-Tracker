@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Account;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,7 +24,7 @@ class AccountFactory extends Factory
             'details' => $this->faker->paragraph(2, true),
             'balance' => $this->faker->randomFloat(2, 10, 100),
             'min_balance' => $this->faker->randomFloat(2, 10, 100),
-            'user_id' => $this->faker->numberBetween(1, 10),
+            'user_id' => User::factory(),
         ];
     }
 }
