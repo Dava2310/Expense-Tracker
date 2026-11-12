@@ -3,6 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Account;
+use App\Models\Category;
+use App\Models\Expense;
+use App\Models\Income;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -23,5 +26,8 @@ class DatabaseSeeder extends Seeder
 
         User::factory(10)->create();
         Account::factory(10)->create();
+        Category::factory(10)->create();
+        Expense::factory(10)->create();
+        Income::factory(10)->create();
     }
 }
