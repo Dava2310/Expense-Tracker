@@ -7,15 +7,35 @@ on:
 
 jobs:
   ci:
+    name: CI (${{ matrix.db }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        db: [sqlite, mysql]
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: secret
+          MYSQL_DATABASE: expense_tracker
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -psecret"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          extensions: sqlite3, pdo_sqlite, mbstring
+          extensions: sqlite3, pdo_sqlite, pdo_mysql, mbstring
           coverage: none
 
       - uses: actions/setup-node@v4
@@ -36,7 +56,18 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
-          touch database/database.sqlite
+          if [ "${{ matrix.db }}" = "mysql" ]; then
+            {
+              echo "DB_CONNECTION=mysql"
+              echo "DB_HOST=127.0.0.1"
+              echo "DB_PORT=3306"
+              echo "DB_DATABASE=expense_tracker"
+              echo "DB_USERNAME=root"
+              echo "DB_PASSWORD=secret"
+            } >> .env
+          else
+            touch database/database.sqlite
+          fi
 
       - name: Migrate and seed a fresh database
         run: php artisan migrate:fresh --seed --force
