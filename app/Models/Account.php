@@ -19,4 +19,14 @@ class Account extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Gets all expenses associated to this bank account.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function expenses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
 }
