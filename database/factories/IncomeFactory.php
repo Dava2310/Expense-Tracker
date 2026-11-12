@@ -22,6 +22,7 @@ class IncomeFactory extends Factory
             'concept' => $this->faker->paragraph(2, true),
             'date' => $this->faker->date(),
             'account_id' => $this->faker->numberBetween(1, 10),
+            'category_id' => $this->faker->numberBetween(1, 10),
         ];
     }
 }

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('concept');
             $table->date('date');
             $table->foreignId('account_id')->constrained();
+            $table->foreignId('category_id')->constrained();
             $table->timestamps();
         });
     }
