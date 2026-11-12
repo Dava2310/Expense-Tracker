@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Account;
+use App\Models\Category;
 use App\Models\Income;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,8 +23,8 @@ class IncomeFactory extends Factory
             'amount' => $this->faker->randomFloat(2, 10, 100),
             'concept' => $this->faker->paragraph(2, true),
             'date' => $this->faker->date(),
-            'account_id' => $this->faker->numberBetween(1, 10),
-            'category_id' => $this->faker->numberBetween(1, 10),
+            'account_id' => Account::factory(),
+            'category_id' => Category::factory(),
         ];
     }
 }
