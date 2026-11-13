@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Userzone;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreAccountRequest;
+use App\Http\Requests\UpdateAccountRequest;
+use App\Models\Account;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -46,5 +48,33 @@ class AccountController extends Controller
 
         // Getting to the accounts list after a successful creation
         return redirect()->route('accounts.index')->with('status', 'account-created');
+    }
+
+    /***
+     * Renders the form to edit one of the user's accounts
+     *
+     * @param Request $request
+     * @param Account $account
+     * @return View
+     */
+    public function edit(Request $request, Account $account): View
+    {
+        abort_unless($account->user_id === $request->user()->id, 404);
+
+        return view('userzone.accounts.edit', ['account' => $account]);
+    }
+
+    /***
+     * Handles the update of an account (balance cannot be changed)
+     *
+     * @param UpdateAccountRequest $request
+     * @param Account $account
+     * @return RedirectResponse
+     */
+    public function update(UpdateAccountRequest $request, Account $account): RedirectResponse
+    {
+        $account->update($request->validated());
+
+        return redirect()->route('accounts.index')->with('status', 'account-updated');
     }
 }
