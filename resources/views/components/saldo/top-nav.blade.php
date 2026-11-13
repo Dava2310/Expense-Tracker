@@ -1,14 +1,3 @@
-@php
-    $user = auth()->user();
-    $initials = str($user->name)
-        ->explode(' ')
-        ->filter()
-        ->take(2)
-        ->map(fn (string $part): string => mb_strtoupper(mb_substr($part, 0, 1)))
-        ->implode('');
-    $iconAttributes = 'width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
-@endphp
-
 <header class="border-b border-saldo-line bg-white">
     <div class="mx-auto flex min-h-[72px] max-w-[1184px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-8 py-3">
 
