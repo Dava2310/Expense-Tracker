@@ -21,8 +21,8 @@ class IncomeFactory extends Factory
     {
         return [
             'amount' => $this->faker->randomFloat(2, 10, 100),
-            'concept' => $this->faker->paragraph(2, true),
-            'date' => $this->faker->date(),
+            'concept' => ucfirst($this->faker->words(3, true)),
+            'date' => $this->faker->dateTimeBetween('-3 months')->format('Y-m-d'),
             'account_id' => Account::factory(),
             'category_id' => Category::factory(),
         ];
