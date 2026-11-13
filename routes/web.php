@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Userzone\AccountController;
 use App\Http\Controllers\Userzone\DashboardController;
+use App\Http\Controllers\Userzone\IncomeController;
 use App\Http\Controllers\Userzone\ProfileController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
     Route::get('/accounts/{account}/edit', [AccountController::class, 'edit'])->name('accounts.edit');
     Route::patch('/accounts/{account}', [AccountController::class, 'update'])->name('accounts.update');
+
+    // Income routes
+    Route::get('/incomes', [IncomeController::class, 'index'])->name('incomes.index');
 
     // For the user's profile management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
