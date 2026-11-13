@@ -44,7 +44,7 @@ class AccountController extends Controller
         // Creation of the account
         $request->user()->accounts()->create($request->validated());
 
-        // Getting to the dashboard after a successful creation
-        return redirect()->route('dashboard')->with('status', 'account-created');
+        // Getting to the accounts list after a successful creation
+        return redirect()->route('accounts.index')->with('status', 'account-created');
     }
 }
