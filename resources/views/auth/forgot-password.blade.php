@@ -1,25 +1,16 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.
-    </div>
+<x-saldo.auth-layout title="Forgot your password?" subtitle="Enter your email and we’ll send you a link to choose a new one.">
+    <x-saldo.status :status="session('status')" />
 
-    <!-- Session Status -->
-    <x-breeze.auth-session-status class="mb-4" :status="session('status')" />
-
-    <form method="POST" action="{{ route('password.email') }}">
+    <form method="POST" action="{{ route('password.email') }}" class="flex flex-col gap-4">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-breeze.input-label for="email" value="Email" />
-            <x-breeze.text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-breeze.input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        <x-saldo.field label="Email" name="email" type="email" placeholder="you@example.com" required autofocus autocomplete="username" />
 
-        <div class="flex items-center justify-end mt-4">
-            <x-breeze.primary-button>
-                Email Password Reset Link
-            </x-breeze.primary-button>
-        </div>
+        <x-saldo.button as="button" size="form" class="mt-2">Send reset link</x-saldo.button>
     </form>
-</x-guest-layout>
+
+    <x-slot:footer>
+        Remembered it?
+        <a href="{{ route('login') }}" class="font-semibold text-saldo-ink">Back to log in</a>
+    </x-slot:footer>
+</x-saldo.auth-layout>
