@@ -70,6 +70,7 @@ test('navigation links to working pages, disables the rest and offers profile an
         ->assertOk()
         ->assertSee('aria-current="page"', false)
         ->assertSee(route('accounts.index'), false)
+        ->assertSee(route('incomes.index'), false)
         ->assertSee(route('profile.edit'), false)
         ->assertSee('action="'.route('logout').'"', false)
         ->assertSee('Alex Rivera')
