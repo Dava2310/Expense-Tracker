@@ -44,6 +44,17 @@
   If we ever want to remove these styles, we need to add an explicit border
   color utility to any element that depends on these defaults.
 */
+/*
+  Edge adds its own "reveal password" button to password inputs. Hide it,
+  since the Saldo password field ships with its own show/hide toggle.
+*/
+@layer base {
+    input[type='password']::-ms-reveal,
+    input[type='password']::-ms-clear {
+        display: none;
+    }
+}
+
 @layer base {
     *,
     ::after,
