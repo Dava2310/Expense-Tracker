@@ -9,6 +9,28 @@
     --font-sans:
         Figtree, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
         'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --font-inter:
+        Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+        sans-serif;
+    --font-display:
+        'Space Grotesk', Inter, ui-sans-serif, system-ui, sans-serif;
+
+    --color-saldo-canvas: #f7f7f4;
+    --color-saldo-ink: #16181b;
+    --color-saldo-ink-hover: #2b2e33;
+    --color-saldo-muted: #555a62;
+    --color-saldo-subtle: #6a6f77;
+    --color-saldo-line: #e7e6e1;
+    --color-saldo-line-strong: #dedcd7;
+    --color-saldo-line-soft: #efeeea;
+    --color-saldo-ghost-hover: #ededed;
+    --color-saldo-green: #0b7a55;
+    --color-saldo-mint: #3fbf8a;
+    --color-saldo-green-tint: #e7f4ee;
+    --color-saldo-warn-bg: #fdf1e3;
+    --color-saldo-warn-fg: #9a4a00;
+    --color-saldo-dark-text: #b9bcc2;
 }
 
 /*
