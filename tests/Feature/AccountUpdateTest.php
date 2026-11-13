@@ -119,6 +119,50 @@ test('details can be left empty when updating', function () {
     expect($account->fresh()->details)->toBe('');
 });
 
+test('the edit form is prefilled and does not offer the balance', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->for($user)->create([
+        'name' => 'Everyday',
+        'bank' => 'Harbor Bank',
+        'details' => 'Card ending 4821',
+        'min_balance' => 500,
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('accounts.edit', $account))
+        ->assertOk()
+        ->assertSee('Edit account')
+        ->assertSee('value="Everyday"', false)
+        ->assertSee('value="Harbor Bank"', false)
+        ->assertSee('Card ending 4821')
+        ->assertSee('value="500.00"', false)
+        ->assertSee('Save changes')
+        ->assertSee('name="_method" value="PATCH"', false)
+        ->assertDontSee('name="balance"', false)
+        ->assertDontSee('New accounts start at');
+});
+
+test('invalid edits are rejected and the errors are shown', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->for($user)->create(['name' => 'Original']);
+
+    $this->actingAs($user)
+        ->from(route('accounts.edit', $account))
+        ->patch(route('accounts.update', $account), [
+            'name' => '',
+            'bank' => 'Bank',
+            'min_balance' => '-1',
+        ])
+        ->assertRedirect(route('accounts.edit', $account))
+        ->assertSessionHasErrors(['name', 'min_balance']);
+
+    expect($account->fresh()->name)->toBe('Original');
+
+    $this->actingAs($user)
+        ->get(route('accounts.edit', $account))
+        ->assertSee('aria-invalid="true"', false);
+});
+
 test('clearing the minimum balance resets it to zero', function () {
     $user = User::factory()->create();
     $account = Account::factory()->for($user)->create(['min_balance' => 80]);
