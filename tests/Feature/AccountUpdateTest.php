@@ -25,7 +25,7 @@ test('owner updates the editable fields', function () {
             'details' => 'New details',
             'min_balance' => '25.50',
         ])
-        ->assertRedirect(route('accounts.index'))
+        ->assertRedirect(route('accounts.show', $account))
         ->assertSessionHas('status', 'account-updated');
 
     $this->assertDatabaseHas('accounts', [
@@ -114,7 +114,7 @@ test('details can be left empty when updating', function () {
             'min_balance' => '25.50',
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('accounts.index'));
+        ->assertRedirect(route('accounts.show', $account));
 
     expect($account->fresh()->details)->toBe('');
 });
@@ -174,7 +174,7 @@ test('clearing the minimum balance resets it to zero', function () {
             'min_balance' => '',
         ])
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('accounts.index'));
+        ->assertRedirect(route('accounts.show', $account));
 
     expect($account->fresh()->min_balance)->toEqual(0);
 });

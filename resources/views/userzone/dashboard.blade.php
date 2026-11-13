@@ -31,14 +31,18 @@
             <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-4">
                 @foreach ($accounts as $account)
                     @php($isLow = $account->isBelowMinimum())
-                    <li @class([
-                        'flex min-h-[184px] flex-col gap-4.5 rounded-2xl border bg-white p-5',
-                        'border-saldo-line' => ! $isLow,
-                        'border-saldo-warn-line' => $isLow,
-                    ])>
-                        <div class="flex flex-col gap-0.5">
-                            <span class="truncate text-[15px] font-semibold">{{ $account->name }}</span>
-                            <span class="truncate text-[13px] text-saldo-subtle">{{ $account->bank }}</span>
+                    <li>
+                        <a href="{{ route('accounts.show', $account) }}" @class([
+                            'flex min-h-[184px] flex-col gap-4.5 rounded-2xl border bg-white p-5 text-saldo-ink no-underline transition hover:border-[#cfcec8] hover:shadow-[0_10px_28px_-12px_rgba(22,24,27,0.16)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink',
+                            'border-saldo-line' => ! $isLow,
+                            'border-saldo-warn-line' => $isLow,
+                        ])>
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex min-w-0 flex-col gap-0.5">
+                                <span class="truncate text-[15px] font-semibold">{{ $account->name }}</span>
+                                <span class="truncate text-[13px] text-saldo-subtle">{{ $account->bank }}</span>
+                            </div>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="flex-none text-saldo-subtle"><path d="m9 6 6 6-6 6"></path></svg>
                         </div>
 
                         <span class="mt-auto font-display text-[30px] font-medium tracking-[-0.02em] tabular-nums">{{ Number::currency((float) $account->balance, 'EUR', 'en') }}</span>
@@ -51,6 +55,7 @@
                         @else
                             <span class="flex h-7 items-center text-[13px] text-saldo-subtle">Minimum {{ Number::currency((float) $account->min_balance, 'EUR', 'en') }}</span>
                         @endif
+                        </a>
                     </li>
                 @endforeach
             </ul>

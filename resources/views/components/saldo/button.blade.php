@@ -4,6 +4,7 @@
     $variantClasses = match ($variant) {
         'ghost' => 'bg-transparent text-saldo-ink hover:bg-saldo-ghost-hover',
         'light' => 'bg-white text-saldo-ink hover:bg-saldo-ghost-hover',
+        'outline' => 'border border-saldo-line-strong bg-white text-saldo-ink hover:border-[#c9c8c1]',
         default => 'bg-saldo-ink text-white hover:bg-saldo-ink-hover',
     };
 
