@@ -12,6 +12,9 @@
                 @if (session('status') === 'account-created')
                     <p class="mb-4 text-sm text-green-600">Account created.</p>
                 @endif
+                @if (session('status') === 'account-updated')
+                    <p class="mb-4 text-sm text-green-600">Account updated.</p>
+                @endif
 
                 <div class="mb-4">
                     <a href="{{ route('accounts.create') }}" class="underline text-sm text-gray-600 hover:text-gray-900">Create Account</a>
@@ -25,7 +28,8 @@
                             <th class="py-2 pe-4">Bank</th>
                             <th class="py-2 pe-4">Details</th>
                             <th class="py-2 pe-4">Balance</th>
-                            <th class="py-2">Minimum balance</th>
+                            <th class="py-2 pe-4">Minimum balance</th>
+                            <th class="py-2"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -34,12 +38,15 @@
                                 <td class="py-2 pe-4">{{ $account->name }}</td>
                                 <td class="py-2 pe-4">{{ $account->bank }}</td>
                                 <td class="py-2 pe-4">{{ $account->details }}</td>
-                                <td class="py-2 pe-4">{{ number_format($account->balance, 2) }}</td>
-                                <td class="py-2">{{ number_format($account->min_balance, 2) }}</td>
+                                <td class="py-2 pe-4">€ {{ number_format($account->balance, 2) }}</td>
+                                <td class="py-2 pe-4">€ {{ number_format($account->min_balance, 2) }}</td>
+                                <td class="py-2">
+                                    <a href="{{ route('accounts.edit', $account) }}" class="underline text-gray-600 hover:text-gray-900">Edit</a>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="py-4 text-gray-600">You have no accounts yet.</td>
+                                <td colspan="6" class="py-4 text-gray-600">You have no accounts yet.</td>
                             </tr>
                         @endforelse
                     </tbody>
