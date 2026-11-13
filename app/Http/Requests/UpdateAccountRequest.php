@@ -27,8 +27,8 @@ class UpdateAccountRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'bank' => ['required', 'string', 'max:255'],
-            'details' => ['required', 'string', 'max:255'],
-            'min_balance' => ['required', 'numeric', 'min:0', 'decimal:0,2', 'max:999999.99'],
+            'details' => ['nullable', 'string', 'max:255'],
+            'min_balance' => ['nullable', 'numeric', 'min:0', 'decimal:0,2', 'max:999999.99'],
         ];
     }
 }

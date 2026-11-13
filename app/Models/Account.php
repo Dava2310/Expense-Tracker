@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\AccountFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +21,33 @@ class Account extends Model
         'balance',
         'min_balance',
     ];
+
+    /**
+     * New accounts start with an empty balance, no details and no minimum balance.
+     *
+     * @var array<string, int|string>
+     */
+    protected $attributes = [
+        'balance' => 0,
+        'details' => '',
+        'min_balance' => 0,
+    ];
+
+    /**
+     * The minimum balance is optional; an empty value means no minimum (0).
+     */
+    protected function minBalance(): Attribute
+    {
+        return Attribute::set(fn (mixed $value): mixed => $value ?? 0);
+    }
+
+    /**
+     * Details are optional; an empty value is stored as an empty string.
+     */
+    protected function details(): Attribute
+    {
+        return Attribute::set(fn (?string $value): string => $value ?? '');
+    }
 
     /**
      * Get the attributes that should be cast.

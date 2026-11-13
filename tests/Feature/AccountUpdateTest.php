@@ -101,3 +101,36 @@ test('guests are redirected to login', function () {
     $this->get(route('accounts.edit', $account))->assertRedirect(route('login'));
     $this->patch(route('accounts.update', $account), [])->assertRedirect(route('login'));
 });
+
+test('details can be left empty when updating', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->for($user)->create(['details' => 'Old details']);
+
+    $this->actingAs($user)
+        ->patch(route('accounts.update', $account), [
+            'name' => 'New name',
+            'bank' => 'New bank',
+            'details' => '',
+            'min_balance' => '25.50',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('accounts.index'));
+
+    expect($account->fresh()->details)->toBe('');
+});
+
+test('clearing the minimum balance resets it to zero', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->for($user)->create(['min_balance' => 80]);
+
+    $this->actingAs($user)
+        ->patch(route('accounts.update', $account), [
+            'name' => 'New name',
+            'bank' => 'New bank',
+            'min_balance' => '',
+        ])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('accounts.index'));
+
+    expect($account->fresh()->min_balance)->toEqual(0);
+});
