@@ -22,6 +22,27 @@ class Account extends Model
     ];
 
     /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'balance' => 'decimal:2',
+            'min_balance' => 'decimal:2',
+        ];
+    }
+
+    /**
+     * Determines whether the balance has dropped under the account's minimum.
+     */
+    public function isBelowMinimum(): bool
+    {
+        return round((float) $this->balance - (float) $this->min_balance, 2) < 0;
+    }
+
+    /**
      * Gets the information of the user that owns this account.
      */
     public function user(): BelongsTo
