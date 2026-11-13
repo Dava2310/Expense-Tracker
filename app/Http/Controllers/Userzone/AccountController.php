@@ -77,4 +77,20 @@ class AccountController extends Controller
 
         return redirect()->route('accounts.index')->with('status', 'account-updated');
     }
+
+    /***
+     * Deactivates one of the user's accounts. Its incomes and expenses are kept.
+     *
+     * @param Request $request
+     * @param Account $account
+     * @return RedirectResponse
+     */
+    public function destroy(Request $request, Account $account): RedirectResponse
+    {
+        abort_unless($account->user_id === $request->user()->id, 404);
+
+        $account->delete();
+
+        return redirect()->route('accounts.index')->with('status', 'account-deactivated');
+    }
 }

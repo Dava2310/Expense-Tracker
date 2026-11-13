@@ -27,6 +27,9 @@
         @if (session('status') === 'account-updated')
             <x-saldo.status status="Account updated." />
         @endif
+        @if (session('status') === 'account-deactivated')
+            <x-saldo.status status="Account deactivated." />
+        @endif
 
         <div class="overflow-hidden rounded-2xl border border-saldo-line bg-white">
             <div class="overflow-x-auto">

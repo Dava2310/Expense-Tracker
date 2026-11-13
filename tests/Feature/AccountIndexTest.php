@@ -54,6 +54,7 @@ test('flash messages are shown after creating and updating an account', function
 })->with([
     'created' => ['account-created', 'Account created.'],
     'updated' => ['account-updated', 'Account updated.'],
+    'deactivated' => ['account-deactivated', 'Account deactivated.'],
 ]);
 
 test('a dash is shown when an account has no details', function () {
