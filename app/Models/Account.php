@@ -2,40 +2,45 @@
 
 namespace App\Models;
 
+use Database\Factories\AccountFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Account extends Model
 {
-    /** @use HasFactory<\Database\Factories\AccountFactory> */
+    /** @use HasFactory<AccountFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'bank',
+        'details',
+        'balance',
+        'min_balance',
+    ];
 
     /**
      * Gets the information of the user that owns this account.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     /**
      * Gets all expenses associated to this bank account.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function expenses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function expenses(): HasMany
     {
         return $this->hasMany(Expense::class);
     }
 
     /**
      * Gets all incomes associated to this bank account.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function incomes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function incomes(): HasMany
     {
         return $this->hasMany(Income::class);
     }

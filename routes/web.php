@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Userzone\AccountController;
 use App\Http\Controllers\Userzone\DashboardController;
 use App\Http\Controllers\Userzone\ProfileController;
 use App\Http\Controllers\WelcomeController;
@@ -17,7 +18,6 @@ Route::get('/', WelcomeController::class)->name('welcome');
  */
 require __DIR__.'/auth.php';
 
-
 /*
  * Userzone routes
  */
@@ -25,7 +25,9 @@ Route::middleware('auth')->group(function () {
     // For the user's dashboard (after login)
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-    // Todo: add your Userzone routes here
+    // Account routes
+    Route::get('/accounts/create', [AccountController::class, 'create'])->name('accounts.create');
+    Route::post('/accounts', [AccountController::class, 'store'])->name('accounts.store');
 
     // For the user's profile management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
