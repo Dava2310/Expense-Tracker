@@ -46,10 +46,10 @@
                     </thead>
                     <tbody>
                         @forelse ($accounts as $account)
-                            <tr class="border-t border-saldo-line-soft transition-colors first:border-t-0 hover:bg-saldo-canvas">
+                            <tr class="relative border-t border-saldo-line-soft transition-colors first:border-t-0 hover:bg-saldo-canvas">
                                 <td class="px-6 py-4">
                                     <div class="flex flex-col gap-0.5">
-                                        <span class="font-medium">{{ $account->name }}</span>
+                                        <a href="{{ route('accounts.show', $account) }}" class="font-medium text-saldo-ink no-underline after:absolute after:inset-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-saldo-ink">{{ $account->name }}</a>
                                         <span class="text-[13px] text-saldo-subtle">{{ $account->bank }}</span>
                                     </div>
                                 </td>
@@ -64,7 +64,7 @@
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    <a href="{{ route('accounts.edit', $account) }}" aria-label="Edit {{ $account->name }}" class="inline-flex h-9 items-center rounded-[9px] px-3 text-[13.5px] font-medium text-saldo-ink no-underline transition-colors hover:bg-saldo-ghost-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">Edit</a>
+                                    <a href="{{ route('accounts.edit', $account) }}" aria-label="Edit {{ $account->name }}" class="relative z-10 inline-flex h-9 items-center rounded-[9px] px-3 text-[13.5px] font-medium text-saldo-ink no-underline transition-colors hover:bg-saldo-ghost-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">Edit</a>
                                 </td>
                             </tr>
                         @empty
