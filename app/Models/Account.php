@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Database\Factories\AccountFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 
 class Account extends Model
 {
     /** @use HasFactory<AccountFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -71,6 +74,39 @@ class Account extends Model
     }
 
     /**
+     * Gets the latest incomes and expenses of this account, newest first.
+     *
+     * @return Collection<int, array{type: string, concept: string, date: CarbonInterface, category: string, amount: float}>
+     */
+    public function recentActivity(int $limit = 20): Collection
+    {
+        $incomes = $this->incomes()->with('category')->latest('date')->latest('id')->limit($limit)->get()
+            ->map(fn (Income $income): array => $this->activityEntry('income', $income));
+
+        $expenses = $this->expenses()->with('category')->latest('date')->latest('id')->limit($limit)->get()
+            ->map(fn (Expense $expense): array => $this->activityEntry('expense', $expense));
+
+        return $incomes->concat($expenses)
+            ->sortByDesc(fn (array $entry): string => $entry['date']->format('Y-m-d').str_pad((string) $entry['id'], 10, '0', STR_PAD_LEFT))
+            ->take($limit)
+            ->values();
+    }
+
+    /**
+     * Sums the incomes or expenses of this account received in the given month.
+     *
+     * @param  'incomes'|'expenses'  $relation
+     */
+    public function monthTotal(string $relation, ?CarbonInterface $month = null): float
+    {
+        $month ??= now();
+
+        return (float) $this->{$relation}()
+            ->whereBetween('date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()])
+            ->sum('amount');
+    }
+
+    /**
      * Gets the information of the user that owns this account.
      */
     public function user(): BelongsTo
@@ -92,5 +128,22 @@ class Account extends Model
     public function incomes(): HasMany
     {
         return $this->hasMany(Income::class);
+    }
+
+    /**
+     * Builds a display-ready activity entry from an income or an expense.
+     *
+     * @return array{id: int, type: string, concept: string, date: CarbonInterface, category: string, amount: float}
+     */
+    private function activityEntry(string $type, Income|Expense $entry): array
+    {
+        return [
+            'id' => $entry->id,
+            'type' => $type,
+            'concept' => $entry->concept,
+            'date' => $entry->date,
+            'category' => $entry->category->name,
+            'amount' => (float) $entry->amount,
+        ];
     }
 }

@@ -62,6 +62,6 @@ class User extends Authenticatable
      */
     public function incomes(): HasManyThrough
     {
-        return $this->hasManyThrough(Income::class, Account::class);
+        return $this->hasManyThrough(Income::class, Account::class)->withTrashedParents();
     }
 }

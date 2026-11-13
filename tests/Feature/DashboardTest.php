@@ -31,6 +31,15 @@ test('dashboard shows only the user\'s accounts with balances and minimums', fun
         ->assertDontSee('Someone else\'s account');
 });
 
+test('each account card links to the account page', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->for($user)->create();
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertSee('href="'.route('accounts.show', $account).'"', false);
+});
+
 test('an account under its minimum is flagged', function () {
     $user = User::factory()->create();
     Account::factory()->for($user)->create([

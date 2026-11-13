@@ -27,4 +27,12 @@ class AccountFactory extends Factory
             'user_id' => User::factory(),
         ];
     }
+
+    /**
+     * Indicate that the account has been deactivated.
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn (): array => ['deleted_at' => now()]);
+    }
 }

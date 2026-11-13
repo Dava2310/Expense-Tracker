@@ -24,6 +24,7 @@ test('accounts table lists only the user\'s accounts with formatted amounts', fu
         ->assertSee('€2,480.15')
         ->assertSee('€500.00')
         ->assertSee('On track')
+        ->assertSee(route('accounts.show', $account), false)
         ->assertSee(route('accounts.edit', $account), false)
         ->assertSee(route('accounts.create'), false)
         ->assertDontSee('Someone else\'s account');
@@ -54,6 +55,7 @@ test('flash messages are shown after creating and updating an account', function
 })->with([
     'created' => ['account-created', 'Account created.'],
     'updated' => ['account-updated', 'Account updated.'],
+    'deactivated' => ['account-deactivated', 'Account deactivated.'],
 ]);
 
 test('a dash is shown when an account has no details', function () {
