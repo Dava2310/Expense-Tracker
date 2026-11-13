@@ -1,39 +1,19 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
+<x-saldo.auth-layout title="Choose a new password" subtitle="Pick a password you haven’t used before, at least 8 characters.">
+    <form method="POST" action="{{ route('password.store') }}" class="flex flex-col gap-4">
         @csrf
 
-        <!-- Password Reset Token -->
         <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
-        <!-- Email Address -->
-        <div>
-            <x-breeze.input-label for="email" value="Email" />
-            <x-breeze.text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            <x-breeze.input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        <x-saldo.field label="Email" name="email" type="email" :value="$request->email" placeholder="you@example.com" required autofocus autocomplete="username" />
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-breeze.input-label for="password" value="Password" />
-            <x-breeze.text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-breeze.input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+        <x-saldo.field label="New password" name="password" type="password" placeholder="At least 8 characters" required autocomplete="new-password" />
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-breeze.input-label for="password_confirmation" value="Confirm Password" />
+        <x-saldo.field label="Confirm new password" name="password_confirmation" type="password" placeholder="Repeat your password" required autocomplete="new-password" />
 
-            <x-breeze.text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
-
-            <x-breeze.input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-breeze.primary-button>
-                Reset Password
-            </x-breeze.primary-button>
-        </div>
+        <x-saldo.button as="button" size="form" class="mt-2">Reset password</x-saldo.button>
     </form>
-</x-guest-layout>
+
+    <x-slot:footer>
+        <a href="{{ route('login') }}" class="font-semibold text-saldo-ink">Back to log in</a>
+    </x-slot:footer>
+</x-saldo.auth-layout>

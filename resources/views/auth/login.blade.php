@@ -1,47 +1,31 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-breeze.auth-session-status class="mb-4" :status="session('status')" />
+<x-saldo.auth-layout title="Welcome back" subtitle="Log in to see your balances.">
+    <x-saldo.status :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('login') }}" class="flex flex-col gap-4">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-breeze.input-label for="email" value="Email" />
-            <x-breeze.text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-breeze.input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        <x-saldo.field label="Email" name="email" type="email" placeholder="you@example.com" required autofocus autocomplete="username" />
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-breeze.input-label for="password" value="Password" />
-
-            <x-breeze.text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-breeze.input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded-sm border-gray-300 text-indigo-600 shadow-xs focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">Remember me</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
+        <x-saldo.field label="Password" name="password" type="password" placeholder="Your password" required autocomplete="current-password">
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    Forgot your password?
-                </a>
+                <x-slot:aside>
+                    <a href="{{ route('password.request') }}" class="rounded text-[13.5px] font-medium text-saldo-muted underline-offset-2 hover:text-saldo-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">
+                        Forgot password?
+                    </a>
+                </x-slot:aside>
             @endif
+        </x-saldo.field>
 
-            <x-breeze.primary-button class="ms-3">
-                Log in
-            </x-breeze.primary-button>
-        </div>
+        <label for="remember_me" class="inline-flex items-center gap-2.5 text-sm text-saldo-muted">
+            <input id="remember_me" type="checkbox" name="remember" class="size-4 rounded border-saldo-line-strong text-saldo-ink focus:ring-saldo-ink">
+            <span>Remember me</span>
+        </label>
+
+        <x-saldo.button as="button" size="form" class="mt-2">Log in</x-saldo.button>
     </form>
-</x-guest-layout>
+
+    <x-slot:footer>
+        New to Saldo?
+        <a href="{{ route('register') }}" class="font-semibold text-saldo-ink">Create an account</a>
+    </x-slot:footer>
+</x-saldo.auth-layout>

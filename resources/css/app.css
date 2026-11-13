@@ -31,6 +31,9 @@
     --color-saldo-warn-bg: #fdf1e3;
     --color-saldo-warn-fg: #9a4a00;
     --color-saldo-dark-text: #b9bcc2;
+    --color-saldo-placeholder: #70747c;
+    --color-saldo-danger: #b42318;
+    --color-saldo-danger-bg: #fffbfa;
 }
 
 /*
