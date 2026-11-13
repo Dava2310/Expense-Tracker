@@ -41,7 +41,7 @@ class IncomeController extends Controller
         $user = $request->user();
 
         // Unknown ids (or accounts that belong to somebody else) are ignored
-        $accountId = $user->accounts()->whereKey($request->integer('account'))->value('id');
+        $accountId = $user->accounts()->withTrashed()->whereKey($request->integer('account'))->value('id');
         $categoryId = Category::whereKey($request->integer('category'))->value('id');
 
         $requestedPeriod = $request->query('period');
@@ -87,7 +87,7 @@ class IncomeController extends Controller
             ])
             ->values();
 
-        $accounts = $user->accounts()->orderBy('name')->get(['id', 'name']);
+        $accounts = $user->accounts()->withTrashed()->orderBy('name')->get(['id', 'name', 'deleted_at']);
         $categories = Category::orderBy('name')->get(['id', 'name']);
 
         $scope = collect([

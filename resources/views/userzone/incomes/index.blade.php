@@ -25,7 +25,7 @@
                 <x-saldo.select label="Account" name="account" id="filter-account" class="min-w-[220px]" x-on:change="$el.form.requestSubmit()">
                     <option value="">All accounts</option>
                     @foreach ($accounts as $account)
-                        <option value="{{ $account->id }}" @selected($accountId === $account->id)>{{ $account->name }}</option>
+                        <option value="{{ $account->id }}" @selected($accountId === $account->id)>{{ $account->name }}{{ $account->trashed() ? ' (inactive)' : '' }}</option>
                     @endforeach
                 </x-saldo.select>
 
