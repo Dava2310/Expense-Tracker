@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/incomes', [IncomeController::class, 'index'])->name('incomes.index');
     Route::get('/incomes/create', [IncomeController::class, 'create'])->name('incomes.create');
     Route::post('/incomes', [IncomeController::class, 'store'])->name('incomes.store');
+    Route::get('/incomes/{income}/edit', [IncomeController::class, 'edit'])->name('incomes.edit');
+    Route::patch('/incomes/{income}', [IncomeController::class, 'update'])->name('incomes.update');
 
     // For the user's profile management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
