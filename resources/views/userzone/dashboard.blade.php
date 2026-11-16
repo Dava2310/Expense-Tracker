@@ -59,6 +59,33 @@
                     </li>
                 @endforeach
             </ul>
+
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(min(460px,100%),1fr))] gap-4">
+                <x-saldo.flow-chart :months="$monthlyFlow" :max="$chartMax" />
+                <x-saldo.category-spending :categories="$categorySpending" :total="$categoryTotal" :month="$currentMonth" />
+            </div>
+        @endif
+
+        @if ($inactiveAccounts->isNotEmpty())
+            <section aria-labelledby="inactive-heading" class="flex flex-col gap-3 pt-3">
+                <h2 id="inactive-heading" class="flex items-center gap-2 text-sm font-semibold text-saldo-muted">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"></rect><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"></path><path d="M10 13h4"></path></svg>
+                    <span>Inactive</span>
+                    <span class="inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-saldo-line px-1.5 text-xs text-saldo-ink">{{ $inactiveAccounts->count() }}</span>
+                </h2>
+                <ul class="grid grid-cols-[repeat(auto-fill,minmax(min(240px,100%),1fr))] gap-4">
+                    @foreach ($inactiveAccounts as $account)
+                        <li class="flex flex-col gap-3.5 rounded-2xl border border-dashed border-[#d6d5cf] p-5 text-saldo-muted">
+                            <div class="flex flex-col gap-0.5">
+                                <span class="truncate text-[15px] font-semibold">{{ $account->name }}</span>
+                                <span class="truncate text-[13px] text-saldo-subtle">{{ $account->bank }}</span>
+                            </div>
+                            <span class="font-display text-[22px] font-medium tabular-nums">{{ Number::currency((float) $account->balance, 'EUR', 'en') }}</span>
+                            <span class="text-[13px] text-saldo-subtle">Deactivated {{ $account->deleted_at->format('M j, Y') }}</span>
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
         @endif
     </div>
 </x-app-layout>
