@@ -36,7 +36,7 @@
                     Incomes
                 </x-saldo.nav-item>
 
-                <x-saldo.nav-item>
+                <x-saldo.nav-item :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                     <x-slot:icon>
                         <svg {!! $iconAttributes !!}><path d="M3 4.5v6.1c0 .5.2 1 .6 1.4l8.4 8.4a2 2 0 0 0 2.8 0l5.7-5.7a2 2 0 0 0 0-2.8L12 3.6c-.4-.4-.9-.6-1.4-.6H4.5C3.7 3 3 3.7 3 4.5Z"></path><circle cx="7.5" cy="7.5" r="1.25"></circle></svg>
                     </x-slot:icon>
