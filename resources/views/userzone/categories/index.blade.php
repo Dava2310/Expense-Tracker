@@ -16,6 +16,9 @@
         @if (session('status') === 'category-created')
             <x-saldo.status status="Category created." />
         @endif
+        @if (session('status') === 'category-updated')
+            <x-saldo.status status="Category updated." />
+        @endif
 
         @if ($categories->isEmpty())
             <section class="flex flex-col items-center gap-2.5 rounded-2xl border border-dashed border-saldo-line-strong px-6 py-14 text-center">
@@ -51,9 +54,9 @@
                                         {{ $entries > 0 ? $entries.' '.str('entry')->plural($entries) : 'Not used yet' }}
                                     </span>
 
-                                    {{-- Both controls are placeholders until the update and delete features exist --}}
+                                    {{-- The delete button is a placeholder until the delete feature exists --}}
                                     <span class="flex justify-end gap-1">
-                                        <a href="#" aria-label="Edit {{ $category->name }}" class="flex size-10 items-center justify-center rounded-[10px] text-saldo-muted no-underline transition-colors hover:bg-saldo-ghost-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">
+                                        <a href="{{ route('categories.edit', $category) }}" aria-label="Edit {{ $category->name }}" class="flex size-10 items-center justify-center rounded-[10px] text-saldo-muted no-underline transition-colors hover:bg-saldo-ghost-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">
                                             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.83 2.83 0 0 0-4-4L4 16v4Z"></path><path d="m13.5 6.5 4 4"></path></svg>
                                         </a>
 

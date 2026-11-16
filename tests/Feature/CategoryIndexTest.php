@@ -30,6 +30,17 @@ test('the page links to the new category form and confirms a created category', 
         ->assertSee('Category created.');
 });
 
+test('each category links to its edit form and an updated category is confirmed', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->for($user)->create();
+
+    $this->actingAs($user)
+        ->withSession(['status' => 'category-updated'])
+        ->get(route('categories.index'))
+        ->assertSee(route('categories.edit', $category), false)
+        ->assertSee('Category updated.');
+});
+
 test('a category without details shows a fallback', function () {
     $user = User::factory()->create();
     Category::factory()->for($user)->create(['description' => null]);
