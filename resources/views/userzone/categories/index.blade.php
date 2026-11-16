@@ -6,13 +6,16 @@
             </x-slot:subtitle>
 
             <x-slot:actions>
-                {{-- The link points to the create form once that feature exists --}}
-                <x-saldo.button href="#" class="gap-2 pl-3.5 pr-4.5">
+                <x-saldo.button :href="route('categories.create')" class="gap-2 pl-3.5 pr-4.5">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
                     <span>New category</span>
                 </x-saldo.button>
             </x-slot:actions>
         </x-saldo.page-header>
+
+        @if (session('status') === 'category-created')
+            <x-saldo.status status="Category created." />
+        @endif
 
         @if ($categories->isEmpty())
             <section class="flex flex-col items-center gap-2.5 rounded-2xl border border-dashed border-saldo-line-strong px-6 py-14 text-center">
