@@ -27,6 +27,14 @@ class Category extends Model
     }
 
     /**
+     * Whether any income or expense uses this category, which stops it from being deleted.
+     */
+    public function isInUse(): bool
+    {
+        return $this->incomes()->exists() || $this->expenses()->exists();
+    }
+
+    /**
      * Returns all expenses associated with this category.
      */
     public function expenses(): HasMany
