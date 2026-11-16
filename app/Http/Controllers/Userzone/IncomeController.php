@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreIncomeRequest;
 use App\Http\Requests\UpdateIncomeRequest;
 use App\Models\Account;
-use App\Models\Category;
 use App\Models\Income;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
@@ -47,7 +46,7 @@ class IncomeController extends Controller
 
         // Unknown ids (or accounts that belong to somebody else) are ignored
         $accountId = $user->accounts()->withTrashed()->whereKey($request->integer('account'))->value('id');
-        $categoryId = Category::whereKey($request->integer('category'))->value('id');
+        $categoryId = $user->categories()->whereKey($request->integer('category'))->value('id');
 
         $requestedPeriod = $request->query('period');
         $period = is_string($requestedPeriod) && isset(self::PERIODS[$requestedPeriod])
@@ -93,7 +92,7 @@ class IncomeController extends Controller
             ->values();
 
         $accounts = $user->accounts()->withTrashed()->orderBy('name')->get(['id', 'name', 'deleted_at']);
-        $categories = Category::orderBy('name')->get(['id', 'name']);
+        $categories = $user->categories()->orderBy('name')->get(['id', 'name']);
 
         $scope = collect([
             $accountId ? 'into '.$accounts->firstWhere('id', $accountId)->name : null,
@@ -128,7 +127,7 @@ class IncomeController extends Controller
     {
         return view('userzone.incomes.create', [
             'accounts' => $request->user()->accounts()->orderBy('name')->get(['id', 'name', 'balance']),
-            'categories' => Category::orderBy('name')->get(['id', 'name']),
+            'categories' => $request->user()->categories()->orderBy('name')->get(['id', 'name']),
         ]);
     }
 

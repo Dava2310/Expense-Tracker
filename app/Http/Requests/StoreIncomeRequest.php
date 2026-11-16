@@ -32,7 +32,11 @@ class StoreIncomeRequest extends FormRequest
                 'required',
                 Rule::exists('accounts', 'id')->where('user_id', $this->user()->id)->whereNull('deleted_at'),
             ],
-            'category_id' => ['required', 'exists:categories,id'],
+            // Only the user's own categories can be used
+            'category_id' => [
+                'required',
+                Rule::exists('categories', 'id')->where('user_id', $this->user()->id),
+            ],
         ];
     }
 }

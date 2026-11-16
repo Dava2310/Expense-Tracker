@@ -58,6 +58,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the categories created by the user.
+     */
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    /**
      * Get the incomes received into the user's accounts.
      */
     public function incomes(): HasManyThrough

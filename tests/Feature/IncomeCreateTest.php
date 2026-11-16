@@ -28,12 +28,13 @@ test('guests are redirected to the login page', function () {
     $this->post(route('incomes.store'), [])->assertRedirect(route('login'));
 });
 
-test('the new income form lists only the active accounts of the user and all categories', function () {
+test('the new income form lists only the active accounts and the categories of the user', function () {
     $user = User::factory()->create();
     Account::factory()->for($user)->create(['name' => 'Everyday']);
     Account::factory()->for($user)->inactive()->create(['name' => 'Closed account']);
     Account::factory()->create(['name' => 'Somebody elses']);
-    Category::factory()->create(['name' => 'Freelance']);
+    Category::factory()->for($user)->create(['name' => 'Freelance']);
+    Category::factory()->create(['name' => 'Foreign category']);
 
     $this->actingAs($user)
         ->get(route('incomes.create'))
@@ -45,13 +46,14 @@ test('the new income form lists only the active accounts of the user and all cat
         ->assertSee('Everyday')
         ->assertSee('Freelance')
         ->assertDontSee('Closed account')
-        ->assertDontSee('Somebody elses');
+        ->assertDontSee('Somebody elses')
+        ->assertDontSee('Foreign category');
 });
 
 test('a user creates an income and its amount is added to the account balance', function () {
     $user = User::factory()->create();
     $account = Account::factory()->for($user)->create(['balance' => 100]);
-    $category = Category::factory()->create();
+    $category = Category::factory()->for($user)->create();
 
     $this->actingAs($user)
         ->post(route('incomes.store'), validIncomeInput($account, $category))
@@ -70,7 +72,7 @@ test('a user creates an income and its amount is added to the account balance', 
 test('invalid input is rejected, nothing is saved and the errors are shown', function (array $overrides, string $invalid) {
     $user = User::factory()->create();
     $account = Account::factory()->for($user)->create(['balance' => 100]);
-    $category = Category::factory()->create();
+    $category = Category::factory()->for($user)->create();
 
     $this->actingAs($user)
         ->from(route('incomes.create'))
@@ -101,7 +103,7 @@ test('invalid input is rejected, nothing is saved and the errors are shown', fun
 test('an account of another user cannot receive an income', function () {
     $user = User::factory()->create();
     $foreignAccount = Account::factory()->create(['balance' => 100]);
-    $category = Category::factory()->create();
+    $category = Category::factory()->for($user)->create();
 
     $this->actingAs($user)
         ->post(route('incomes.store'), validIncomeInput($foreignAccount, $category))
@@ -111,10 +113,23 @@ test('an account of another user cannot receive an income', function () {
         ->and($foreignAccount->refresh()->balance)->toEqual(100);
 });
 
+test('a category of another user cannot be used', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->for($user)->create(['balance' => 100]);
+    $foreignCategory = Category::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('incomes.store'), validIncomeInput($account, $foreignCategory))
+        ->assertSessionHasErrors('category_id');
+
+    expect(Income::count())->toBe(0)
+        ->and($account->refresh()->balance)->toEqual(100);
+});
+
 test('a deactivated account cannot receive an income', function () {
     $user = User::factory()->create();
     $inactiveAccount = Account::factory()->for($user)->inactive()->create(['balance' => 100]);
-    $category = Category::factory()->create();
+    $category = Category::factory()->for($user)->create();
 
     $this->actingAs($user)
         ->post(route('incomes.store'), validIncomeInput($inactiveAccount, $category))

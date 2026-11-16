@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         ]));
 
         $accounts = Account::factory(10)->recycle($users)->create();
-        $categories = Category::factory(10)->create();
+        $categories = Category::factory(10)->recycle($users)->create();
 
         Expense::factory(10)->recycle($accounts)->recycle($categories)->create();
         Income::factory(10)->recycle($accounts)->recycle($categories)->create();
