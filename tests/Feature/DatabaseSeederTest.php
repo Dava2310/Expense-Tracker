@@ -16,6 +16,17 @@ test('seeder creates the expected records without extra parents', function () {
         ->and(Income::count())->toBe(10);
 });
 
+test('seeded incomes and expenses use a category of the user that owns their account', function () {
+    $this->seed();
+
+    $entries = Income::with(['account', 'category'])->get()
+        ->concat(Expense::with(['account', 'category'])->get());
+
+    expect($entries)->toHaveCount(20);
+
+    $entries->each(fn ($entry) => expect($entry->category->user_id)->toBe($entry->account->user_id));
+});
+
 test('seeder creates the test user', function () {
     $this->seed();
 
