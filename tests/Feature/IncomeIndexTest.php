@@ -78,8 +78,8 @@ test('incomes can be filtered by account, by category and by both', function (ar
     $user = User::factory()->create();
     $everyday = Account::factory()->for($user)->create(['name' => 'Everyday']);
     $savings = Account::factory()->for($user)->create(['name' => 'Savings']);
-    $salary = Category::factory()->create(['name' => 'Salary']);
-    $gifts = Category::factory()->create(['name' => 'Gifts']);
+    $salary = Category::factory()->for($user)->create(['name' => 'Salary']);
+    $gifts = Category::factory()->for($user)->create(['name' => 'Gifts']);
     incomeFor($everyday, $salary, ['concept' => 'Everyday salary', 'date' => '2026-11-02']);
     incomeFor($everyday, $gifts, ['concept' => 'Everyday gift', 'date' => '2026-11-03']);
     incomeFor($savings, $salary, ['concept' => 'Savings salary', 'date' => '2026-11-04']);
@@ -104,6 +104,21 @@ test('incomes can be filtered by account, by category and by both', function (ar
     'by category' => [['category' => 'salary'], ['Everyday salary', 'Savings salary'], ['Everyday gift'], 'from Salary'],
     'by both' => [['account' => 'everyday', 'category' => 'salary'], ['Everyday salary'], ['Everyday gift', 'Savings salary'], 'into Everyday from Salary'],
 ]);
+
+test('a category that belongs to somebody else is ignored as a filter', function () {
+    $user = User::factory()->create();
+    $account = Account::factory()->for($user)->create();
+    $category = Category::factory()->for($user)->create(['name' => 'Salary']);
+    incomeFor($account, $category, ['concept' => 'My income', 'date' => '2026-11-02']);
+    $foreignCategory = Category::factory()->create(['name' => 'Foreign category']);
+
+    $this->actingAs($user)
+        ->get(route('incomes.index', ['category' => $foreignCategory->id]))
+        ->assertOk()
+        ->assertSee('My income')
+        ->assertDontSee('Foreign category')
+        ->assertDontSee('Clear filters');
+});
 
 test('an account that belongs to somebody else is ignored as a filter', function () {
     $user = User::factory()->create();

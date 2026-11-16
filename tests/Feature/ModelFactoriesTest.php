@@ -21,8 +21,9 @@ test('factory creates its parent records on an empty database', function (string
 ]);
 
 test('factory uses the provided parent instead of creating another', function () {
-    $account = Account::factory()->create();
-    $category = Category::factory()->create();
+    $user = User::factory()->create();
+    $account = Account::factory()->for($user)->create();
+    $category = Category::factory()->for($user)->create();
 
     $expense = Expense::factory()->recycle($account)->recycle($category)->create();
 
