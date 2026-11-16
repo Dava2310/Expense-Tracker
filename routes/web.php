@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Userzone\AccountController;
+use App\Http\Controllers\Userzone\CategoryController;
 use App\Http\Controllers\Userzone\DashboardController;
 use App\Http\Controllers\Userzone\IncomeController;
 use App\Http\Controllers\Userzone\ProfileController;
@@ -41,6 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/incomes', [IncomeController::class, 'store'])->name('incomes.store');
     Route::get('/incomes/{income}/edit', [IncomeController::class, 'edit'])->name('incomes.edit');
     Route::patch('/incomes/{income}', [IncomeController::class, 'update'])->name('incomes.update');
+
+    // Category routes
+    Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 
     // For the user's profile management
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
