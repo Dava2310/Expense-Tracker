@@ -3,6 +3,7 @@
 use App\Http\Controllers\Userzone\AccountController;
 use App\Http\Controllers\Userzone\CategoryController;
 use App\Http\Controllers\Userzone\DashboardController;
+use App\Http\Controllers\Userzone\ExpenseController;
 use App\Http\Controllers\Userzone\IncomeController;
 use App\Http\Controllers\Userzone\ProfileController;
 use App\Http\Controllers\WelcomeController;
@@ -42,6 +43,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/incomes', [IncomeController::class, 'store'])->name('incomes.store');
     Route::get('/incomes/{income}/edit', [IncomeController::class, 'edit'])->name('incomes.edit');
     Route::patch('/incomes/{income}', [IncomeController::class, 'update'])->name('incomes.update');
+
+    // Expense routes
+    Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+    Route::get('/expenses/create', [ExpenseController::class, 'create'])->name('expenses.create');
+    Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+    Route::get('/expenses/{expense}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
+    Route::patch('/expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
 
     // Category routes
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');

@@ -71,7 +71,7 @@ test('dashboard invites users without accounts to create one', function () {
         ->assertSee(route('accounts.create'), false);
 });
 
-test('navigation links to working pages, disables the rest and offers profile and log out', function () {
+test('navigation links to every module and offers profile and log out', function () {
     $user = User::factory()->create(['name' => 'Alex Rivera', 'email' => 'alex@example.com']);
 
     $this->actingAs($user)
@@ -79,11 +79,13 @@ test('navigation links to working pages, disables the rest and offers profile an
         ->assertOk()
         ->assertSee('aria-current="page"', false)
         ->assertSee(route('accounts.index'), false)
+        ->assertSee(route('expenses.index'), false)
         ->assertSee(route('incomes.index'), false)
+        ->assertSee(route('categories.index'), false)
         ->assertSee(route('profile.edit'), false)
         ->assertSee('action="'.route('logout').'"', false)
         ->assertSee('Alex Rivera')
         ->assertSee('alex@example.com')
         ->assertSeeInOrder(['Expenses', 'Incomes', 'Categories'])
-        ->assertSee('aria-disabled="true"', false);
+        ->assertDontSee('aria-disabled="true"', false);
 });

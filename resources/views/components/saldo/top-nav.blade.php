@@ -22,7 +22,7 @@
                     Accounts
                 </x-saldo.nav-item>
 
-                <x-saldo.nav-item>
+                <x-saldo.nav-item :href="route('expenses.index')" :active="request()->routeIs('expenses.*')">
                     <x-slot:icon>
                         <svg {!! $iconAttributes !!}><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg>
                     </x-slot:icon>
