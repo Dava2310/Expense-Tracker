@@ -3,12 +3,14 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
 class User extends Authenticatable
 {
@@ -79,5 +81,57 @@ class User extends Authenticatable
     public function expenses(): HasManyThrough
     {
         return $this->hasManyThrough(Expense::class, Account::class)->withTrashedParents();
+    }
+
+    /**
+     * Totals the incomes and expenses of each of the last months, oldest first.
+     * Months without movements are included with zero totals.
+     *
+     * @return Collection<int, array{label: string, name: string, income: float, expenses: float}>
+     */
+    public function monthlyFlow(int $months = 6): Collection
+    {
+        $firstMonth = now()->startOfMonth()->subMonths($months - 1);
+        $range = [$firstMonth, now()->endOfMonth()];
+
+        $incomes = $this->incomes()->whereBetween('incomes.date', $range)->get(['incomes.date', 'incomes.amount'])
+            ->groupBy(fn (Income $income): string => $income->date->format('Y-m'));
+
+        $expenses = $this->expenses()->whereBetween('expenses.date', $range)->get(['expenses.date', 'expenses.amount'])
+            ->groupBy(fn (Expense $expense): string => $expense->date->format('Y-m'));
+
+        return collect(range(0, $months - 1))->map(function (int $offset) use ($firstMonth, $incomes, $expenses): array {
+            $month = $firstMonth->copy()->addMonths($offset);
+            $key = $month->format('Y-m');
+
+            return [
+                'label' => $month->format('M'),
+                'name' => $month->format('F Y'),
+                'income' => (float) $incomes->get($key, collect())->sum('amount'),
+                'expenses' => (float) $expenses->get($key, collect())->sum('amount'),
+            ];
+        });
+    }
+
+    /**
+     * Totals the expenses of the given month (the current one by default) by category, biggest first.
+     *
+     * @return Collection<int, array{name: string, amount: float}>
+     */
+    public function monthSpendingByCategory(?CarbonInterface $month = null): Collection
+    {
+        $month ??= now();
+
+        return $this->expenses()
+            ->with('category')
+            ->whereBetween('expenses.date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()])
+            ->get()
+            ->groupBy('category_id')
+            ->map(fn (Collection $expenses): array => [
+                'name' => $expenses->first()->category->name,
+                'amount' => (float) $expenses->sum('amount'),
+            ])
+            ->sortByDesc('amount')
+            ->values();
     }
 }
