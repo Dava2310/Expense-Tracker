@@ -26,9 +26,13 @@ class DatabaseSeeder extends Seeder
         ]));
 
         $accounts = Account::factory(10)->recycle($users)->create();
-        $categories = Category::factory(10)->recycle($users)->create();
 
-        Expense::factory(10)->recycle($accounts)->recycle($categories)->create();
-        Income::factory(10)->recycle($accounts)->recycle($categories)->create();
+        // Every entry uses a category of the same user that owns its account
+        $accounts->each(function (Account $account): void {
+            $category = Category::factory()->for($account->user)->create();
+
+            Expense::factory()->for($account)->for($category)->create();
+            Income::factory()->for($account)->for($category)->create();
+        });
     }
 }
