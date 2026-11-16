@@ -78,6 +78,28 @@ class CategoryController extends Controller
         return redirect()->route('categories.index')->with('status', 'category-updated');
     }
 
+    /***
+     * Deletes one of the user's categories, unless an income or an expense uses it
+     *
+     * @param Request $request
+     * @param Category $category
+     * @return RedirectResponse
+     */
+    public function destroy(Request $request, Category $category): RedirectResponse
+    {
+        $this->ensureOwnedBy($request, $category);
+
+        // The page already hides the option, but the category may have been used since it was loaded
+        if ($category->isInUse()) {
+            return redirect()->route('categories.index')
+                ->withErrors(['category' => $category->name.' is in use, so it can’t be deleted.']);
+        }
+
+        $category->delete();
+
+        return redirect()->route('categories.index')->with('status', 'category-deleted');
+    }
+
     /**
      * Categories that belong to somebody else are reported as not found.
      */
