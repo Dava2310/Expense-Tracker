@@ -1,7 +1,11 @@
 <?php
 
 use App\Models\Account;
+use App\Models\Category;
+use App\Models\Expense;
+use App\Models\Income;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 
 test('guests are redirected to the login page', function () {
     $this->get(route('dashboard'))->assertRedirect(route('login'));
@@ -88,4 +92,112 @@ test('navigation links to every module and offers profile and log out', function
         ->assertSee('alex@example.com')
         ->assertSeeInOrder(['Expenses', 'Incomes', 'Categories'])
         ->assertDontSee('aria-disabled="true"', false);
+});
+
+describe('monthly overview', function () {
+    beforeEach(function () {
+        $this->travelTo(Carbon::parse('2026-11-13 12:00:00'));
+        $this->user = User::factory()->create();
+        $this->account = Account::factory()->for($this->user)->create();
+        $this->category = Category::factory()->for($this->user)->create(['name' => 'Groceries']);
+    });
+
+    test('the chart totals incomes and expenses of each of the last six months', function () {
+        Income::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 3000, 'date' => '2026-11-01']);
+        Income::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 650, 'date' => '2026-11-30']);
+        Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 1478.87, 'date' => '2026-11-10']);
+        Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 2310.45, 'date' => '2026-06-15']);
+        Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 999.99, 'date' => '2026-05-31']);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('Income vs. expenses')
+            ->assertSee('November 2026: income €3,650.00, expenses €1,478.87')
+            ->assertSee('June 2026: income €0.00, expenses €2,310.45')
+            ->assertDontSee('May 2026')
+            ->assertDontSee('999.99');
+    });
+
+    test('the chart ignores the incomes and expenses of other users', function () {
+        $stranger = Account::factory()->create();
+        Expense::factory()->create(['account_id' => $stranger->id, 'category_id' => Category::factory()->for($stranger->user)->create()->id, 'amount' => 777.77, 'date' => '2026-11-05']);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('No incomes or expenses in this period yet.')
+            ->assertDontSee('777.77');
+    });
+
+    test('movements of a deactivated account still count', function () {
+        Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 120, 'date' => '2026-11-05']);
+        Account::factory()->for($this->user)->create();
+        $this->account->delete();
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertSee('November 2026: income €0.00, expenses €120.00');
+    });
+
+    test('spending by category lists this month\'s expenses, biggest first', function () {
+        $rent = Category::factory()->for($this->user)->create(['name' => 'Rent']);
+        Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 84.30, 'date' => '2026-11-02']);
+        Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 15.70, 'date' => '2026-11-09']);
+        Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => $rent->id, 'amount' => 1250, 'date' => '2026-11-01']);
+        Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => Category::factory()->for($this->user)->create(['name' => 'Travel'])->id, 'amount' => 500, 'date' => '2026-10-31']);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertSeeInOrder(['Spending by category', 'November so far · €1,350.00 total', 'Rent', '€1,250.00', 'Groceries', '€100.00'])
+            ->assertDontSee('Travel')
+            ->assertSee('href="'.route('expenses.index').'"', false);
+    });
+
+    test('spending by category shows only the top seven categories but totals them all', function () {
+        foreach (range(1, 8) as $number) {
+            Expense::factory()->create([
+                'account_id' => $this->account->id,
+                'category_id' => Category::factory()->for($this->user)->create(['name' => "Category {$number}"])->id,
+                'amount' => $number * 10,
+                'date' => '2026-11-03',
+            ]);
+        }
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertSee('Category 8')
+            ->assertSee('Category 2')
+            ->assertDontSee('Category 1<', false)
+            ->assertSee('€360.00 total');
+    });
+
+    test('spending by category invites to log expenses when there are none this month', function () {
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertSee('No expenses this month yet.');
+    });
+});
+
+describe('inactive accounts', function () {
+    test('deactivated accounts are listed apart and left out of the total balance', function () {
+        $user = User::factory()->create();
+        Account::factory()->for($user)->create(['name' => 'Everyday', 'balance' => 100]);
+        $old = Account::factory()->for($user)->create(['name' => 'Joint account', 'bank' => 'Pine Federal', 'balance' => 0]);
+        $old->delete();
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertSeeInOrder(['Inactive', 'Joint account', 'Pine Federal', 'Deactivated '.$old->deleted_at->format('M j, Y')])
+            ->assertSee('across 1 account');
+    });
+
+    test('the inactive section is hidden when no account was deactivated', function () {
+        $user = User::factory()->create();
+        Account::factory()->for($user)->create();
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertDontSee('Inactive');
+    });
 });
