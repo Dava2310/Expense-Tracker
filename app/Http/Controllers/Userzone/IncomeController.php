@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Userzone;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreIncomeRequest;
+use App\Models\Account;
 use App\Models\Category;
 use App\Models\Income;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Throwable;
 
@@ -111,6 +115,40 @@ class IncomeController extends Controller
             'activeFilters' => collect([$accountId, $categoryId, $period !== self::DEFAULT_PERIOD])->filter()->count(),
             'outsideCount' => $filteredIncomes()->count() - $incomes->count(),
         ]);
+    }
+
+    /***
+     * Renders the form to register a new income
+     *
+     * @param Request $request
+     * @return View
+     */
+    public function create(Request $request): View
+    {
+        return view('userzone.incomes.create', [
+            'accounts' => $request->user()->accounts()->orderBy('name')->get(['id', 'name', 'balance']),
+            'categories' => Category::orderBy('name')->get(['id', 'name']),
+        ]);
+    }
+
+    /***
+     * Handles the creation of the new Income and adds its amount to the account balance
+     *
+     * @param StoreIncomeRequest $request
+     * @return RedirectResponse
+     */
+    public function store(StoreIncomeRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+
+        // The income and the balance update succeed or fail together
+        DB::transaction(function () use ($data): void {
+            Income::create($data);
+
+            Account::whereKey($data['account_id'])->increment('balance', $data['amount']);
+        });
+
+        return redirect()->route('incomes.index')->with('status', 'income-created');
     }
 
     /**
