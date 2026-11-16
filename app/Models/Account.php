@@ -66,6 +66,14 @@ class Account extends Model
     }
 
     /**
+     * Determines whether the balance is enough to pay the given amount.
+     */
+    public function hasEnoughBalanceFor(string|float $amount): bool
+    {
+        return round((float) $this->balance - (float) $amount, 2) >= 0;
+    }
+
+    /**
      * Determines whether the balance has dropped under the account's minimum.
      */
     public function isBelowMinimum(): bool

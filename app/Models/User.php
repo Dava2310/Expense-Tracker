@@ -72,4 +72,12 @@ class User extends Authenticatable
     {
         return $this->hasManyThrough(Income::class, Account::class)->withTrashedParents();
     }
+
+    /**
+     * Get the expenses paid from the user's accounts.
+     */
+    public function expenses(): HasManyThrough
+    {
+        return $this->hasManyThrough(Expense::class, Account::class)->withTrashedParents();
+    }
 }
