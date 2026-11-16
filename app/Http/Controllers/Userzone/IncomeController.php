@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Userzone;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreIncomeRequest;
+use App\Http\Requests\UpdateIncomeRequest;
 use App\Models\Account;
 use App\Models\Category;
 use App\Models\Income;
@@ -149,6 +150,44 @@ class IncomeController extends Controller
         });
 
         return redirect()->route('incomes.index')->with('status', 'income-created');
+    }
+
+    /***
+     * Shows one of the user's incomes and the form to edit its concept
+     *
+     * @param Request $request
+     * @param Income $income
+     * @return View
+     */
+    public function edit(Request $request, Income $income): View
+    {
+        $this->ensureOwnedBy($request, $income);
+
+        return view('userzone.incomes.edit', [
+            'income' => $income->load(['account', 'category']),
+        ]);
+    }
+
+    /***
+     * Handles the update of an income (only its concept can be changed)
+     *
+     * @param UpdateIncomeRequest $request
+     * @param Income $income
+     * @return RedirectResponse
+     */
+    public function update(UpdateIncomeRequest $request, Income $income): RedirectResponse
+    {
+        $income->update($request->validated());
+
+        return redirect()->route('incomes.index')->with('status', 'income-updated');
+    }
+
+    /**
+     * Incomes that belong to somebody else's account are reported as not found.
+     */
+    private function ensureOwnedBy(Request $request, Income $income): void
+    {
+        abort_unless($income->account->user_id === $request->user()->id, 404);
     }
 
     /**

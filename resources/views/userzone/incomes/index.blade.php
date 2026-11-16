@@ -19,6 +19,9 @@
         @if (session('status') === 'income-created')
             <x-saldo.status status="Income created." />
         @endif
+        @if (session('status') === 'income-updated')
+            <x-saldo.status status="Income updated." />
+        @endif
 
         <form
             method="GET"
@@ -80,7 +83,7 @@
                         <li class="grid min-h-16 grid-cols-[88px_minmax(0,1fr)_auto] items-center gap-4 border-t border-saldo-line-soft px-5 py-2.5 first:border-t-0">
                             <span class="text-[13.5px] text-saldo-subtle">{{ $income->date->format('M j') }}</span>
                             <span class="flex min-w-0 flex-col gap-0.5">
-                                <span class="truncate text-[15px] font-medium">{{ $income->concept }}</span>
+                                <a href="{{ route('incomes.edit', $income) }}" class="truncate text-[15px] font-medium text-saldo-ink no-underline hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">{{ $income->concept }}</a>
                                 <span class="text-[13px] text-saldo-subtle">{{ $income->category->name }} · {{ $income->account->name }}</span>
                             </span>
                             <span class="text-[15px] font-medium tabular-nums text-saldo-green">+{{ Number::currency((float) $income->amount, 'EUR', 'en') }}</span>
