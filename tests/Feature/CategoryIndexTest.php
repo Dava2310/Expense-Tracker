@@ -22,6 +22,14 @@ test('the page lists only the user\'s categories ordered by name with their deta
         ->assertDontSee('Somebody elses category');
 });
 
+test('the page links to the new category form and confirms a created category', function () {
+    $this->actingAs(User::factory()->create())
+        ->withSession(['status' => 'category-created'])
+        ->get(route('categories.index'))
+        ->assertSee(route('categories.create'), false)
+        ->assertSee('Category created.');
+});
+
 test('a category without details shows a fallback', function () {
     $user = User::factory()->create();
     Category::factory()->for($user)->create(['description' => null]);
