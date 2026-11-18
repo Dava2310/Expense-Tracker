@@ -1,5 +1,3 @@
-@use('Illuminate\Support\Number')
-
 <x-app-layout>
     <div class="mx-auto flex max-w-[1184px] flex-col gap-7 px-8 pb-18 pt-10">
         <x-saldo.page-header title="Accounts">
@@ -7,9 +5,7 @@
                 @if ($accounts->isEmpty())
                     Add your first account to start tracking your balance.
                 @else
-                    Total balance
-                    <strong class="font-semibold tabular-nums text-saldo-ink">{{ Number::currency($accounts->sum(fn ($account): float => (float) $account->balance), 'EUR', 'en') }}</strong>
-                    across {{ $accounts->count() }} {{ str('account')->plural($accounts->count()) }}
+                    {{ $accounts->count() }} {{ str('account')->plural($accounts->count()) }}
                 @endif
             </x-slot:subtitle>
 
@@ -54,8 +50,8 @@
                                     </div>
                                 </td>
                                 <td class="hidden max-w-[260px] truncate px-4 py-4 text-[14px] text-saldo-muted md:table-cell">{{ filled($account->details) ? $account->details : '-' }}</td>
-                                <td class="px-4 py-4 text-right font-medium tabular-nums">{{ Number::currency((float) $account->balance, 'EUR', 'en') }}</td>
-                                <td class="px-4 py-4 text-right tabular-nums text-saldo-muted">{{ Number::currency((float) $account->min_balance, 'EUR', 'en') }}</td>
+                                <td class="px-4 py-4 text-right font-medium tabular-nums">{{ $account->formatMoney($account->balance) }}</td>
+                                <td class="px-4 py-4 text-right tabular-nums text-saldo-muted">{{ $account->formatMoney($account->min_balance) }}</td>
                                 <td class="px-4 py-4">
                                     @if ($account->isBelowMinimum())
                                         <span class="inline-flex items-center rounded-full bg-saldo-warn-bg px-2.5 py-1 text-[12.5px] font-medium whitespace-nowrap text-saldo-warn-fg">Below minimum</span>
