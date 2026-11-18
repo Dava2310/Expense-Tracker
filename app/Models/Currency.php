@@ -10,6 +10,11 @@ class Currency extends Model
     /** @use HasFactory<\Database\Factories\CurrencyFactory> */
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'symbol',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

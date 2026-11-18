@@ -2,34 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCurrencyRequest;
 use App\Models\Currency;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class CurrencyController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $currencies = $request->user()->currencies()->latest()->get();
+
         return view('currencies.index', compact('currencies'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): View
     {
-        //
+        return view('currencies.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCurrencyRequest $request)
     {
-        //
+        $request->user()->currencies()->create($request->validated());
+
+        return redirect()->route('currencies.index')->with('status', 'currency-created');
     }
 
     /**
