@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Account;
 use App\Models\Category;
+use App\Models\Currency;
 use App\Models\Expense;
 use App\Models\Income;
 use App\Models\User;
@@ -25,14 +26,20 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]));
 
-        $accounts = Account::factory(10)->recycle($users)->create();
+        // Creating currencies and accounts for every user
+        foreach ($users as $user) {
+            // Creating one currency for this current user
+            $currency = Currency::factory()->for($user)->create();
 
-        // Every entry uses a category of the same user that owns its account
-        $accounts->each(function (Account $account): void {
-            $category = Category::factory()->for($account->user)->create();
+            // Creating an account with the current user and the currency just created
+            $account = Account::factory()->for($user)->for($currency)->create();
 
-            Expense::factory()->for($account)->for($category)->create();
-            Income::factory()->for($account)->for($category)->create();
-        });
+            // Creating between 1-3 categories per user
+            $categories = Category::factory(random_int(1, 3))->for($user)->create();
+
+            // Creating between 1-5 incomes and expenses for this user
+            Income::factory(random_int(1, 5))->recycle($categories)->for($account)->create();
+            Expense::factory(random_int(1, 5))->recycle($categories)->for($account)->create();
+        }
     }
 }
