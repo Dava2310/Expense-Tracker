@@ -44,6 +44,9 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Creating base categories for the created user
+        $user->createStarterCategories();
+
         event(new Registered($user));
 
         Auth::login($user);
