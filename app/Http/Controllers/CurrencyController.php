@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCurrencyRequest;
+use App\Http\Requests\UpdateCurrencyRequest;
 use App\Models\Account;
 use App\Models\Currency;
 use Illuminate\Http\Request;
@@ -66,17 +67,28 @@ class CurrencyController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Currency $currency)
+    public function edit(Request $request, Currency $currency)
     {
-        //
+        $this->ensureOwnedBy($request, $currency);
+
+        $accountsCount = $currency->accounts()->count();
+
+        return view('currencies.edit', [
+            'currency' => $currency,
+            'accountsCount' => $accountsCount,
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Currency $currency)
+    public function update(UpdateCurrencyRequest $request, Currency $currency)
     {
-        //
+        $this->ensureOwnedBy($request, $currency);
+
+        $currency->update($request->validated());
+
+        return redirect()->route('currencies.index')->with('status', 'currency-updated');
     }
 
     /**

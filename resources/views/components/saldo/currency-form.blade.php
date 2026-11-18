@@ -1,4 +1,4 @@
-@props(['action', 'cta', 'currency' => null])
+@props(['action', 'cta', 'currency' => null, 'accountsCount' => 0])
 
 <form
     method="POST"
@@ -30,6 +30,19 @@
                 class="font-display text-xl font-medium tracking-[-0.01em]"
             ></span>
         </div>
+
+        @if ($currency)
+            <p class="flex items-start gap-2.5 text-[13.5px] leading-normal text-saldo-muted">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="mt-px flex-none"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
+                <span>
+                    @if ($accountsCount > 0)
+                        Used by {{ $accountsCount }} {{ str('account')->plural($accountsCount) }}. Their balances will show the new symbol.
+                    @else
+                        Not used by any accounts yet.
+                    @endif
+                </span>
+            </p>
+        @endif
     </div>
 
     <div class="flex flex-wrap justify-end gap-2 border-t border-saldo-line-soft bg-[#fafaf8] px-6 py-4">
