@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('balance');
             $table->decimal('min_balance');
             $table->foreignId('user_id')->constrained();
+            $table->foreignId('currency_id')->constrained();
             $table->timestamps();
             $table->softDeletes();
         });

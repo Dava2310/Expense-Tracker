@@ -60,6 +60,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the currencies created from the user.
+     * @return HasMany
+     */
+    public function currencies(): HasMany
+    {
+        return $this->hasMany(Currency::class);
+    }
+
+    /**
      * Get the categories created by the user.
      */
     public function categories(): HasMany
