@@ -70,9 +70,9 @@ class Account extends Model
     /**
      * Formats an amount with the symbol of the currency this account is held in.
      */
-    public function formatMoney(string|float $amount): string
+    public function formatMoney(string|float $amount, int $precision = 2): string
     {
-        return $this->currency->symbol.Number::format((float) $amount, 2, locale: 'en');
+        return $this->currency->symbol.Number::format((float) $amount, $precision, locale: 'en');
     }
 
     /**
@@ -122,6 +122,36 @@ class Account extends Model
         return (float) $this->{$relation}()
             ->whereBetween('date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()])
             ->sum('amount');
+    }
+
+    /**
+     * Totals the incomes and expenses of this account in each of the last months, oldest first.
+     * Months without movements are included with zero totals.
+     *
+     * @return Collection<int, array{label: string, name: string, income: float, expenses: float}>
+     */
+    public function monthlyFlow(int $months = 6): Collection
+    {
+        $firstMonth = now()->startOfMonth()->subMonths($months - 1);
+        $range = [$firstMonth, now()->endOfMonth()];
+
+        $incomes = $this->incomes()->whereBetween('date', $range)->get(['date', 'amount'])
+            ->groupBy(fn (Income $income): string => $income->date->format('Y-m'));
+
+        $expenses = $this->expenses()->whereBetween('date', $range)->get(['date', 'amount'])
+            ->groupBy(fn (Expense $expense): string => $expense->date->format('Y-m'));
+
+        return collect(range(0, $months - 1))->map(function (int $offset) use ($firstMonth, $incomes, $expenses): array {
+            $month = $firstMonth->copy()->addMonths($offset);
+            $key = $month->format('Y-m');
+
+            return [
+                'label' => $month->format('M'),
+                'name' => $month->format('F Y'),
+                'income' => (float) $incomes->get($key, collect())->sum('amount'),
+                'expenses' => (float) $expenses->get($key, collect())->sum('amount'),
+            ];
+        });
     }
 
     /**

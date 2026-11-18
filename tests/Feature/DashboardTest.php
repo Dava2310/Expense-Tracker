@@ -129,7 +129,7 @@ describe('monthly overview', function () {
         Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 999.99, 'date' => '2026-05-31']);
 
         $this->actingAs($this->user)
-            ->get(route('dashboard'))
+            ->get(route('dashboard', ['inc_exp' => $this->account->id]))
             ->assertOk()
             ->assertSee('Income vs. expenses')
             ->assertSee('November 2026: income €3,650.00, expenses €1,478.87')
@@ -143,20 +143,60 @@ describe('monthly overview', function () {
         Expense::factory()->create(['account_id' => $stranger->id, 'category_id' => Category::factory()->for($stranger->user)->create()->id, 'amount' => 777.77, 'date' => '2026-11-05']);
 
         $this->actingAs($this->user)
-            ->get(route('dashboard'))
+            ->get(route('dashboard', ['inc_exp' => $this->account->id]))
             ->assertOk()
             ->assertSee('No incomes or expenses in this period yet.')
             ->assertDontSee('777.77');
     });
 
-    test('movements of a deactivated account still count', function () {
-        Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 120, 'date' => '2026-11-05']);
-        Account::factory()->for($this->user)->create();
-        $this->account->delete();
+    test('the chart asks for an account and runs no income, expense or category query until one is chosen', function () {
+        Income::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 3000, 'date' => '2026-11-01']);
+
+        DB::enableQueryLog();
 
         $this->actingAs($this->user)
             ->get(route('dashboard'))
-            ->assertSee('November 2026: income €0.00, expenses €120.00');
+            ->assertSee('Choose an account to see its income and expenses.')
+            ->assertDontSee('3,000');
+
+        $queries = collect(DB::getQueryLog())->pluck('query')
+            ->filter(fn (string $query): bool => str_contains($query, 'incomes') || str_contains($query, 'expenses') || str_contains($query, 'categories'));
+
+        expect($queries)->toBeEmpty();
+    });
+
+    test('the chart only looks at the chosen account and uses its currency', function () {
+        $dollars = Currency::factory()->for($this->user)->create(['symbol' => '$']);
+        $other = Account::factory()->for($this->user)->for($dollars)->create(['name' => 'Travel card']);
+        Income::factory()->create(['account_id' => $other->id, 'category_id' => $this->category->id, 'amount' => 500, 'date' => '2026-11-01']);
+        Income::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 3000, 'date' => '2026-11-01']);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard', ['inc_exp' => $other->id]))
+            ->assertSee('Last 6 months · Travel card')
+            ->assertSee('November 2026: income $500.00, expenses $0.00')
+            ->assertDontSee('3,000');
+    });
+
+    test('a deactivated account, one of somebody else or an invalid id is ignored by the chart filter', function () {
+        $inactive = Account::factory()->for($this->user)->create();
+        $inactive->delete();
+        $stranger = Account::factory()->create();
+
+        foreach ([$inactive->id, $stranger->id, 'abc'] as $id) {
+            $this->actingAs($this->user)
+                ->get(route('dashboard', ['inc_exp' => $id]))
+                ->assertSee('Choose an account to see its income and expenses.');
+        }
+    });
+
+    test('both filters can be used at once and each keeps the other\'s account', function () {
+        $other = Account::factory()->for($this->user)->create(['name' => 'Travel card']);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard', ['inc_exp' => $this->account->id, 'cat' => $other->id]))
+            ->assertSee('name="cat" value="'.$other->id.'"', false)
+            ->assertSee('name="inc_exp" value="'.$this->account->id.'"', false);
     });
 
     test('spending by category lists this month\'s expenses, biggest first', function () {

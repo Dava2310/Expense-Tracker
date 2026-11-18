@@ -57,8 +57,8 @@
             </ul>
 
             <div class="grid grid-cols-[repeat(auto-fit,minmax(min(460px,100%),1fr))] gap-4">
-                <x-saldo.flow-chart :months="$monthlyFlow" :max="$chartMax" />
-                <x-saldo.category-spending :categories="$categorySpending" :total="$categoryTotal" :month="$currentMonth" :account="$categoryAccount" :accounts="$accounts" :preserve="['inc_exp' => $flowAccountId]" />
+                <x-saldo.flow-chart :months="$monthlyFlow" :max="$chartMax" :account="$flowAccount" :accounts="$accounts" :preserve="['cat' => $categoryAccount?->id]" />
+                <x-saldo.category-spending :categories="$categorySpending" :total="$categoryTotal" :month="$currentMonth" :account="$categoryAccount" :accounts="$accounts" :preserve="['inc_exp' => $flowAccount?->id]" />
             </div>
         @endif
 
