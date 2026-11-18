@@ -6,13 +6,18 @@ use App\Http\Requests\StoreCurrencyRequest;
 use App\Http\Requests\UpdateCurrencyRequest;
 use App\Models\Account;
 use App\Models\Currency;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CurrencyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
+    /***
+     * Lists the currencies of the logged-in user with the number of accounts using each one,
+     * counting inactive accounts too
+     *
+     * @param Request $request
+     * @return View
      */
     public function index(Request $request): View
     {
@@ -24,28 +29,38 @@ class CurrencyController extends Controller
         return view('currencies.index', compact('currencies'));
     }
 
-    /**
-     * Show the form for creating a new resource.
+    /***
+     * Renders the form to create a new currency
+     *
+     * @return View
      */
     public function create(): View
     {
         return view('currencies.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
+    /***
+     * Handles the creation of the new currency
+     *
+     * @param StoreCurrencyRequest $request
+     * @return RedirectResponse
      */
-    public function store(StoreCurrencyRequest $request)
+    public function store(StoreCurrencyRequest $request): RedirectResponse
     {
         $request->user()->currencies()->create($request->validated());
 
         return redirect()->route('currencies.index')->with('status', 'currency-created');
     }
 
-    /**
-     * Display the specified resource.
+    /***
+     * Shows one of the user's currencies with the accounts that use it (active and inactive),
+     * their counts and their total balance
+     *
+     * @param Request $request
+     * @param Currency $currency
+     * @return View
      */
-    public function show(Request $request, Currency $currency)
+    public function show(Request $request, Currency $currency): View
     {
         $this->ensureOwnedBy($request, $currency);
 
@@ -67,10 +82,14 @@ class CurrencyController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
+    /***
+     * Renders the form to edit one of the user's currencies
+     *
+     * @param Request $request
+     * @param Currency $currency
+     * @return View
      */
-    public function edit(Request $request, Currency $currency)
+    public function edit(Request $request, Currency $currency): View
     {
         $this->ensureOwnedBy($request, $currency);
 
@@ -82,10 +101,14 @@ class CurrencyController extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
+    /***
+     * Handles the update of a currency
+     *
+     * @param UpdateCurrencyRequest $request
+     * @param Currency $currency
+     * @return RedirectResponse
      */
-    public function update(UpdateCurrencyRequest $request, Currency $currency)
+    public function update(UpdateCurrencyRequest $request, Currency $currency): RedirectResponse
     {
         $this->ensureOwnedBy($request, $currency);
 
@@ -94,16 +117,19 @@ class CurrencyController extends Controller
         return redirect()->route('currencies.index')->with('status', 'currency-updated');
     }
 
-    /**
-     * Remove the specified resource from storage.
+    /***
+     * Deletes a currency. A currency used by any account, active or inactive, can't be deleted
+     *
+     * @param Request $request
+     * @param Currency $currency
+     * @return RedirectResponse
      */
-    public function destroy(Request $request, Currency $currency)
+    public function destroy(Request $request, Currency $currency): RedirectResponse
     {
         $this->ensureOwnedBy($request, $currency);
 
         // If currency has at least one account assigned to it, it can not be deleted
-        if (!$currency->canBeDeleted())
-        {
+        if (! $currency->canBeDeleted()) {
             return redirect()->route('currencies.index');
         }
 
@@ -112,8 +138,12 @@ class CurrencyController extends Controller
         return redirect()->route('currencies.index')->with('status', 'currency-deleted');
     }
 
-    /**
-     * Accounts that belong to somebody else are reported as not found.
+    /***
+     * Reports a currency that belongs to somebody else as not found
+     *
+     * @param Request $request
+     * @param Currency $currency
+     * @return void
      */
     private function ensureOwnedBy(Request $request, Currency $currency): void
     {
