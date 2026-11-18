@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Number;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
@@ -60,7 +59,7 @@ class StoreExpenseRequest extends FormRequest
                 if (! $account->hasEnoughBalanceFor($this->input('amount'))) {
                     $validator->errors()->add(
                         'amount',
-                        $account->name.' only has '.Number::currency((float) $account->balance, 'EUR', 'en').' available.'
+                        $account->name.' only has '.$account->formatMoney($account->balance).' available.'
                     );
                 }
             },
