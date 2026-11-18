@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAccountRequest extends FormRequest
 {
@@ -26,6 +27,7 @@ class StoreAccountRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'bank' => ['required', 'string', 'max:255'],
             'details' => ['nullable', 'string', 'max:255'],
+            'currency_id' => ['required', Rule::exists('currencies', 'id')->where('user_id', $this->user()->id)],
             'min_balance' => ['nullable', 'numeric', 'min:0', 'decimal:0,2', 'max:999999.99'],
         ];
     }

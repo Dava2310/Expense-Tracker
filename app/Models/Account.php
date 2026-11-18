@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Number;
 
 class Account extends Model
 {
@@ -21,6 +22,7 @@ class Account extends Model
         'name',
         'bank',
         'details',
+        'currency_id',
         'balance',
         'min_balance',
     ];
@@ -63,6 +65,14 @@ class Account extends Model
             'balance' => 'decimal:2',
             'min_balance' => 'decimal:2',
         ];
+    }
+
+    /**
+     * Formats an amount with the symbol of the currency this account is held in.
+     */
+    public function formatMoney(string|float $amount): string
+    {
+        return $this->currency->symbol.Number::format((float) $amount, 2, locale: 'en');
     }
 
     /**

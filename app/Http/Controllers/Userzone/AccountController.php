@@ -21,18 +21,21 @@ class AccountController extends Controller
     public function index(Request $request): View
     {
         return view('userzone.accounts.index', [
-            'accounts' => $request->user()->accounts()->latest()->get(),
+            'accounts' => $request->user()->accounts()->with('currency')->latest()->get(),
         ]);
     }
 
     /***
      * Renders the form to create a new account
      *
+     * @param Request $request
      * @return View
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('userzone.accounts.create');
+        return view('userzone.accounts.create', [
+            'currencies' => $request->user()->currencies()->orderBy('name')->get(),
+        ]);
     }
 
     /***
@@ -62,7 +65,7 @@ class AccountController extends Controller
         $this->ensureOwnedBy($request, $account);
 
         return view('userzone.accounts.show', [
-            'account' => $account,
+            'account' => $account->load('currency'),
             'activity' => $account->recentActivity(),
             'monthIncome' => $account->monthTotal('incomes'),
             'monthExpenses' => $account->monthTotal('expenses'),
@@ -81,7 +84,7 @@ class AccountController extends Controller
     {
         $this->ensureOwnedBy($request, $account);
 
-        return view('userzone.accounts.edit', ['account' => $account]);
+        return view('userzone.accounts.edit', ['account' => $account->load('currency')]);
     }
 
     /***
