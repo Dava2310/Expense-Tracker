@@ -24,7 +24,7 @@ test('the new account form asks for name, bank, details, currency and minimum ba
         ->assertSee('Euro (€)')
         ->assertSee('name="min_balance"', false)
         ->assertDontSee('name="balance"', false)
-        ->assertSee('New accounts start at €0.00.');
+        ->assertSee('New accounts start with an empty balance.');
 });
 
 test('a user creates an account that starts at zero', function () {
@@ -134,3 +134,13 @@ test('the currency is required and must belong to the user', function (string $c
 
     expect(Account::count())->toBe(0);
 })->with(['missing' => '', 'somebody elses' => 'foreign']);
+
+test('the minimum balance prefix follows the symbols of the user\'s currencies', function () {
+    $user = User::factory()->create();
+    $currency = Currency::factory()->for($user)->create(['symbol' => '$']);
+
+    $this->actingAs($user)
+        ->get(route('accounts.create'))
+        ->assertSee('x-text="symbol"', false)
+        ->assertSee('\u0022'.$currency->id.'\u0022:\u0022$\u0022', false);
+});
