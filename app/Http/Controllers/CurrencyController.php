@@ -95,8 +95,20 @@ class CurrencyController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(Currency $currency)
+    public function destroy(Request $request, Currency $currency)
     {
         //
+        $this->ensureOwnedBy($request, $currency);
+
+        // If currency has more than one account assigned to it, it can not be deleted
+        if (!$currency->canBeDeleted())
+        {
+            abort(403);
+        }
+
+        $currency->delete();
+
+        return redirect()->route('currencies.index')->with('status', 'currency-deleted');
     }
 
     /**

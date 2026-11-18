@@ -34,4 +34,8 @@ class Currency extends Model
         return $this->hasMany(Account::class);
     }
 
+    public function canBeDeleted(): bool
+    {
+        return !($this->accounts()->count() > 0);
+    }
 }
