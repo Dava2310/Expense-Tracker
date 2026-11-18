@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\Category;
+use App\Models\Currency;
 use App\Models\Expense;
 use App\Models\User;
 
@@ -167,4 +168,17 @@ test('a deactivated account cannot pay an expense', function () {
 
     expect(Expense::count())->toBe(0)
         ->and($inactiveAccount->refresh()->balance)->toEqual(100);
+});
+
+test('the new expense form puts the account before the amount and uses each account\'s currency', function () {
+    $user = User::factory()->create();
+    $dollars = Currency::factory()->for($user)->create(['symbol' => '$']);
+    $account = Account::factory()->for($user)->for($dollars)->create(['name' => 'Everyday', 'balance' => 1250]);
+
+    $this->actingAs($user)
+        ->get(route('expenses.create'))
+        ->assertSeeInOrder(['name="account_id"', 'name="amount"', 'name="concept"', 'name="category_id"', 'name="date"'], false)
+        ->assertSee('Everyday · $1,250.00')
+        ->assertSee('x-text="symbol"', false)
+        ->assertSee('\u0022'.$account->id.'\u0022:\u0022$\u0022', false);
 });
