@@ -87,7 +87,7 @@ class ExpenseController extends Controller
     public function create(Request $request): View
     {
         return view('userzone.expenses.create', [
-            'accounts' => $request->user()->accounts()->orderBy('name')->get(['id', 'name', 'balance']),
+            'accounts' => $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance', 'currency_id']),
             'categories' => $request->user()->categories()->orderBy('name')->get(['id', 'name']),
         ]);
     }
