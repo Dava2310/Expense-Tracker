@@ -1,4 +1,4 @@
-@props(['label', 'name', 'type' => 'text', 'id' => null, 'value' => null, 'hint' => null, 'optional' => false, 'prefix' => null])
+@props(['label', 'name', 'type' => 'text', 'id' => null, 'value' => null, 'hint' => null, 'optional' => false, 'prefix' => null, 'prefixModel' => null])
 
 @php
     $id ??= $name;
@@ -14,7 +14,7 @@
         'border-saldo-line-strong' => ! $error,
         'border-saldo-danger bg-saldo-danger-bg' => $error,
         'pr-12' => $isPassword,
-        'pl-7' => $prefix,
+        'pl-7' => $prefix && ! $prefixModel,
     ]);
 @endphp
 
@@ -60,14 +60,16 @@
             @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
             {{ $attributes->class([$inputClasses]) }}
         >{{ old($name, $value) }}</textarea>
-    @elseif ($prefix)
+    @elseif ($prefix || $prefixModel)
         <div class="relative">
-            <span aria-hidden="true" class="pointer-events-none absolute left-3.5 top-[11px] text-[15px] text-saldo-subtle">{{ $prefix }}</span>
+            <span aria-hidden="true" @if ($prefixModel) x-text="{{ $prefixModel }}" @endif class="pointer-events-none absolute left-3.5 top-[11px] text-[15px] text-saldo-subtle">{{ $prefix }}</span>
             <input
                 id="{{ $id }}"
                 name="{{ $name }}"
                 type="{{ $type }}"
                 value="{{ old($name, $value) }}"
+                {{-- A dynamic prefix can be longer than one character, so the padding follows its length --}}
+                @if ($prefixModel) x-bind:style="{ paddingLeft: 'calc(0.875rem + ' + String({{ $prefixModel }}).length + 'ch + 0.5rem)' }" @endif
                 @if ($error) aria-invalid="true" @endif
                 @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
                 {{ $attributes->class([$inputClasses]) }}

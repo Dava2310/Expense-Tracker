@@ -1,6 +1,16 @@
 @props(['action', 'cta', 'account' => null, 'currencies' => collect()])
 
-<form method="POST" action="{{ $action }}" class="overflow-hidden rounded-2xl border border-saldo-line bg-white">
+@php
+    // The symbol shown in the minimum balance field follows the account's currency
+    $symbols = $account ? [$account->currency_id => $account->currency->symbol] : $currencies->pluck('symbol', 'id');
+@endphp
+
+<form
+    method="POST"
+    action="{{ $action }}"
+    x-data="{ symbols: @js($symbols), currencyId: @js((string) old('currency_id', $account?->currency_id)), get symbol() { return this.symbols[this.currencyId] ?? '' } }"
+    class="overflow-hidden rounded-2xl border border-saldo-line bg-white"
+>
     @csrf
     @if ($account)
         @method('PATCH')
@@ -22,7 +32,7 @@
                 You need a currency before opening an account. <a href="{{ route('currencies.create') }}" class="font-medium text-saldo-ink underline">Create one</a>.
             </p>
         @else
-            <x-saldo.select label="Currency" name="currency_id" required>
+            <x-saldo.select label="Currency" name="currency_id" x-model="currencyId" required>
                 <option value="" disabled @selected(! old('currency_id'))>Choose a currency</option>
                 @foreach ($currencies as $currency)
                     <option value="{{ $currency->id }}" @selected((string) old('currency_id') === (string) $currency->id)>{{ $currency->name }} ({{ $currency->symbol }})</option>
@@ -35,19 +45,19 @@
         <x-saldo.field
             label="Minimum balance"
             name="min_balance"
-            prefix="€"
+            prefix-model="symbol"
             inputmode="decimal"
             :value="$account?->min_balance"
             optional
             placeholder="0.00"
-            hint="We’ll flag this account whenever its balance drops below this amount. Leave it empty for €0.00."
+            hint="We’ll flag this account whenever its balance drops below this amount. Leave it empty for no minimum."
             class="max-w-[220px] tabular-nums"
         />
 
         @unless ($account)
             <p class="flex items-start gap-2.5 rounded-xl bg-saldo-canvas px-3.5 py-3 text-[13.5px] leading-normal text-saldo-muted">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="mt-px flex-none"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
-                <span>New accounts start at €0.00. Add an income to set the opening balance.</span>
+                <span>New accounts start with an empty balance. Add an income to set the opening balance.</span>
             </p>
         @endunless
     </div>
