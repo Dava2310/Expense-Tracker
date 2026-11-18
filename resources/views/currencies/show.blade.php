@@ -20,7 +20,7 @@
                     <span>Edit</span>
                 </x-saldo.button>
 
-                <x-saldo.button as="button" type="button" variant="outline" class="gap-2 pl-3.5 pr-4" x-data="" aria-haspopup="dialog" x-on:click.prevent="$dispatch('open-modal', @js($isInUse ? 'currency-in-use' : 'confirm-currency-deletion'))">
+                <x-saldo.button as="button" type="button" variant="outline" class="gap-2 pl-3.5 pr-4" x-data="" :disabled="$isInUse" :title="$isInUse ? 'In use by '.$accountsCount.' '.str('account')->plural($accountsCount).', so it can’t be deleted' : null" :class="$isInUse ? 'cursor-not-allowed opacity-50 hover:border-saldo-line-strong' : ''" aria-haspopup="dialog" x-on:click.prevent="$dispatch('open-modal', 'confirm-currency-deletion')">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"></path><path d="M9 7V4h6v3"></path></svg>
                     <span>Delete</span>
                 </x-saldo.button>
@@ -93,21 +93,6 @@
             @endif
         </section>
     </div>
-
-    <x-saldo.modal name="currency-in-use" labelledby="in-use-title" describedby="in-use-text">
-        <span aria-hidden="true" class="flex size-11 items-center justify-center rounded-xl bg-saldo-warn-bg text-saldo-warn-fg">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
-        </span>
-
-        <div class="flex flex-col gap-2">
-            <h2 id="in-use-title" class="font-display text-[22px] font-semibold tracking-[-0.02em]">{{ $currency->name }} can’t be deleted</h2>
-            <p id="in-use-text" class="text-[15px] leading-[1.55] text-saldo-muted">It’s used by {{ $accountsCount }} {{ str('account')->plural($accountsCount) }}. A currency that’s in use can’t be deleted, so those balances keep their meaning.</p>
-        </div>
-
-        <div class="flex justify-end pt-1">
-            <x-saldo.button as="button" type="button" class="px-5" x-on:click="$dispatch('close')">Got it</x-saldo.button>
-        </div>
-    </x-saldo.modal>
 
     <x-saldo.modal name="confirm-currency-deletion" labelledby="delete-title" describedby="delete-text">
         <span aria-hidden="true" class="flex size-11 items-center justify-center rounded-xl bg-[#fdecea] text-saldo-danger">
