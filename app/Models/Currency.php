@@ -36,6 +36,6 @@ class Currency extends Model
 
     public function canBeDeleted(): bool
     {
-        return !($this->accounts()->count() > 0);
+        return ! $this->accounts()->withTrashed()->exists();
     }
 }
