@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCurrencyRequest;
+use App\Models\Account;
 use App\Models\Currency;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -40,9 +41,26 @@ class CurrencyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Currency $currency)
+    public function show(Request $request, Currency $currency)
     {
-        //
+        $this->ensureOwnedBy($request, $currency);
+
+        $accounts = $request->user()->accounts()->withTrashed()->where('currency_id', $currency->id)->get();
+        $accountsCount = $accounts->count();
+        $activeAccountsCount = $accounts->filter(fn (Account $account): bool => ! $account->trashed())->count();
+        $inactiveAccountsCount = $accounts->filter(fn (Account $account): bool => $account->trashed())->count();
+        $isInUse = $accountsCount > 0;
+        $totalBalance = $currency->symbol.number_format((float) $accounts->sum('balance'), 2);
+
+        return view('currencies.show', [
+            'currency' => $currency,
+            'accounts' => $accounts,
+            'accountsCount' => $accountsCount,
+            'activeAccountsCount' => $activeAccountsCount,
+            'inactiveAccountsCount' => $inactiveAccountsCount,
+            'isInUse' => $isInUse,
+            'totalBalance' => $totalBalance,
+        ]);
     }
 
     /**
@@ -67,5 +85,13 @@ class CurrencyController extends Controller
     public function destroy(Currency $currency)
     {
         //
+    }
+
+    /**
+     * Accounts that belong to somebody else are reported as not found.
+     */
+    private function ensureOwnedBy(Request $request, Currency $currency): void
+    {
+        abort_unless($currency->user_id === $request->user()->id, 404);
     }
 }
