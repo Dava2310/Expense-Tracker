@@ -37,7 +37,7 @@ class ExpenseController extends Controller
             ->when($categoryId, fn ($query) => $query->where('expenses.category_id', $categoryId));
 
         $expenses = $filteredExpenses()
-            ->with(['account', 'category'])
+            ->with(['account.currency', 'category'])
             ->when($period->start(), fn ($query, $start) => $query->where('expenses.date', '>=', $start))
             ->when($period->end(), fn ($query, $end) => $query->where('expenses.date', '<=', $end))
             ->orderByDesc('expenses.date')
@@ -49,7 +49,6 @@ class ExpenseController extends Controller
             ->map(fn ($items): array => [
                 'title' => $items->first()->date->format('F Y'),
                 'count' => $items->count(),
-                'total' => $items->sum(fn (Expense $expense): float => (float) $expense->amount),
                 'expenses' => $items,
             ])
             ->values();
@@ -64,7 +63,6 @@ class ExpenseController extends Controller
 
         return view('userzone.expenses.index', [
             'groups' => $groups,
-            'total' => $expenses->sum(fn (Expense $expense): float => (float) $expense->amount),
             'periodPhrase' => $period->phrase(),
             'scope' => $scope,
             'accounts' => $accounts,
@@ -126,7 +124,7 @@ class ExpenseController extends Controller
         $this->ensureOwnedBy($request, $expense);
 
         return view('userzone.expenses.edit', [
-            'expense' => $expense->load(['account', 'category']),
+            'expense' => $expense->load(['account.currency', 'category']),
         ]);
     }
 

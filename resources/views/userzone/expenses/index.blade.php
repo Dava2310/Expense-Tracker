@@ -1,11 +1,8 @@
-@use('Illuminate\Support\Number')
-
 <x-app-layout>
     <div class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-10">
         <x-saldo.page-header title="Expenses">
             <x-slot:subtitle>
-                <strong class="font-semibold tabular-nums text-saldo-ink">{{ Number::currency($total, 'EUR', 'en') }}</strong>
-                spent {{ $periodPhrase }} {{ $scope }}
+                Spent {{ $periodPhrase }} {{ $scope }}
             </x-slot:subtitle>
 
             <x-slot:actions>
@@ -41,7 +38,7 @@
                 <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-saldo-line-soft bg-[#fafaf8] px-5 py-3.5">
                     <h2 class="text-sm font-semibold">{{ $group['title'] }}</h2>
                     <span class="text-[13.5px] tabular-nums text-saldo-muted">
-                        {{ $group['count'] }} {{ str('expense')->plural($group['count']) }} · −{{ Number::currency($group['total'], 'EUR', 'en') }}
+                        {{ $group['count'] }} {{ str('expense')->plural($group['count']) }}
                     </span>
                 </div>
 
@@ -53,7 +50,7 @@
                                 <a href="{{ route('expenses.edit', $expense) }}" class="truncate text-[15px] font-medium text-saldo-ink no-underline hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">{{ $expense->concept }}</a>
                                 <span class="text-[13px] text-saldo-subtle">{{ $expense->category->name }} · {{ $expense->account->name }}</span>
                             </span>
-                            <span class="text-[15px] font-medium tabular-nums">−{{ Number::currency((float) $expense->amount, 'EUR', 'en') }}</span>
+                            <span class="text-[15px] font-medium tabular-nums">−{{ $expense->account->formatMoney($expense->amount) }}</span>
                         </li>
                     @endforeach
                 </ul>
