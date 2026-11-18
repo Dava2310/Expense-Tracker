@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Account;
+use App\Models\Currency;
 use App\Models\User;
 
 test('guests are redirected to the login page', function () {
@@ -65,4 +66,17 @@ test('a dash is shown when an account has no details', function () {
     $this->actingAs($user)
         ->get(route('accounts.index'))
         ->assertSee('md:table-cell">-</td>', false);
+});
+
+test('each account shows its own currency symbol and no total balance is shown', function () {
+    $user = User::factory()->create();
+    Account::factory()->for($user)->for(Currency::factory()->for($user)->create(['symbol' => '$']))->create(['balance' => 100, 'min_balance' => 10]);
+    Account::factory()->for($user)->for(Currency::factory()->for($user)->create(['symbol' => '€']))->create(['balance' => 200, 'min_balance' => 20]);
+
+    $this->actingAs($user)
+        ->get(route('accounts.index'))
+        ->assertSee('$100.00')
+        ->assertSee('€200.00')
+        ->assertSee('2 accounts')
+        ->assertDontSee('Total balance');
 });

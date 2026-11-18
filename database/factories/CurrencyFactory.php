@@ -20,7 +20,7 @@ class CurrencyFactory extends Factory
     {
         return [
             'name' => $this->faker->word(),
-            'symbol' => $this->faker->currencyCode(),
+            'symbol' => '€',
             'user_id' => User::factory(),
         ];
     }

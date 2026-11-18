@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\Category;
+use App\Models\Currency;
 use App\Models\Expense;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -43,7 +44,7 @@ test('the index lists only the user\'s expenses with their details', function ()
         ->assertDontSee('Secret expense');
 });
 
-test('expenses are grouped by month with counts and totals, newest first', function () {
+test('expenses are grouped by month with counts, newest first', function () {
     $user = User::factory()->create();
     $account = Account::factory()->for($user)->create();
     $category = Category::factory()->for($user)->create();
@@ -54,12 +55,12 @@ test('expenses are grouped by month with counts and totals, newest first', funct
     $this->actingAs($user)
         ->get(route('expenses.index'))
         ->assertSeeInOrder([
-            'November 2026', '2 expenses · −€1,334.30', 'Weekly groceries', 'November rent',
-            'October 2026', '1 expense · −€35.00', 'Gym membership',
+            'November 2026', '2 expenses', 'Weekly groceries', 'November rent',
+            'October 2026', '1 expense', 'Gym membership',
         ]);
 });
 
-test('the header sums what was spent in the selected period', function (array $query, string $phrase, string $total) {
+test('the header describes the selected period', function (array $query, string $phrase) {
     $user = User::factory()->create();
     $account = Account::factory()->for($user)->create();
     $category = Category::factory()->for($user)->create();
@@ -69,11 +70,11 @@ test('the header sums what was spent in the selected period', function (array $q
 
     $this->actingAs($user)
         ->get(route('expenses.index', $query))
-        ->assertSeeInOrder([$total, 'spent '.$phrase.' across all accounts']);
+        ->assertSee('Spent '.$phrase.' across all accounts');
 })->with([
-    'default (all time)' => [[], 'in total', '€6,000.00'],
-    'last 3 months' => [['period' => '3m'], 'in the last 3 months', '€1,000.00'],
-    'this month' => [['period' => 'month'], 'this month', '€100.00'],
+    'default (all time)' => [[], 'in total'],
+    'last 3 months' => [['period' => '3m'], 'in the last 3 months'],
+    'this month' => [['period' => 'month'], 'this month'],
 ]);
 
 test('a custom range includes both end dates and is shown in the header', function () {
@@ -91,7 +92,7 @@ test('a custom range includes both end dates and is shown in the header', functi
         ->assertSee('Last day')
         ->assertDontSee('Before range')
         ->assertDontSee('After range')
-        ->assertSee('spent between Mar 1, 2026 and Mar 31, 2026');
+        ->assertSee('Spent between Mar 1, 2026 and Mar 31, 2026');
 });
 
 test('expenses can be filtered by account, by category and by both', function (array $filters, array $visible, array $hidden, string $scope) {
@@ -111,7 +112,7 @@ test('expenses can be filtered by account, by category and by both', function (a
 
     $response = $this->actingAs($user)->get(route('expenses.index', array_filter($query)));
 
-    $response->assertOk()->assertSee('spent in total '.$scope);
+    $response->assertOk()->assertSee('Spent in total '.$scope);
 
     foreach ($visible as $concept) {
         $response->assertSee($concept);
@@ -208,3 +209,19 @@ test('a confirmation is shown after creating or updating an expense', function (
     'created' => ['expense-created', 'Expense created.'],
     'updated' => ['expense-updated', 'Expense updated.'],
 ]);
+
+test('each expense shows the symbol of its own account\'s currency and no total is shown', function () {
+    $user = User::factory()->create();
+    $dollars = Currency::factory()->for($user)->create(['symbol' => '$']);
+    $euros = Currency::factory()->for($user)->create(['symbol' => '€']);
+    $category = Category::factory()->for($user)->create();
+    expenseFor(Account::factory()->for($user)->for($dollars)->create(), $category, ['amount' => 10, 'date' => '2026-11-02']);
+    expenseFor(Account::factory()->for($user)->for($euros)->create(), $category, ['amount' => 20, 'date' => '2026-11-03']);
+
+    $this->actingAs($user)
+        ->get(route('expenses.index'))
+        ->assertSee('−$10.00')
+        ->assertSee('−€20.00')
+        ->assertSee('2 expenses')
+        ->assertDontSee('30.00');
+});

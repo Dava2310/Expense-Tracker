@@ -41,7 +41,7 @@ test('the index lists only the user\'s incomes with their details', function () 
         ->assertDontSee('Secret income');
 });
 
-test('incomes are grouped by month with counts and totals, newest first', function () {
+test('incomes are grouped by month with counts, newest first', function () {
     $user = User::factory()->create();
     $account = Account::factory()->for($user)->create();
     $category = Category::factory()->create();
@@ -52,12 +52,12 @@ test('incomes are grouped by month with counts and totals, newest first', functi
     $this->actingAs($user)
         ->get(route('incomes.index'))
         ->assertSeeInOrder([
-            'November 2026', '2 incomes · +€3,650.00', 'Logo project', 'Monthly salary',
-            'October 2026', '1 income · +€300.00', 'Deposit',
+            'November 2026', '2 incomes', 'Logo project', 'Monthly salary',
+            'October 2026', '1 income', 'Deposit',
         ]);
 });
 
-test('the header sums what was received in the selected period', function (array $query, string $phrase, string $total) {
+test('the header describes the selected period', function (array $query, string $phrase) {
     $user = User::factory()->create();
     $account = Account::factory()->for($user)->create();
     $category = Category::factory()->create();
@@ -67,11 +67,11 @@ test('the header sums what was received in the selected period', function (array
 
     $this->actingAs($user)
         ->get(route('incomes.index', $query))
-        ->assertSeeInOrder([$total, 'received '.$phrase.' across all accounts']);
+        ->assertSee('Received '.$phrase.' across all accounts');
 })->with([
-    'default (all time)' => [[], 'in total', '+€6,000.00'],
-    'last 3 months' => [['period' => '3m'], 'in the last 3 months', '+€1,000.00'],
-    'this month' => [['period' => 'month'], 'this month', '+€100.00'],
+    'default (all time)' => [[], 'in total'],
+    'last 3 months' => [['period' => '3m'], 'in the last 3 months'],
+    'this month' => [['period' => 'month'], 'this month'],
 ]);
 
 test('incomes can be filtered by account, by category and by both', function (array $filters, array $visible, array $hidden, string $scope) {
@@ -91,7 +91,7 @@ test('incomes can be filtered by account, by category and by both', function (ar
 
     $response = $this->actingAs($user)->get(route('incomes.index', array_filter($query)));
 
-    $response->assertOk()->assertSee('received in total '.$scope);
+    $response->assertOk()->assertSee('Received in total '.$scope);
 
     foreach ($visible as $concept) {
         $response->assertSee($concept);
@@ -249,7 +249,7 @@ test('a custom range includes both end dates and is shown in the header', functi
         ->assertSee('Last day')
         ->assertDontSee('Before range')
         ->assertDontSee('After range')
-        ->assertSee('received between Mar 1, 2026 and Mar 31, 2026');
+        ->assertSee('Received between Mar 1, 2026 and Mar 31, 2026');
 });
 
 test('a custom range can be open on one side or given in the wrong order', function () {
@@ -263,7 +263,7 @@ test('a custom range can be open on one side or given in the wrong order', funct
         ->get(route('incomes.index', ['period' => 'custom', 'from' => '2026-03-01']))
         ->assertSee('Late income')
         ->assertDontSee('Early income')
-        ->assertSee('received since Mar 1, 2026');
+        ->assertSee('Received since Mar 1, 2026');
 
     $this->actingAs($user)
         ->get(route('incomes.index', ['period' => 'custom', 'from' => '2026-12-31', 'to' => '2026-01-01']))
@@ -280,14 +280,14 @@ test('an unknown period or an invalid date falls back to the defaults', function
         ->get(route('incomes.index', ['period' => 'forever']))
         ->assertOk()
         ->assertSee('Recent income')
-        ->assertSee('received in total')
+        ->assertSee('Received in total')
         ->assertDontSee('Clear filters');
 
     $this->actingAs($user)
         ->get(route('incomes.index', ['period' => 'custom', 'from' => '2026-13-45', 'to' => 'tomorrow']))
         ->assertOk()
         ->assertSee('Recent income')
-        ->assertSee('received in total');
+        ->assertSee('Received in total');
 });
 
 test('a period without incomes points to the ones outside of it', function () {
