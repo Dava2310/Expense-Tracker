@@ -16,7 +16,10 @@ class CurrencyController extends Controller
      */
     public function index(Request $request): View
     {
-        $currencies = $request->user()->currencies()->latest()->get();
+        $currencies = $request->user()->currencies()
+            ->withCount(['accounts' => fn ($query) => $query->withTrashed()])
+            ->latest()
+            ->get();
 
         return view('currencies.index', compact('currencies'));
     }
@@ -71,7 +74,7 @@ class CurrencyController extends Controller
     {
         $this->ensureOwnedBy($request, $currency);
 
-        $accountsCount = $currency->accounts()->count();
+        $accountsCount = $currency->accounts()->withTrashed()->count();
 
         return view('currencies.edit', [
             'currency' => $currency,
@@ -94,16 +97,14 @@ class CurrencyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Currency $currency)
     public function destroy(Request $request, Currency $currency)
     {
-        //
         $this->ensureOwnedBy($request, $currency);
 
-        // If currency has more than one account assigned to it, it can not be deleted
+        // If currency has at least one account assigned to it, it can not be deleted
         if (!$currency->canBeDeleted())
         {
-            abort(403);
+            return redirect()->route('currencies.index');
         }
 
         $currency->delete();
