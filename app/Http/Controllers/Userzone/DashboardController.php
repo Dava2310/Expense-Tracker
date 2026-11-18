@@ -19,7 +19,9 @@ class DashboardController extends Controller
         $monthlyFlow = $user->monthlyFlow();
         $highestAmount = $monthlyFlow->flatMap(fn (array $month): array => [$month['income'], $month['expenses']])->max();
 
-        $monthSpending = $user->monthSpendingByCategory();
+        // Each chart only queries its data once an account was chosen in its own filter
+        $categoryAccount = $accounts->firstWhere('id', $request->integer('cat'));
+        $monthSpending = $categoryAccount?->monthSpendingByCategory() ?? collect();
 
         return view('userzone.dashboard', [
             'accounts' => $accounts,
@@ -28,6 +30,8 @@ class DashboardController extends Controller
             'chartMax' => $highestAmount > 0 ? $this->roundUpToScale($highestAmount) : 0,
             'categorySpending' => $monthSpending->take(7),
             'categoryTotal' => $monthSpending->sum('amount'),
+            'categoryAccount' => $categoryAccount,
+            'flowAccountId' => $request->integer('inc_exp') ?: null,
             'currentMonth' => now()->format('F'),
         ]);
     }

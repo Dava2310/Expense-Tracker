@@ -7,6 +7,7 @@ use App\Models\Expense;
 use App\Models\Income;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 test('guests are redirected to the login page', function () {
     $this->get(route('dashboard'))->assertRedirect(route('login'));
@@ -166,10 +167,10 @@ describe('monthly overview', function () {
         Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => Category::factory()->for($this->user)->create(['name' => 'Travel'])->id, 'amount' => 500, 'date' => '2026-10-31']);
 
         $this->actingAs($this->user)
-            ->get(route('dashboard'))
+            ->get(route('dashboard', ['cat' => $this->account->id]))
             ->assertSeeInOrder(['Spending by category', 'November so far · €1,350.00 total', 'Rent', '€1,250.00', 'Groceries', '€100.00'])
             ->assertDontSee('Travel')
-            ->assertSee('href="'.route('expenses.index').'"', false);
+            ->assertSee('href="'.route('expenses.index', ['account' => $this->account->id]).'"', false);
     });
 
     test('spending by category shows only the top seven categories but totals them all', function () {
@@ -183,7 +184,7 @@ describe('monthly overview', function () {
         }
 
         $this->actingAs($this->user)
-            ->get(route('dashboard'))
+            ->get(route('dashboard', ['cat' => $this->account->id]))
             ->assertSee('Category 8')
             ->assertSee('Category 2')
             ->assertDontSee('Category 1<', false)
@@ -192,8 +193,54 @@ describe('monthly overview', function () {
 
     test('spending by category invites to log expenses when there are none this month', function () {
         $this->actingAs($this->user)
-            ->get(route('dashboard'))
+            ->get(route('dashboard', ['cat' => $this->account->id]))
             ->assertSee('No expenses this month yet.');
+    });
+
+    test('spending by category asks for an account and loads no category data until one is chosen', function () {
+        Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 84.30, 'date' => '2026-11-02']);
+
+        DB::enableQueryLog();
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard'))
+            ->assertSee('Choose an account to see its spending this month.')
+            ->assertDontSee('Groceries');
+
+        $categoryQueries = collect(DB::getQueryLog())->pluck('query')->filter(fn (string $query): bool => str_contains($query, 'categories'));
+
+        expect($categoryQueries)->toBeEmpty();
+    });
+
+    test('spending by category only looks at the chosen account and uses its currency', function () {
+        $dollars = Currency::factory()->for($this->user)->create(['symbol' => '$']);
+        $other = Account::factory()->for($this->user)->for($dollars)->create(['name' => 'Travel card']);
+        Expense::factory()->create(['account_id' => $this->account->id, 'category_id' => $this->category->id, 'amount' => 84.30, 'date' => '2026-11-02']);
+        Expense::factory()->create(['account_id' => $other->id, 'category_id' => $this->category->id, 'amount' => 40, 'date' => '2026-11-03']);
+
+        $this->actingAs($this->user)
+            ->get(route('dashboard', ['cat' => $other->id]))
+            ->assertSee('November so far · $40.00 total')
+            ->assertDontSee('November so far · €');
+    });
+
+    test('an account of somebody else or an inactive one is ignored by the category filter', function () {
+        $stranger = Account::factory()->create();
+        $inactive = Account::factory()->for($this->user)->create();
+        $inactive->delete();
+
+        foreach ([$stranger->id, $inactive->id, 'abc'] as $id) {
+            $this->actingAs($this->user)
+                ->get(route('dashboard', ['cat' => $id]))
+                ->assertSee('Choose an account to see its spending this month.');
+        }
+    });
+
+    test('the category filter keeps the other chart\'s account in the form', function () {
+        $this->actingAs($this->user)
+            ->get(route('dashboard', ['cat' => $this->account->id, 'inc_exp' => $this->account->id]))
+            ->assertSee('name="inc_exp" value="'.$this->account->id.'"', false)
+            ->assertSee('<option value="'.$this->account->id.'" selected>', false);
     });
 });
 

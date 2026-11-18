@@ -125,6 +125,28 @@ class Account extends Model
     }
 
     /**
+     * Totals the expenses of this account in the given month (the current one by default) by category, biggest first.
+     *
+     * @return Collection<int, array{name: string, amount: float}>
+     */
+    public function monthSpendingByCategory(?CarbonInterface $month = null): Collection
+    {
+        $month ??= now();
+
+        return $this->expenses()
+            ->with('category')
+            ->whereBetween('date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()])
+            ->get()
+            ->groupBy('category_id')
+            ->map(fn (Collection $expenses): array => [
+                'name' => $expenses->first()->category->name,
+                'amount' => (float) $expenses->sum('amount'),
+            ])
+            ->sortByDesc('amount')
+            ->values();
+    }
+
+    /**
      * Gets the information of the user that owns this account.
      */
     public function user(): BelongsTo
