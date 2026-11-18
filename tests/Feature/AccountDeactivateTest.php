@@ -31,7 +31,7 @@ test('the owner deactivates an account and is told about it', function () {
         ->assertDontSee('Everyday');
 });
 
-test('a deactivated account moves to the inactive section and leaves the totals', function () {
+test('a deactivated account moves to the inactive section and leaves the count', function () {
     $user = User::factory()->create();
     $kept = Account::factory()->for($user)->create(['name' => 'Savings', 'balance' => 100]);
     $deactivated = Account::factory()->for($user)->create(['name' => 'Old wallet', 'balance' => 50]);
@@ -41,7 +41,8 @@ test('a deactivated account moves to the inactive section and leaves the totals'
     $this->actingAs($user)
         ->get(route('dashboard'))
         ->assertSeeInOrder(['Savings', 'Inactive', 'Old wallet'])
-        ->assertSee('across 1 account')
+        ->assertSee('1 account')
+        ->assertDontSee('2 accounts')
         ->assertSee('€100.00')
         ->assertDontSee('€150.00');
 
