@@ -1,4 +1,4 @@
-@props(['action', 'cta', 'account' => null])
+@props(['action', 'cta', 'account' => null, 'currencies' => collect()])
 
 <form method="POST" action="{{ $action }}" class="overflow-hidden rounded-2xl border border-saldo-line bg-white">
     @csrf
@@ -11,6 +11,24 @@
             <x-saldo.field label="Account name" name="name" :value="$account?->name" placeholder="e.g. Everyday" required autofocus />
             <x-saldo.field label="Bank" name="bank" :value="$account?->bank" placeholder="e.g. Harbor Bank or Cash" required />
         </div>
+
+        @if ($account)
+            <div class="flex flex-col gap-1.5">
+                <span class="text-[13.5px] font-medium">Currency</span>
+                <p class="text-[15px] text-saldo-muted">{{ $account->currency->name }} ({{ $account->currency->symbol }}). It can’t be changed once the account exists.</p>
+            </div>
+        @elseif ($currencies->isEmpty())
+            <p class="rounded-xl bg-saldo-canvas px-3.5 py-3 text-[13.5px] leading-normal text-saldo-muted">
+                You need a currency before opening an account. <a href="{{ route('currencies.create') }}" class="font-medium text-saldo-ink underline">Create one</a>.
+            </p>
+        @else
+            <x-saldo.select label="Currency" name="currency_id" required>
+                <option value="" disabled @selected(! old('currency_id'))>Choose a currency</option>
+                @foreach ($currencies as $currency)
+                    <option value="{{ $currency->id }}" @selected((string) old('currency_id') === (string) $currency->id)>{{ $currency->name }} ({{ $currency->symbol }})</option>
+                @endforeach
+            </x-saldo.select>
+        @endif
 
         <x-saldo.field label="Details" name="details" type="textarea" :value="$account?->details" optional placeholder="What it’s for, card ending, anything useful" />
 
