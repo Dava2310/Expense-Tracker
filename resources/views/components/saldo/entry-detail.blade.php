@@ -1,5 +1,3 @@
-@use('Illuminate\Support\Number')
-
 {{-- One income or expense, where only the concept can be changed --}}
 @props(['entry', 'kind'])
 
@@ -30,7 +28,7 @@
             <h1 @class([
                 'font-display text-[40px] font-medium leading-[1.1] tracking-[-0.025em] tabular-nums',
                 'text-saldo-green' => $isIncome,
-            ])>{{ $isIncome ? '+' : '−' }}{{ Number::currency((float) $entry->amount, 'EUR', 'en') }}</h1>
+            ])>{{ $isIncome ? '+' : '−' }}{{ $entry->account->formatMoney($entry->amount) }}</h1>
             <p class="text-[14.5px] text-saldo-muted">{{ $isIncome ? 'Added to' : 'Deducted from' }} {{ $entry->account->name }} on {{ $entry->date->format('l, M j, Y') }}</p>
         </div>
     </div>

@@ -37,7 +37,7 @@ class IncomeController extends Controller
             ->when($categoryId, fn ($query) => $query->where('incomes.category_id', $categoryId));
 
         $incomes = $filteredIncomes()
-            ->with(['account', 'category'])
+            ->with(['account.currency', 'category'])
             ->when($period->start(), fn ($query, $start) => $query->where('incomes.date', '>=', $start))
             ->when($period->end(), fn ($query, $end) => $query->where('incomes.date', '<=', $end))
             ->orderByDesc('incomes.date')
@@ -49,7 +49,6 @@ class IncomeController extends Controller
             ->map(fn ($items): array => [
                 'title' => $items->first()->date->format('F Y'),
                 'count' => $items->count(),
-                'total' => $items->sum(fn (Income $income): float => (float) $income->amount),
                 'incomes' => $items,
             ])
             ->values();
@@ -64,7 +63,6 @@ class IncomeController extends Controller
 
         return view('userzone.incomes.index', [
             'groups' => $groups,
-            'total' => $incomes->sum(fn (Income $income): float => (float) $income->amount),
             'periodPhrase' => $period->phrase(),
             'scope' => $scope,
             'accounts' => $accounts,
@@ -126,7 +124,7 @@ class IncomeController extends Controller
         $this->ensureOwnedBy($request, $income);
 
         return view('userzone.incomes.edit', [
-            'income' => $income->load(['account', 'category']),
+            'income' => $income->load(['account.currency', 'category']),
         ]);
     }
 
