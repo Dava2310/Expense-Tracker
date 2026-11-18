@@ -123,6 +123,14 @@ class Account extends Model
     }
 
     /**
+     * Gets the currency this bank account is held in.
+     */
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class);
+    }
+
+    /**
      * Gets all expenses associated to this bank account.
      */
     public function expenses(): HasMany

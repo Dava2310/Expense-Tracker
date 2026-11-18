@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Account;
+use App\Models\Currency;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -25,6 +26,7 @@ class AccountFactory extends Factory
             'balance' => $this->faker->randomFloat(2, 10, 100),
             'min_balance' => $this->faker->randomFloat(2, 10, 100),
             'user_id' => User::factory(),
+            'currency_id' => Currency::factory(),
         ];
     }
 
