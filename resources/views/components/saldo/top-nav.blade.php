@@ -6,8 +6,8 @@
             <span class="font-display text-[19px] font-semibold tracking-[-0.02em]">Saldo</span>
         </a>
 
-        <nav aria-label="Main" class="order-last w-full overflow-x-auto lg:order-none lg:w-auto">
-            <div class="flex w-max gap-0.5 rounded-xl bg-[#f1f1ee] p-1">
+        <nav aria-label="Main" class="order-last w-full overflow-x-auto">
+            <div class="flex w-full min-w-max gap-0.5 rounded-xl bg-[#f1f1ee] p-1 *:flex-1 *:justify-center">
                 <x-saldo.nav-item :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     <x-slot:icon>
                         <svg {!! $iconAttributes !!}><rect x="3" y="3" width="7.5" height="7.5" rx="2"></rect><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"></rect><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"></rect><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"></rect></svg>
@@ -41,6 +41,13 @@
                         <svg {!! $iconAttributes !!}><path d="M3 4.5v6.1c0 .5.2 1 .6 1.4l8.4 8.4a2 2 0 0 0 2.8 0l5.7-5.7a2 2 0 0 0 0-2.8L12 3.6c-.4-.4-.9-.6-1.4-.6H4.5C3.7 3 3 3.7 3 4.5Z"></path><circle cx="7.5" cy="7.5" r="1.25"></circle></svg>
                     </x-slot:icon>
                     Categories
+                </x-saldo.nav-item>
+
+                <x-saldo.nav-item :href="route('currencies.index')" :active="request()->routeIs('currencies.*')">
+                    <x-slot:icon>
+                        <svg {!! $iconAttributes !!}><circle cx="12" cy="12" r="9"></circle><path d="M14.8 9.2c-.5-.8-1.5-1.2-2.8-1.2-1.6 0-2.7.8-2.7 2s1 1.7 2.7 2 2.7.8 2.7 2-1.1 2-2.7 2c-1.3 0-2.3-.4-2.8-1.2"></path><path d="M12 6.5V8m0 8v1.5"></path></svg>
+                    </x-slot:icon>
+                    Currencies
                 </x-saldo.nav-item>
             </div>
         </nav>
