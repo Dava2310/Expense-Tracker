@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\Userzone\AccountController;
 use App\Http\Controllers\Userzone\CategoryController;
 use App\Http\Controllers\Userzone\DashboardController;
@@ -27,6 +28,9 @@ require __DIR__.'/auth.php';
 Route::middleware('auth')->group(function () {
     // For the user's dashboard (after login)
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    // Currencies
+    Route::resource('currencies', CurrencyController::class);
 
     // Account routes
     Route::get('/accounts', [AccountController::class, 'index'])->name('accounts.index');
