@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Userzone;
 
 use App\Http\Controllers\Controller;
-use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -15,7 +14,7 @@ class DashboardController extends Controller
     public function __invoke(Request $request): View
     {
         $user = $request->user();
-        $accounts = $user->accounts()->orderBy('name')->get();
+        $accounts = $user->accounts()->with('currency')->orderBy('name')->get();
 
         $monthlyFlow = $user->monthlyFlow();
         $highestAmount = $monthlyFlow->flatMap(fn (array $month): array => [$month['income'], $month['expenses']])->max();
@@ -24,8 +23,7 @@ class DashboardController extends Controller
 
         return view('userzone.dashboard', [
             'accounts' => $accounts,
-            'totalBalance' => $accounts->sum(fn (Account $account): float => (float) $account->balance),
-            'inactiveAccounts' => $user->accounts()->onlyTrashed()->orderBy('name')->get(),
+            'inactiveAccounts' => $user->accounts()->onlyTrashed()->with('currency')->orderBy('name')->get(),
             'monthlyFlow' => $monthlyFlow,
             'chartMax' => $highestAmount > 0 ? $this->roundUpToScale($highestAmount) : 0,
             'categorySpending' => $monthSpending->take(7),

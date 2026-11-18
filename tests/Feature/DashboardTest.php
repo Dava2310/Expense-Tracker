@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\Category;
+use App\Models\Currency;
 use App\Models\Expense;
 use App\Models\Income;
 use App\Models\User;
@@ -29,10 +30,27 @@ test('dashboard shows only the user\'s accounts with balances and minimums', fun
         ->assertSee('Minimum €500.00')
         ->assertSee('Savings')
         ->assertSee('€12,350.00')
-        ->assertSee('Total balance')
-        ->assertSee('€14,830.15')
-        ->assertSee('across 2 accounts')
+        ->assertSee('2 accounts')
+        ->assertDontSee('Total balance')
         ->assertDontSee('Someone else\'s account');
+});
+
+test('each account card shows the symbol of its own currency', function () {
+    $user = User::factory()->create();
+    $dollars = Currency::factory()->for($user)->create(['symbol' => '$']);
+    $pesos = Currency::factory()->for($user)->create(['symbol' => 'COP ']);
+    Account::factory()->for($user)->for($dollars)->create(['balance' => 100, 'min_balance' => 10]);
+    Account::factory()->for($user)->for($pesos)->create(['balance' => 2000, 'min_balance' => 500]);
+    $old = Account::factory()->for($user)->for($dollars)->create(['balance' => 7]);
+    $old->delete();
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertSee('$100.00')
+        ->assertSee('Minimum $10.00')
+        ->assertSee('COP 2,000.00')
+        ->assertSee('Minimum COP 500.00')
+        ->assertSee('$7.00');
 });
 
 test('each account card links to the account page', function () {
@@ -180,7 +198,7 @@ describe('monthly overview', function () {
 });
 
 describe('inactive accounts', function () {
-    test('deactivated accounts are listed apart and left out of the total balance', function () {
+    test('deactivated accounts are listed apart and left out of the account count', function () {
         $user = User::factory()->create();
         Account::factory()->for($user)->create(['name' => 'Everyday', 'balance' => 100]);
         $old = Account::factory()->for($user)->create(['name' => 'Joint account', 'bank' => 'Pine Federal', 'balance' => 0]);
@@ -189,7 +207,8 @@ describe('inactive accounts', function () {
         $this->actingAs($user)
             ->get(route('dashboard'))
             ->assertSeeInOrder(['Inactive', 'Joint account', 'Pine Federal', 'Deactivated '.$old->deleted_at->format('M j, Y')])
-            ->assertSee('across 1 account');
+            ->assertSee('1 account')
+            ->assertDontSee('2 accounts');
     });
 
     test('the inactive section is hidden when no account was deactivated', function () {
