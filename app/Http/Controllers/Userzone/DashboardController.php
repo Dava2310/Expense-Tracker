@@ -16,10 +16,11 @@ class DashboardController extends Controller
         $user = $request->user();
         $accounts = $user->accounts()->with('currency')->orderBy('name')->get();
 
-        $monthlyFlow = $user->monthlyFlow();
+        // Each chart only queries its data once an account was chosen in its own filter
+        $flowAccount = $accounts->firstWhere('id', $request->integer('inc_exp'));
+        $monthlyFlow = $flowAccount?->monthlyFlow() ?? collect();
         $highestAmount = $monthlyFlow->flatMap(fn (array $month): array => [$month['income'], $month['expenses']])->max();
 
-        // Each chart only queries its data once an account was chosen in its own filter
         $categoryAccount = $accounts->firstWhere('id', $request->integer('cat'));
         $monthSpending = $categoryAccount?->monthSpendingByCategory() ?? collect();
 
@@ -31,7 +32,7 @@ class DashboardController extends Controller
             'categorySpending' => $monthSpending->take(7),
             'categoryTotal' => $monthSpending->sum('amount'),
             'categoryAccount' => $categoryAccount,
-            'flowAccountId' => $request->integer('inc_exp') ?: null,
+            'flowAccount' => $flowAccount,
             'currentMonth' => now()->format('F'),
         ]);
     }

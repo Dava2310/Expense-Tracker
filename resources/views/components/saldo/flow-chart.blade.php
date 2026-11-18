@@ -1,12 +1,10 @@
-@props(['months', 'max'])
-
-@use('Illuminate\Support\Number')
+@props(['months', 'max', 'account' => null, 'accounts', 'preserve' => []])
 
 @php
     $lastIndex = $months->count() - 1;
-    $money = fn (float $amount, int $precision = 2): string => Number::currency($amount, 'EUR', 'en', $precision);
+    $money = fn (float $amount, int $precision = 2): string => $account->formatMoney($amount, $precision);
 
-    $readouts = $months->map(fn (array $month): array => [
+    $readouts = $account === null ? collect() : $months->map(fn (array $month): array => [
         'name' => $month['name'],
         'income' => '+'.$money($month['income']),
         'expenses' => '−'.$money($month['expenses']),
@@ -20,15 +18,20 @@
     <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div class="flex flex-col gap-1">
             <h2 id="flow-title" class="text-[15px] font-semibold">Income vs. expenses</h2>
-            <p class="text-[13.5px] text-saldo-subtle">Last {{ $months->count() }} months · all accounts</p>
+            <p class="text-[13.5px] text-saldo-subtle">Last 6 months{{ $account ? ' · '.$account->name : '' }}</p>
         </div>
-        <div aria-hidden="true" class="flex h-[22px] items-center gap-4 text-[13px] text-saldo-muted">
-            <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-[3px] bg-saldo-green"></span>Income</span>
-            <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-[3px] bg-saldo-indigo"></span>Expenses</span>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div aria-hidden="true" class="flex h-[22px] items-center gap-4 text-[13px] text-saldo-muted">
+                <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-[3px] bg-saldo-green"></span>Income</span>
+                <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-[3px] bg-saldo-indigo"></span>Expenses</span>
+            </div>
+            <x-saldo.account-filter name="inc_exp" :accounts="$accounts" :selected="$account?->id" :preserve="$preserve" />
         </div>
     </div>
 
-    @if ($max <= 0)
+    @if (! $account)
+        <p class="py-10 text-center text-[14px] text-saldo-subtle">Choose an account to see its income and expenses.</p>
+    @elseif ($max <= 0)
         <p class="py-10 text-center text-[14px] text-saldo-subtle">No incomes or expenses in this period yet.</p>
     @else
         <div x-data="{ active: {{ $lastIndex }}, readouts: @js($readouts) }" class="flex flex-col gap-4.5">
