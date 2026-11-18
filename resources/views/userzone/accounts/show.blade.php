@@ -1,5 +1,3 @@
-@use('Illuminate\Support\Number')
-
 <x-app-layout>
     <div class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-7">
         <x-saldo.back-link :href="route('accounts.index')">Accounts</x-saldo.back-link>
@@ -35,21 +33,21 @@
         <section aria-label="Summary" class="grid grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-px overflow-hidden rounded-2xl border border-saldo-line bg-saldo-line">
             <div class="flex flex-col gap-1.5 bg-white px-6 py-5">
                 <span class="text-[13.5px] text-saldo-subtle">Balance</span>
-                <span class="font-display text-[34px] font-medium tracking-[-0.025em] tabular-nums">{{ Number::currency((float) $account->balance, 'EUR', 'en') }}</span>
+                <span class="font-display text-[34px] font-medium tracking-[-0.025em] tabular-nums">{{ $account->formatMoney($account->balance) }}</span>
             </div>
 
             <div class="flex flex-col gap-1.5 bg-white px-6 py-5">
                 <span class="text-[13.5px] text-saldo-subtle">Minimum balance</span>
-                <span class="font-display text-2xl font-medium tracking-[-0.02em] tabular-nums">{{ Number::currency((float) $account->min_balance, 'EUR', 'en') }}</span>
+                <span class="font-display text-2xl font-medium tracking-[-0.02em] tabular-nums">{{ $account->formatMoney($account->min_balance) }}</span>
                 @if ($account->isBelowMinimum())
                     <span class="inline-flex items-center gap-1.5 text-[13px] text-saldo-warn-fg">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path><path d="M12 9v4M12 17h.01"></path></svg>
-                        <span>{{ Number::currency(abs($aboveMinimum), 'EUR', 'en') }} below minimum</span>
+                        <span>{{ $account->formatMoney(abs($aboveMinimum)) }} below minimum</span>
                     </span>
                 @else
                     <span class="inline-flex items-center gap-1.5 text-[13px] text-saldo-green">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>
-                        <span>{{ Number::currency($aboveMinimum, 'EUR', 'en') }} above minimum</span>
+                        <span>{{ $account->formatMoney($aboveMinimum) }} above minimum</span>
                     </span>
                 @endif
             </div>
@@ -58,11 +56,11 @@
                 <span class="text-[13.5px] text-saldo-subtle">This month</span>
                 <div class="flex justify-between gap-3 text-[15px]">
                     <span class="text-saldo-muted">In</span>
-                    <span class="font-medium tabular-nums text-saldo-green">+{{ Number::currency($monthIncome, 'EUR', 'en') }}</span>
+                    <span class="font-medium tabular-nums text-saldo-green">+{{ $account->formatMoney($monthIncome) }}</span>
                 </div>
                 <div class="flex justify-between gap-3 text-[15px]">
                     <span class="text-saldo-muted">Out</span>
-                    <span class="font-medium tabular-nums">−{{ Number::currency($monthExpenses, 'EUR', 'en') }}</span>
+                    <span class="font-medium tabular-nums">−{{ $account->formatMoney($monthExpenses) }}</span>
                 </div>
             </div>
         </section>
@@ -100,7 +98,7 @@
                             <span @class([
                                 'text-[15px] font-medium tabular-nums',
                                 'text-saldo-green' => $isIncome,
-                            ])>{{ $isIncome ? '+' : '−' }}{{ Number::currency($entry['amount'], 'EUR', 'en') }}</span>
+                            ])>{{ $isIncome ? '+' : '−' }}{{ $account->formatMoney($entry['amount']) }}</span>
                         </li>
                     @endforeach
                 </ul>
