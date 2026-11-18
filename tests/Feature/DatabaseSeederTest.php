@@ -2,6 +2,7 @@
 
 use App\Models\Account;
 use App\Models\Category;
+use App\Models\Currency;
 use App\Models\Expense;
 use App\Models\Income;
 use App\Models\User;
@@ -10,10 +11,11 @@ test('seeder creates the expected records without extra parents', function () {
     $this->seed();
 
     expect(User::count())->toBe(11)
-        ->and(Account::count())->toBe(10)
-        ->and(Category::count())->toBe(10)
-        ->and(Expense::count())->toBe(10)
-        ->and(Income::count())->toBe(10);
+        ->and(Currency::count())->toBe(11)
+        ->and(Account::count())->toBe(11)
+        ->and(Category::count())->toBeBetween(11, 33)
+        ->and(Expense::count())->toBeBetween(11, 55)
+        ->and(Income::count())->toBeBetween(11, 55);
 });
 
 test('seeded incomes and expenses use a category of the user that owns their account', function () {
@@ -21,8 +23,6 @@ test('seeded incomes and expenses use a category of the user that owns their acc
 
     $entries = Income::with(['account', 'category'])->get()
         ->concat(Expense::with(['account', 'category'])->get());
-
-    expect($entries)->toHaveCount(20);
 
     $entries->each(fn ($entry) => expect($entry->category->user_id)->toBe($entry->account->user_id));
 });

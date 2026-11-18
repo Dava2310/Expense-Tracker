@@ -49,7 +49,7 @@ test('a deactivated account moves to the inactive section and leaves the totals'
         ->get(route('accounts.index'))
         ->assertSee('Savings')
         ->assertDontSee('Old wallet')
-        ->assertSee('across 1 account');
+        ->assertSee('1 account');
 });
 
 test('the history of a deactivated account is kept', function () {

@@ -26,7 +26,7 @@ class AccountFactory extends Factory
             'balance' => $this->faker->randomFloat(2, 10, 100),
             'min_balance' => $this->faker->randomFloat(2, 10, 100),
             'user_id' => User::factory(),
-            'currency_id' => Currency::factory(),
+            'currency_id' => fn (array $attributes): int => Currency::factory()->create(['user_id' => $attributes['user_id']])->id,
         ];
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Account;
+use App\Models\Currency;
 use App\Models\User;
 
 test('guests are redirected to the login page', function () {
@@ -8,14 +9,19 @@ test('guests are redirected to the login page', function () {
     $this->post(route('accounts.store'), [])->assertRedirect(route('login'));
 });
 
-test('the new account form asks for name, bank, details and minimum balance only', function () {
-    $this->actingAs(User::factory()->create())
+test('the new account form asks for name, bank, details, currency and minimum balance only', function () {
+    $user = User::factory()->create();
+    Currency::factory()->for($user)->create(['name' => 'Euro', 'symbol' => '€']);
+
+    $this->actingAs($user)
         ->get(route('accounts.create'))
         ->assertOk()
         ->assertSee('New account')
         ->assertSee('name="name"', false)
         ->assertSee('name="bank"', false)
         ->assertSee('name="details"', false)
+        ->assertSee('name="currency_id"', false)
+        ->assertSee('Euro (€)')
         ->assertSee('name="min_balance"', false)
         ->assertDontSee('name="balance"', false)
         ->assertSee('New accounts start at €0.00.');
@@ -23,12 +29,14 @@ test('the new account form asks for name, bank, details and minimum balance only
 
 test('a user creates an account that starts at zero', function () {
     $user = User::factory()->create();
+    $currency = Currency::factory()->for($user)->create();
 
     $this->actingAs($user)
         ->post(route('accounts.store'), [
             'name' => 'Everyday',
             'bank' => 'Harbor Bank',
             'details' => 'Card ending 4821',
+            'currency_id' => $currency->id,
             'min_balance' => '500.00',
         ])
         ->assertRedirect(route('accounts.index'))
@@ -38,15 +46,19 @@ test('a user creates an account that starts at zero', function () {
 
     expect($account->user_id)->toBe($user->id)
         ->and($account->bank)->toBe('Harbor Bank')
+        ->and($account->currency_id)->toBe($currency->id)
         ->and($account->details)->toBe('Card ending 4821')
         ->and($account->min_balance)->toEqual(500)
         ->and($account->balance)->toEqual(0);
 });
 
 test('a submitted balance is ignored when creating an account', function () {
-    $this->actingAs(User::factory()->create())->post(route('accounts.store'), [
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->post(route('accounts.store'), [
         'name' => 'Savings',
         'bank' => 'Harbor Bank',
+        'currency_id' => Currency::factory()->for($user)->create()->id,
         'min_balance' => '100',
         'balance' => '999',
     ]);
@@ -55,10 +67,13 @@ test('a submitted balance is ignored when creating an account', function () {
 });
 
 test('details are optional', function () {
-    $this->actingAs(User::factory()->create())
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
         ->post(route('accounts.store'), [
             'name' => 'Wallet',
             'bank' => 'Cash',
+            'currency_id' => Currency::factory()->for($user)->create()->id,
             'details' => '',
             'min_balance' => '20',
         ])
@@ -69,8 +84,10 @@ test('details are optional', function () {
 });
 
 test('the minimum balance defaults to zero when left empty or omitted', function (array $extra) {
-    $this->actingAs(User::factory()->create())
-        ->post(route('accounts.store'), ['name' => 'Wallet', 'bank' => 'Cash', ...$extra])
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('accounts.store'), ['name' => 'Wallet', 'bank' => 'Cash', 'currency_id' => Currency::factory()->for($user)->create()->id, ...$extra])
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('accounts.index'));
 
@@ -82,6 +99,7 @@ test('the minimum balance defaults to zero when left empty or omitted', function
 
 test('invalid input is rejected and the errors are shown', function (array $input, array $invalid) {
     $user = User::factory()->create();
+    $input += ['currency_id' => Currency::factory()->for($user)->create()->id];
 
     $this->actingAs($user)
         ->from(route('accounts.create'))
@@ -101,3 +119,18 @@ test('invalid input is rejected and the errors are shown', function (array $inpu
     'too many decimals' => [['name' => 'Name', 'bank' => 'Bank', 'min_balance' => '1.234'], ['min_balance']],
     'not a number' => [['name' => 'Name', 'bank' => 'Bank', 'min_balance' => 'lots'], ['min_balance']],
 ]);
+
+test('the currency is required and must belong to the user', function (string $currency) {
+    $user = User::factory()->create();
+    $foreign = Currency::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('accounts.store'), [
+            'name' => 'Name',
+            'bank' => 'Bank',
+            'currency_id' => $currency === 'foreign' ? $foreign->id : '',
+        ])
+        ->assertSessionHasErrors('currency_id');
+
+    expect(Account::count())->toBe(0);
+})->with(['missing' => '', 'somebody elses' => 'foreign']);
