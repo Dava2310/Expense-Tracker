@@ -1,4 +1,4 @@
-<x-saldo.auth-layout title="Verify your email" subtitle="Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn’t receive the email, we will gladly send you another.">
+<x-layout.auth title="Verify your email" subtitle="Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn’t receive the email, we will gladly send you another.">
     @if (session('status') == 'verification-link-sent')
         <x-ui.status status="A new verification link has been sent to the email address you provided during registration." />
     @endif
@@ -14,4 +14,4 @@
 
         <button type="submit" class="cursor-pointer font-semibold text-saldo-ink">Log out</button>
     </form>
-</x-saldo.auth-layout>
+</x-layout.auth>

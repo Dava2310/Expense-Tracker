@@ -1,4 +1,4 @@
-<x-saldo.auth-layout title="Welcome back" subtitle="Log in to see your balances.">
+<x-layout.auth title="Welcome back" subtitle="Log in to see your balances.">
     <x-ui.status :status="session('status')" />
 
     <form method="POST" action="{{ route('login') }}" class="flex flex-col gap-4">
@@ -28,4 +28,4 @@
         New to Saldo?
         <a href="{{ route('register') }}" class="font-semibold text-saldo-ink">Create an account</a>
     </x-slot:footer>
-</x-saldo.auth-layout>
+</x-layout.auth>

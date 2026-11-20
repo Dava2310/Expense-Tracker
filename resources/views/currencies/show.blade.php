@@ -1,6 +1,6 @@
 @use('Illuminate\Support\Number')
 
-<x-app-layout>
+<x-layout.app>
     <div class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-7">
         <x-ui.back-link :href="route('currencies.index')">Currencies</x-ui.back-link>
 
@@ -112,4 +112,4 @@
             <x-ui.button as="button" variant="danger" class="px-4.5">Delete currency</x-ui.button>
         </form>
     </x-ui.modal>
-</x-app-layout>
+</x-layout.app>
