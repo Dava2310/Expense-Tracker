@@ -1,29 +1,17 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.
-    </div>
-
+<x-saldo.auth-layout title="Verify your email" subtitle="Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn’t receive the email, we will gladly send you another.">
     @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600">
-            A new verification link has been sent to the email address you provided during registration.
-        </div>
+        <x-saldo.status status="A new verification link has been sent to the email address you provided during registration." />
     @endif
 
-    <div class="mt-4 flex items-center justify-between">
-        <form method="POST" action="{{ route('verification.send') }}">
-            @csrf
+    <form method="POST" action="{{ route('verification.send') }}" class="flex flex-col gap-4">
+        @csrf
 
-            <div>
-                <x-saldo.button as="button">Resend Verification Email</x-saldo.button>
-            </div>
-        </form>
+        <x-saldo.button as="button" size="form">Resend verification email</x-saldo.button>
+    </form>
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
+    <form method="POST" action="{{ route('logout') }}" class="text-center text-sm text-saldo-muted">
+        @csrf
 
-            <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Log Out
-            </button>
-        </form>
-    </div>
-</x-guest-layout>
+        <button type="submit" class="cursor-pointer font-semibold text-saldo-ink">Log out</button>
+    </form>
+</x-saldo.auth-layout>
