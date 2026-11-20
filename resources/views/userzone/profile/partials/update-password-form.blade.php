@@ -13,26 +13,14 @@
         @csrf
         @method('put')
 
-        <div>
-            <x-breeze.input-label for="update_password_current_password" value="Current Password" />
-            <x-breeze.text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
-            <x-breeze.input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
-        </div>
+        <x-saldo.field label="Current Password" name="current_password" id="update_password_current_password" type="password" bag="updatePassword" autocomplete="current-password" />
 
-        <div>
-            <x-breeze.input-label for="update_password_password" value="New Password" />
-            <x-breeze.text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-breeze.input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
-        </div>
+        <x-saldo.field label="New Password" name="password" id="update_password_password" type="password" bag="updatePassword" autocomplete="new-password" />
 
-        <div>
-            <x-breeze.input-label for="update_password_password_confirmation" value="Confirm Password" />
-            <x-breeze.text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
-            <x-breeze.input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
-        </div>
+        <x-saldo.field label="Confirm Password" name="password_confirmation" id="update_password_password_confirmation" type="password" bag="updatePassword" autocomplete="new-password" />
 
         <div class="flex items-center gap-4">
-            <x-breeze.primary-button>Save</x-breeze.primary-button>
+            <x-saldo.button as="button">Save</x-saldo.button>
 
             @if (session('status') === 'password-updated')
                 <p

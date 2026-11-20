@@ -1,8 +1,8 @@
-@props(['label', 'name', 'type' => 'text', 'id' => null, 'value' => null, 'hint' => null, 'optional' => false, 'prefix' => null, 'prefixModel' => null])
+@props(['label', 'name', 'type' => 'text', 'id' => null, 'value' => null, 'hint' => null, 'optional' => false, 'prefix' => null, 'prefixModel' => null, 'bag' => 'default'])
 
 @php
     $id ??= $name;
-    $error = $errors->first($name);
+    $error = $errors->getBag($bag)->first($name);
     $isPassword = $type === 'password';
     $isTextarea = $type === 'textarea';
     $describedBy = collect([$hint ? $id.'-hint' : null, $error ? $id.'-error' : null])->filter()->implode(' ');

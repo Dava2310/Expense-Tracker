@@ -14,9 +14,7 @@
             @csrf
 
             <div>
-                <x-breeze.primary-button>
-                    Resend Verification Email
-                </x-breeze.primary-button>
+                <x-saldo.button as="button">Resend Verification Email</x-saldo.button>
             </div>
         </form>
 

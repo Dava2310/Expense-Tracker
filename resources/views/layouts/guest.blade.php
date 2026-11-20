@@ -23,7 +23,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/">
-                    <x-breeze.application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    <x-saldo.logo :size="64" />
                 </a>
             </div>
 
