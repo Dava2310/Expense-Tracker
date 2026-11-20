@@ -26,7 +26,7 @@ class CurrencyController extends Controller
             ->latest()
             ->get();
 
-        return view('currencies.index', compact('currencies'));
+        return view('userzone.currencies.index', compact('currencies'));
     }
 
     /***
@@ -36,7 +36,7 @@ class CurrencyController extends Controller
      */
     public function create(): View
     {
-        return view('currencies.create');
+        return view('userzone.currencies.create');
     }
 
     /***
@@ -71,7 +71,7 @@ class CurrencyController extends Controller
         $isInUse = $accountsCount > 0;
         $totalBalance = $currency->symbol.number_format((float) $accounts->sum('balance'), 2);
 
-        return view('currencies.show', [
+        return view('userzone.currencies.show', [
             'currency' => $currency,
             'accounts' => $accounts,
             'accountsCount' => $accountsCount,
@@ -95,7 +95,7 @@ class CurrencyController extends Controller
 
         $accountsCount = $currency->accounts()->withTrashed()->count();
 
-        return view('currencies.edit', [
+        return view('userzone.currencies.edit', [
             'currency' => $currency,
             'accountsCount' => $accountsCount,
         ]);
