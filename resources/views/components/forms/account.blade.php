@@ -18,8 +18,8 @@
 
     <div class="flex flex-col gap-5 p-6">
         <div class="grid grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))] gap-4">
-            <x-saldo.field label="Account name" name="name" :value="$account?->name" placeholder="e.g. Everyday" required autofocus />
-            <x-saldo.field label="Bank" name="bank" :value="$account?->bank" placeholder="e.g. Harbor Bank or Cash" required />
+            <x-forms.field label="Account name" name="name" :value="$account?->name" placeholder="e.g. Everyday" required autofocus />
+            <x-forms.field label="Bank" name="bank" :value="$account?->bank" placeholder="e.g. Harbor Bank or Cash" required />
         </div>
 
         @if ($account)
@@ -32,17 +32,17 @@
                 You need a currency before opening an account. <a href="{{ route('currencies.create') }}" class="font-medium text-saldo-ink underline">Create one</a>.
             </p>
         @else
-            <x-saldo.select label="Currency" name="currency_id" x-model="currencyId" required>
+            <x-forms.select label="Currency" name="currency_id" x-model="currencyId" required>
                 <option value="" disabled @selected(! old('currency_id'))>Choose a currency</option>
                 @foreach ($currencies as $currency)
                     <option value="{{ $currency->id }}" @selected((string) old('currency_id') === (string) $currency->id)>{{ $currency->name }} ({{ $currency->symbol }})</option>
                 @endforeach
-            </x-saldo.select>
+            </x-forms.select>
         @endif
 
-        <x-saldo.field label="Details" name="details" type="textarea" :value="$account?->details" optional placeholder="What it’s for, card ending, anything useful" />
+        <x-forms.field label="Details" name="details" type="textarea" :value="$account?->details" optional placeholder="What it’s for, card ending, anything useful" />
 
-        <x-saldo.field
+        <x-forms.field
             label="Minimum balance"
             name="min_balance"
             prefix-model="symbol"

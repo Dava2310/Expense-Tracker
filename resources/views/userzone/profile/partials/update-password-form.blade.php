@@ -13,11 +13,11 @@
         @csrf
         @method('put')
 
-        <x-saldo.field label="Current Password" name="current_password" id="update_password_current_password" type="password" bag="updatePassword" autocomplete="current-password" />
+        <x-forms.field label="Current Password" name="current_password" id="update_password_current_password" type="password" bag="updatePassword" autocomplete="current-password" />
 
-        <x-saldo.field label="New Password" name="password" id="update_password_password" type="password" bag="updatePassword" autocomplete="new-password" />
+        <x-forms.field label="New Password" name="password" id="update_password_password" type="password" bag="updatePassword" autocomplete="new-password" />
 
-        <x-saldo.field label="Confirm Password" name="password_confirmation" id="update_password_password_confirmation" type="password" bag="updatePassword" autocomplete="new-password" />
+        <x-forms.field label="Confirm Password" name="password_confirmation" id="update_password_password_confirmation" type="password" bag="updatePassword" autocomplete="new-password" />
 
         <div class="flex items-center gap-4">
             <x-saldo.button as="button">Save</x-saldo.button>

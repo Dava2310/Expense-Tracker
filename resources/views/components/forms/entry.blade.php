@@ -19,27 +19,27 @@
 
     <div class="flex flex-col gap-5 p-6">
         <div class="grid grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))] gap-4">
-            <x-saldo.select :label="$isIncome ? 'Add to account' : 'Pay from account'" name="account_id" x-model="accountId" required autofocus>
+            <x-forms.select :label="$isIncome ? 'Add to account' : 'Pay from account'" name="account_id" x-model="accountId" required autofocus>
                 <option value="" disabled @selected(! old('account_id'))>Choose an account</option>
                 @foreach ($accounts as $account)
                     <option value="{{ $account->id }}" @selected((string) old('account_id') === (string) $account->id)>{{ $account->name }} · {{ $account->formatMoney($account->balance) }}</option>
                 @endforeach
-            </x-saldo.select>
+            </x-forms.select>
 
-            <x-saldo.field label="Amount" name="amount" prefix-model="symbol" inputmode="decimal" placeholder="0.00" class="tabular-nums" required />
+            <x-forms.field label="Amount" name="amount" prefix-model="symbol" inputmode="decimal" placeholder="0.00" class="tabular-nums" required />
         </div>
 
-        <x-saldo.field label="Concept" name="concept" :placeholder="$isIncome ? 'e.g. Monthly salary' : 'e.g. Weekly groceries'" required />
+        <x-forms.field label="Concept" name="concept" :placeholder="$isIncome ? 'e.g. Monthly salary' : 'e.g. Weekly groceries'" required />
 
         <div class="grid grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))] gap-4">
-            <x-saldo.select label="Category" name="category_id" required>
+            <x-forms.select label="Category" name="category_id" required>
                 <option value="" disabled @selected(! old('category_id'))>Choose a category</option>
                 @foreach ($categories as $category)
                     <option value="{{ $category->id }}" @selected((string) old('category_id') === (string) $category->id)>{{ $category->name }}</option>
                 @endforeach
-            </x-saldo.select>
+            </x-forms.select>
 
-            <x-saldo.field label="Date" name="date" type="date" :value="now()->format('Y-m-d')" required />
+            <x-forms.field label="Date" name="date" type="date" :value="now()->format('Y-m-d')" required />
         </div>
     </div>
 

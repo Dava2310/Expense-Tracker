@@ -4,7 +4,7 @@
     <form method="POST" action="{{ route('password.email') }}" class="flex flex-col gap-4">
         @csrf
 
-        <x-saldo.field label="Email" name="email" type="email" placeholder="you@example.com" required autofocus autocomplete="username" />
+        <x-forms.field label="Email" name="email" type="email" placeholder="you@example.com" required autofocus autocomplete="username" />
 
         <x-saldo.button as="button" size="form" class="mt-2">Send reset link</x-saldo.button>
     </form>

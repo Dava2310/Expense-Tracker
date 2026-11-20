@@ -6,6 +6,6 @@
             <x-slot:subtitle>Changes show up everywhere this category is used.</x-slot:subtitle>
         </x-saldo.page-header>
 
-        <x-saldo.category-form :action="route('categories.update', $category)" :category="$category" cta="Save changes" />
+        <x-forms.category :action="route('categories.update', $category)" :category="$category" cta="Save changes" />
     </div>
 </x-app-layout>

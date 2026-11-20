@@ -17,10 +17,10 @@
         @csrf
         @method('patch')
 
-        <x-saldo.field label="Name" name="name" :value="$user->name" required autofocus autocomplete="name" />
+        <x-forms.field label="Name" name="name" :value="$user->name" required autofocus autocomplete="name" />
 
         <div>
-            <x-saldo.field label="Email" name="email" type="email" :value="$user->email" required autocomplete="username" />
+            <x-forms.field label="Email" name="email" type="email" :value="$user->email" required autocomplete="username" />
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>

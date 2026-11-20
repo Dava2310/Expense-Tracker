@@ -14,7 +14,7 @@
         </div>
 
         <div class="flex items-center gap-1">
-            <x-saldo.account-filter name="cat" :accounts="$accounts" :selected="$account?->id" :preserve="$preserve" />
+            <x-forms.account-filter name="cat" :accounts="$accounts" :selected="$account?->id" :preserve="$preserve" />
             <a href="{{ route('expenses.index', array_filter(['account' => $account?->id])) }}" class="inline-flex h-9 items-center gap-0.5 rounded-[9px] pl-3 pr-1.5 text-[13.5px] font-medium text-saldo-ink no-underline transition-colors hover:bg-saldo-ghost-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">
                 <span>See expenses</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>

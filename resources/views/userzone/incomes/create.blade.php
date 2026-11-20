@@ -6,6 +6,6 @@
             <x-slot:subtitle>The amount is added to the account you choose.</x-slot:subtitle>
         </x-saldo.page-header>
 
-        <x-saldo.entry-form kind="income" :accounts="$accounts" :categories="$categories" />
+        <x-forms.entry kind="income" :accounts="$accounts" :categories="$categories" />
     </div>
 </x-app-layout>

@@ -6,6 +6,6 @@
             <x-slot:subtitle>The amount is deducted from the account you choose.</x-slot:subtitle>
         </x-saldo.page-header>
 
-        <x-saldo.entry-form kind="expense" :accounts="$accounts" :categories="$categories" />
+        <x-forms.entry kind="expense" :accounts="$accounts" :categories="$categories" />
     </div>
 </x-app-layout>
