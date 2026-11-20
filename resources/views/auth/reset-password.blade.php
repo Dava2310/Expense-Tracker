@@ -10,7 +10,7 @@
 
         <x-forms.field label="Confirm new password" name="password_confirmation" type="password" placeholder="Repeat your password" required autocomplete="new-password" />
 
-        <x-saldo.button as="button" size="form" class="mt-2">Reset password</x-saldo.button>
+        <x-ui.button as="button" size="form" class="mt-2">Reset password</x-ui.button>
     </form>
 
     <x-slot:footer>

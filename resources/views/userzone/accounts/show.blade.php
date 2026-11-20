@@ -1,9 +1,9 @@
 <x-app-layout>
     <div class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-7">
-        <x-saldo.back-link :href="route('accounts.index')">Accounts</x-saldo.back-link>
+        <x-ui.back-link :href="route('accounts.index')">Accounts</x-ui.back-link>
 
         @if (session('status') === 'account-updated')
-            <x-saldo.status status="Account updated." />
+            <x-ui.status status="Account updated." />
         @endif
 
         <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-4">
@@ -18,15 +18,15 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
-                <x-saldo.button variant="outline" :href="route('accounts.edit', $account)" class="gap-2 pl-3.5 pr-4">
+                <x-ui.button variant="outline" :href="route('accounts.edit', $account)" class="gap-2 pl-3.5 pr-4">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.83 2.83 0 0 0-4-4L4 16v4Z"></path><path d="m13.5 6.5 4 4"></path></svg>
                     <span>Edit</span>
-                </x-saldo.button>
+                </x-ui.button>
 
-                <x-saldo.button as="button" type="button" variant="outline" class="gap-2 pl-3.5 pr-4" x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-account-deactivation')">
+                <x-ui.button as="button" type="button" variant="outline" class="gap-2 pl-3.5 pr-4" x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-account-deactivation')">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"></rect><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"></path><path d="M10 13h4"></path></svg>
                     <span>Deactivate</span>
-                </x-saldo.button>
+                </x-ui.button>
             </div>
         </div>
 
@@ -106,7 +106,7 @@
         </section>
     </div>
 
-    <x-saldo.modal name="confirm-account-deactivation" labelledby="deactivate-title" describedby="deactivate-text">
+    <x-ui.modal name="confirm-account-deactivation" labelledby="deactivate-title" describedby="deactivate-text">
         <span aria-hidden="true" class="flex size-11 items-center justify-center rounded-xl bg-[#f0f0ec] text-saldo-ink">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="5" rx="1"></rect><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9"></path><path d="M10 13h4"></path></svg>
         </span>
@@ -120,8 +120,8 @@
             @csrf
             @method('DELETE')
 
-            <x-saldo.button as="button" type="button" variant="outline" x-on:click="$dispatch('close')">Cancel</x-saldo.button>
-            <x-saldo.button as="button" class="px-4.5">Deactivate account</x-saldo.button>
+            <x-ui.button as="button" type="button" variant="outline" x-on:click="$dispatch('close')">Cancel</x-ui.button>
+            <x-ui.button as="button" class="px-4.5">Deactivate account</x-ui.button>
         </form>
-    </x-saldo.modal>
+    </x-ui.modal>
 </x-app-layout>

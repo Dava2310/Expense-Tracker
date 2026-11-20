@@ -9,15 +9,15 @@
         </p>
     </header>
 
-    <x-saldo.button
+    <x-ui.button
         as="button"
         type="button"
         variant="danger"
         x-data=""
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
-    >Delete Account</x-saldo.button>
+    >Delete Account</x-ui.button>
 
-    <x-saldo.modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" labelledby="confirm-user-deletion-title" describedby="confirm-user-deletion-description">
+    <x-ui.modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" labelledby="confirm-user-deletion-title" describedby="confirm-user-deletion-description">
         <form method="post" action="{{ route('profile.destroy') }}" class="flex flex-col gap-5">
             @csrf
             @method('delete')
@@ -35,14 +35,14 @@
             <x-forms.field label="Password" name="password" id="delete_user_password" type="password" bag="userDeletion" placeholder="Password" />
 
             <div class="flex justify-end gap-3">
-                <x-saldo.button as="button" type="button" variant="outline" x-on:click="$dispatch('close')">
+                <x-ui.button as="button" type="button" variant="outline" x-on:click="$dispatch('close')">
                     Cancel
-                </x-saldo.button>
+                </x-ui.button>
 
-                <x-saldo.button as="button" variant="danger">
+                <x-ui.button as="button" variant="danger">
                     Delete Account
-                </x-saldo.button>
+                </x-ui.button>
             </div>
         </form>
-    </x-saldo.modal>
+    </x-ui.modal>
 </section>

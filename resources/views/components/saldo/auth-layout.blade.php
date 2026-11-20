@@ -41,7 +41,7 @@
 
         <aside class="m-3 flex min-h-[360px] flex-[1_1_520px] flex-col justify-between gap-10 overflow-hidden rounded-3xl bg-saldo-ink px-12 py-10 text-white">
             <a href="{{ route('welcome') }}" aria-label="Saldo home" class="flex items-center gap-2.5 self-start text-white no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                <x-saldo.logo variant="light" />
+                <x-ui.logo variant="light" />
                 <span class="font-display text-xl font-semibold tracking-[-0.02em]">Saldo</span>
             </a>
 

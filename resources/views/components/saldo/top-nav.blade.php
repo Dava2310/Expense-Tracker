@@ -2,7 +2,7 @@
     <div class="mx-auto flex min-h-[72px] max-w-[1184px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-8 py-3">
 
         <a href="{{ route('dashboard') }}" aria-label="Saldo, go to dashboard" class="flex items-center gap-2.5 text-saldo-ink no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">
-            <x-saldo.logo />
+            <x-ui.logo />
             <span class="font-display text-[19px] font-semibold tracking-[-0.02em]">Saldo</span>
         </a>
 

@@ -20,7 +20,7 @@
 
         <x-forms.field label="Confirm password" name="password_confirmation" type="password" placeholder="Repeat your password" required autocomplete="new-password" />
 
-        <x-saldo.button as="button" size="form" class="mt-2">Create account</x-saldo.button>
+        <x-ui.button as="button" size="form" class="mt-2">Create account</x-ui.button>
     </form>
 
     <x-slot:footer>

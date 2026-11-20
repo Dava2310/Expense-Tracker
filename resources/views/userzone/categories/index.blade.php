@@ -1,27 +1,27 @@
 <x-app-layout>
     {{-- "category" holds the row whose delete button was clicked, for the two dialogs below --}}
     <div x-data="{ category: {} }" class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-10">
-        <x-saldo.page-header title="Categories">
+        <x-ui.page-header title="Categories">
             <x-slot:subtitle>
                 {{ $categories->count() }} {{ str('category')->plural($categories->count()) }}, shared by your expenses and incomes.
             </x-slot:subtitle>
 
             <x-slot:actions>
-                <x-saldo.button :href="route('categories.create')" class="gap-2 pl-3.5 pr-4.5">
+                <x-ui.button :href="route('categories.create')" class="gap-2 pl-3.5 pr-4.5">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
                     <span>New category</span>
-                </x-saldo.button>
+                </x-ui.button>
             </x-slot:actions>
-        </x-saldo.page-header>
+        </x-ui.page-header>
 
         @if (session('status') === 'category-created')
-            <x-saldo.status status="Category created." />
+            <x-ui.status status="Category created." />
         @endif
         @if (session('status') === 'category-updated')
-            <x-saldo.status status="Category updated." />
+            <x-ui.status status="Category updated." />
         @endif
         @if (session('status') === 'category-deleted')
-            <x-saldo.status status="Category deleted." />
+            <x-ui.status status="Category deleted." />
         @endif
         @error('category')
             <p role="alert" class="rounded-[10px] border border-saldo-danger bg-saldo-danger-bg px-3.5 py-3 text-sm font-medium leading-normal text-saldo-danger">{{ $message }}</p>
@@ -89,7 +89,7 @@
             </section>
         @endif
 
-        <x-saldo.modal name="category-in-use" labelledby="in-use-title" describedby="in-use-text">
+        <x-ui.modal name="category-in-use" labelledby="in-use-title" describedby="in-use-text">
             <span aria-hidden="true" class="flex size-11 items-center justify-center rounded-xl bg-saldo-warn-bg text-saldo-warn-fg">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
             </span>
@@ -100,11 +100,11 @@
             </div>
 
             <div class="flex justify-end pt-1">
-                <x-saldo.button as="button" type="button" class="px-5" x-on:click="$dispatch('close')">Got it</x-saldo.button>
+                <x-ui.button as="button" type="button" class="px-5" x-on:click="$dispatch('close')">Got it</x-ui.button>
             </div>
-        </x-saldo.modal>
+        </x-ui.modal>
 
-        <x-saldo.modal name="confirm-category-deletion" labelledby="delete-title" describedby="delete-text">
+        <x-ui.modal name="confirm-category-deletion" labelledby="delete-title" describedby="delete-text">
             <span aria-hidden="true" class="flex size-11 items-center justify-center rounded-xl bg-[#fdecea] text-saldo-danger">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"></path><path d="M9 7V4h6v3"></path></svg>
             </span>
@@ -118,9 +118,9 @@
                 @csrf
                 @method('DELETE')
 
-                <x-saldo.button as="button" type="button" variant="outline" x-on:click="$dispatch('close')">Cancel</x-saldo.button>
-                <x-saldo.button as="button" variant="danger" class="px-4.5">Delete category</x-saldo.button>
+                <x-ui.button as="button" type="button" variant="outline" x-on:click="$dispatch('close')">Cancel</x-ui.button>
+                <x-ui.button as="button" variant="danger" class="px-4.5">Delete category</x-ui.button>
             </form>
-        </x-saldo.modal>
+        </x-ui.modal>
     </div>
 </x-app-layout>
