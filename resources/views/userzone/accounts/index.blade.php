@@ -1,4 +1,4 @@
-<x-layout.app>
+<x-layout.app title="Accounts">
     <div class="mx-auto flex max-w-[1184px] flex-col gap-7 px-8 pb-18 pt-10">
         <x-ui.page-header title="Accounts">
             <x-slot:subtitle>

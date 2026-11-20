@@ -1,4 +1,4 @@
-<x-layout.app>
+<x-layout.app title="Categories">
     {{-- "category" holds the row whose delete button was clicked, for the two dialogs below --}}
     <div x-data="{ category: {} }" class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-10">
         <x-ui.page-header title="Categories">
