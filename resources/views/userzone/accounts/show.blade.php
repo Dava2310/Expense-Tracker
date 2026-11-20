@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-layout.app>
     <div class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-7">
         <x-ui.back-link :href="route('accounts.index')">Accounts</x-ui.back-link>
 
@@ -124,4 +124,4 @@
             <x-ui.button as="button" class="px-4.5">Deactivate account</x-ui.button>
         </form>
     </x-ui.modal>
-</x-app-layout>
+</x-layout.app>

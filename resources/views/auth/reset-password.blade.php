@@ -1,4 +1,4 @@
-<x-saldo.auth-layout title="Choose a new password" subtitle="Pick a password you haven’t used before, at least 8 characters.">
+<x-layout.auth title="Choose a new password" subtitle="Pick a password you haven’t used before, at least 8 characters.">
     <form method="POST" action="{{ route('password.store') }}" class="flex flex-col gap-4">
         @csrf
 
@@ -16,4 +16,4 @@
     <x-slot:footer>
         <a href="{{ route('login') }}" class="font-semibold text-saldo-ink">Back to log in</a>
     </x-slot:footer>
-</x-saldo.auth-layout>
+</x-layout.auth>

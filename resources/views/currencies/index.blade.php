@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-layout.app>
     {{-- "currency" holds the row whose delete button was clicked, for the confirmation dialog below --}}
     <div x-data="{ currency: {} }" class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-10">
         <x-ui.page-header title="Currencies">
@@ -119,4 +119,4 @@
             </form>
         </x-ui.modal>
     </div>
-</x-app-layout>
+</x-layout.app>

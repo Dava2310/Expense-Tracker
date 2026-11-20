@@ -1,13 +1,13 @@
 <?php
 
-namespace App\View\Components\Saldo;
+namespace App\View\Components\Layout;
 
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
-class TopNav extends Component
+class Navigation extends Component
 {
     /**
      * The authenticated user shown in the user menu.
@@ -44,6 +44,6 @@ class TopNav extends Component
      */
     public function render(): View
     {
-        return view('components.saldo.top-nav');
+        return view('components.layout.navigation');
     }
 }

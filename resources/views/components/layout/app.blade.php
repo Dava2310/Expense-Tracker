@@ -18,7 +18,7 @@
     @endif
 </head>
 <body class="min-h-screen bg-saldo-surface font-inter text-saldo-ink antialiased">
-    <x-saldo.top-nav />
+    <x-layout.navigation />
 
     @isset($header)
         <header class="mx-auto max-w-[1184px] px-8 pt-10">

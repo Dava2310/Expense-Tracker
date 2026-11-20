@@ -1,4 +1,4 @@
-<x-saldo.auth-layout title="Forgot your password?" subtitle="Enter your email and we’ll send you a link to choose a new one.">
+<x-layout.auth title="Forgot your password?" subtitle="Enter your email and we’ll send you a link to choose a new one.">
     <x-ui.status :status="session('status')" />
 
     <form method="POST" action="{{ route('password.email') }}" class="flex flex-col gap-4">
@@ -13,4 +13,4 @@
         Remembered it?
         <a href="{{ route('login') }}" class="font-semibold text-saldo-ink">Back to log in</a>
     </x-slot:footer>
-</x-saldo.auth-layout>
+</x-layout.auth>

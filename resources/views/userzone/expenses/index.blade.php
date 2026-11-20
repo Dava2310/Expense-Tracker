@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-layout.app>
     <div class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-10">
         <x-ui.page-header title="Expenses">
             <x-slot:subtitle>
@@ -82,4 +82,4 @@
             </div>
         @endif
     </div>
-</x-app-layout>
+</x-layout.app>

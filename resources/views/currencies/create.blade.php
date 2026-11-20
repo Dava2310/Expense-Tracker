@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-layout.app>
     <div class="mx-auto flex max-w-[680px] flex-col gap-5 px-8 pb-18 pt-7">
         <x-ui.back-link :href="route('currencies.index')">Currencies</x-ui.back-link>
 
@@ -8,4 +8,4 @@
 
         <x-forms.currency :action="route('currencies.store')" cta="Create currency" />
     </div>
-</x-app-layout>
+</x-layout.app>

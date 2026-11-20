@@ -2,7 +2,7 @@
     $emailTaken = $errors->has('email') && str_contains($errors->first('email'), 'already exists');
 @endphp
 
-<x-saldo.auth-layout title="Create your account" subtitle="Track your accounts, expenses and incomes in one place.">
+<x-layout.auth title="Create your account" subtitle="Track your accounts, expenses and incomes in one place.">
     <form method="POST" action="{{ route('register') }}" class="flex flex-col gap-4">
         @csrf
 
@@ -27,4 +27,4 @@
         Already have an account?
         <a href="{{ route('login') }}" class="font-semibold text-saldo-ink">Log in</a>
     </x-slot:footer>
-</x-saldo.auth-layout>
+</x-layout.auth>
