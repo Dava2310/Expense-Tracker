@@ -17,16 +17,10 @@
         @csrf
         @method('patch')
 
-        <div>
-            <x-breeze.input-label for="name" value="Name" />
-            <x-breeze.text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-breeze.input-error class="mt-2" :messages="$errors->get('name')" />
-        </div>
+        <x-saldo.field label="Name" name="name" :value="$user->name" required autofocus autocomplete="name" />
 
         <div>
-            <x-breeze.input-label for="email" value="Email" />
-            <x-breeze.text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-breeze.input-error class="mt-2" :messages="$errors->get('email')" />
+            <x-saldo.field label="Email" name="email" type="email" :value="$user->email" required autocomplete="username" />
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
@@ -48,7 +42,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-breeze.primary-button>Save</x-breeze.primary-button>
+            <x-saldo.button as="button">Save</x-saldo.button>
 
             @if (session('status') === 'profile-updated')
                 <p

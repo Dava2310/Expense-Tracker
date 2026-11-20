@@ -38,3 +38,21 @@ test('correct password must be provided to update password', function () {
         ->assertSessionHasErrorsIn('updatePassword', 'current_password')
         ->assertRedirect('/profile');
 });
+
+test('the profile page shows the password error from the updatePassword bag', function () {
+    $user = User::factory()->create();
+
+    $this
+        ->actingAs($user)
+        ->from('/profile')
+        ->put('/password', [
+            'current_password' => 'wrong-password',
+            'password' => 'new-password',
+            'password_confirmation' => 'new-password',
+        ]);
+
+    $this
+        ->actingAs($user)
+        ->get('/profile')
+        ->assertSee('id="update_password_current_password-error"', false);
+});

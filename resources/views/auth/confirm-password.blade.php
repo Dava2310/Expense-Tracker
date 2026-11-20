@@ -3,25 +3,13 @@
         This is a secure area of the application. Please confirm your password before continuing.
     </div>
 
-    <form method="POST" action="{{ route('password.confirm') }}">
+    <form method="POST" action="{{ route('password.confirm') }}" class="flex flex-col gap-4">
         @csrf
 
-        <!-- Password -->
-        <div>
-           breeze. <x-breeze.input-label for="password" value="Password" />
+        <x-saldo.field label="Password" name="password" type="password" required autocomplete="current-password" />
 
-            <x-breeze.text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-breeze.input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <div class="flex justify-end mt-4">
-            <x-breeze.primary-button>
-                Confirm
-            </x-breeze.primary-button>
+        <div class="flex justify-end">
+            <x-saldo.button as="button">Confirm</x-saldo.button>
         </div>
     </form>
 </x-guest-layout>
