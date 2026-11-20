@@ -22,25 +22,39 @@ class Navigation extends Component
     /**
      * The menu entries rendered by the view.
      *
-     * @var list<array{label: string, route: string, pattern: string, icon: string}>
+     * @var list<array{label: string, route: string, pattern: string, icon: string|null}>
      */
     public array $items;
 
     /**
-     * The single definition of the application menu.
+     * The single definition of the application menu, shared by the header and the footer.
      *
-     * @return list<array{label: string, route: string, pattern: string, icon: string}>
+     * Items are tagged with who sees them: `auth` for signed-in users, `guest` for visitors.
+     *
+     * @return list<array{label: string, route: string, pattern: string, icon: string|null}>
      */
-    public static function menuItems(): array
+    public static function menuItems(?bool $authenticated = null): array
     {
-        return [
-            ['label' => 'Dashboard', 'route' => 'dashboard', 'pattern' => 'dashboard', 'icon' => 'dashboard'],
-            ['label' => 'Accounts', 'route' => 'accounts.index', 'pattern' => 'accounts.*', 'icon' => 'accounts'],
-            ['label' => 'Expenses', 'route' => 'expenses.index', 'pattern' => 'expenses.*', 'icon' => 'expenses'],
-            ['label' => 'Incomes', 'route' => 'incomes.index', 'pattern' => 'incomes.*', 'icon' => 'incomes'],
-            ['label' => 'Categories', 'route' => 'categories.index', 'pattern' => 'categories.*', 'icon' => 'categories'],
-            ['label' => 'Currencies', 'route' => 'currencies.index', 'pattern' => 'currencies.*', 'icon' => 'currencies'],
+        $authenticated ??= auth()->check();
+
+        $items = [
+            ['label' => 'Dashboard', 'route' => 'dashboard', 'pattern' => 'dashboard', 'icon' => 'dashboard', 'audience' => 'auth'],
+            ['label' => 'Accounts', 'route' => 'accounts.index', 'pattern' => 'accounts.*', 'icon' => 'accounts', 'audience' => 'auth'],
+            ['label' => 'Expenses', 'route' => 'expenses.index', 'pattern' => 'expenses.*', 'icon' => 'expenses', 'audience' => 'auth'],
+            ['label' => 'Incomes', 'route' => 'incomes.index', 'pattern' => 'incomes.*', 'icon' => 'incomes', 'audience' => 'auth'],
+            ['label' => 'Categories', 'route' => 'categories.index', 'pattern' => 'categories.*', 'icon' => 'categories', 'audience' => 'auth'],
+            ['label' => 'Currencies', 'route' => 'currencies.index', 'pattern' => 'currencies.*', 'icon' => 'currencies', 'audience' => 'auth'],
+            ['label' => 'Home', 'route' => 'welcome', 'pattern' => 'welcome', 'icon' => null, 'audience' => 'guest'],
+            ['label' => 'Log in', 'route' => 'login', 'pattern' => 'login', 'icon' => null, 'audience' => 'guest'],
+            ['label' => 'Get started', 'route' => 'register', 'pattern' => 'register', 'icon' => null, 'audience' => 'guest'],
         ];
+
+        $audience = $authenticated ? 'auth' : 'guest';
+
+        return array_values(array_filter(
+            $items,
+            fn (array $item): bool => $item['audience'] === $audience,
+        ));
     }
 
     /**
@@ -49,7 +63,7 @@ class Navigation extends Component
     public function __construct(Request $request)
     {
         $this->user = $request->user();
-        $this->items = self::menuItems();
+        $this->items = self::menuItems(authenticated: true);
 
         $this->initials = str($this->user->name)
             ->explode(' ')

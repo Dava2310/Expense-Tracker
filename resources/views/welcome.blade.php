@@ -190,13 +190,7 @@
         </section>
     </main>
 
-    <footer class="mx-auto flex max-w-[1184px] flex-wrap items-center justify-between gap-3 px-8 pb-12 pt-8 text-[13.5px] text-saldo-subtle">
-        <span class="flex items-center gap-2 font-display text-[15px] font-semibold text-saldo-ink">
-            <x-ui.logo :size="20" />
-            <span>Saldo</span>
-        </span>
-        <span>© {{ now()->year }} Saldo</span>
-    </footer>
+    <x-layout.footer />
 
 </body>
 </html>
