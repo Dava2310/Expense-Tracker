@@ -20,9 +20,28 @@ class Navigation extends Component
     public string $initials;
 
     /**
-     * SVG attributes shared by every menu icon.
+     * The menu entries rendered by the view.
+     *
+     * @var list<array{label: string, route: string, pattern: string, icon: string}>
      */
-    public string $iconAttributes = 'width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+    public array $items;
+
+    /**
+     * The single definition of the application menu.
+     *
+     * @return list<array{label: string, route: string, pattern: string, icon: string}>
+     */
+    public static function menuItems(): array
+    {
+        return [
+            ['label' => 'Dashboard', 'route' => 'dashboard', 'pattern' => 'dashboard', 'icon' => 'dashboard'],
+            ['label' => 'Accounts', 'route' => 'accounts.index', 'pattern' => 'accounts.*', 'icon' => 'accounts'],
+            ['label' => 'Expenses', 'route' => 'expenses.index', 'pattern' => 'expenses.*', 'icon' => 'expenses'],
+            ['label' => 'Incomes', 'route' => 'incomes.index', 'pattern' => 'incomes.*', 'icon' => 'incomes'],
+            ['label' => 'Categories', 'route' => 'categories.index', 'pattern' => 'categories.*', 'icon' => 'categories'],
+            ['label' => 'Currencies', 'route' => 'currencies.index', 'pattern' => 'currencies.*', 'icon' => 'currencies'],
+        ];
+    }
 
     /**
      * Create a new component instance.
@@ -30,6 +49,7 @@ class Navigation extends Component
     public function __construct(Request $request)
     {
         $this->user = $request->user();
+        $this->items = self::menuItems();
 
         $this->initials = str($this->user->name)
             ->explode(' ')
