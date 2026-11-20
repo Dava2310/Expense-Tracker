@@ -34,7 +34,7 @@
     </div>
 
     <div class="flex flex-col gap-6 p-6">
-        <x-saldo.field label="Concept" name="concept" :value="$entry->concept" required autofocus />
+        <x-forms.field label="Concept" name="concept" :value="$entry->concept" required autofocus />
 
         <div class="flex flex-col gap-2.5">
             <div class="flex items-center gap-2 text-[13.5px] font-medium text-saldo-muted">

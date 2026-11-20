@@ -2,7 +2,7 @@
     <form method="POST" action="{{ route('password.confirm') }}" class="flex flex-col gap-4">
         @csrf
 
-        <x-saldo.field label="Password" name="password" type="password" required autofocus autocomplete="current-password" />
+        <x-forms.field label="Password" name="password" type="password" required autofocus autocomplete="current-password" />
 
         <x-saldo.button as="button" size="form" class="mt-2">Confirm</x-saldo.button>
     </form>

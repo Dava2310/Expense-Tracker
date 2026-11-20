@@ -14,11 +14,11 @@
     <div class="flex flex-col gap-5 p-6">
         <div class="flex flex-wrap items-start gap-4">
             <div class="min-w-[260px] flex-[2_1_260px]">
-                <x-saldo.field label="Name" name="name" :value="$currency?->name" placeholder="e.g. Euro" required autofocus />
+                <x-forms.field label="Name" name="name" :value="$currency?->name" placeholder="e.g. Euro" required autofocus />
             </div>
 
             <div class="max-w-[200px] min-w-[140px] flex-[1_1_140px]">
-                <x-saldo.field label="Symbol" name="symbol" :value="$currency?->symbol" placeholder="e.g. €" maxlength="10" required x-model="symbol" class="font-display text-base font-semibold" />
+                <x-forms.field label="Symbol" name="symbol" :value="$currency?->symbol" placeholder="e.g. €" maxlength="10" required x-model="symbol" class="font-display text-base font-semibold" />
             </div>
         </div>
 

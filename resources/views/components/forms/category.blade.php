@@ -7,9 +7,9 @@
     @endif
 
     <div class="flex flex-col gap-5 p-6">
-        <x-saldo.field label="Name" name="name" :value="$category?->name" placeholder="e.g. Pets" required autofocus />
+        <x-forms.field label="Name" name="name" :value="$category?->name" placeholder="e.g. Pets" required autofocus />
 
-        <x-saldo.field label="Details" name="description" type="textarea" :value="$category?->description" optional placeholder="What goes in this category" />
+        <x-forms.field label="Details" name="description" type="textarea" :value="$category?->description" optional placeholder="What goes in this category" />
 
         @if ($category)
             @php($entries = $category->incomes_count + $category->expenses_count)

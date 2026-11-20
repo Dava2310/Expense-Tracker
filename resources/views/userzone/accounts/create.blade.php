@@ -6,6 +6,6 @@
             <x-slot:subtitle>A bank account, a savings pot or the cash in your wallet.</x-slot:subtitle>
         </x-saldo.page-header>
 
-        <x-saldo.account-form :action="route('accounts.store')" :currencies="$currencies" cta="Create account" />
+        <x-forms.account :action="route('accounts.store')" :currencies="$currencies" cta="Create account" />
     </div>
 </x-app-layout>

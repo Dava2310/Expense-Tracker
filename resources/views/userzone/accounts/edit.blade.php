@@ -6,6 +6,6 @@
             <x-slot:subtitle>Changes apply right away. Past expenses and incomes stay as they are.</x-slot:subtitle>
         </x-saldo.page-header>
 
-        <x-saldo.account-form :action="route('accounts.update', $account)" :account="$account" cta="Save changes" />
+        <x-forms.account :action="route('accounts.update', $account)" :account="$account" cta="Save changes" />
     </div>
 </x-app-layout>

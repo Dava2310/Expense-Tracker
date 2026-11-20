@@ -4,9 +4,9 @@
     <form method="POST" action="{{ route('login') }}" class="flex flex-col gap-4">
         @csrf
 
-        <x-saldo.field label="Email" name="email" type="email" placeholder="you@example.com" required autofocus autocomplete="username" />
+        <x-forms.field label="Email" name="email" type="email" placeholder="you@example.com" required autofocus autocomplete="username" />
 
-        <x-saldo.field label="Password" name="password" type="password" placeholder="Your password" required autocomplete="current-password">
+        <x-forms.field label="Password" name="password" type="password" placeholder="Your password" required autocomplete="current-password">
             @if (Route::has('password.request'))
                 <x-slot:aside>
                     <a href="{{ route('password.request') }}" class="rounded text-[13.5px] font-medium text-saldo-muted underline-offset-2 hover:text-saldo-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">
@@ -14,7 +14,7 @@
                     </a>
                 </x-slot:aside>
             @endif
-        </x-saldo.field>
+        </x-forms.field>
 
         <label for="remember_me" class="inline-flex items-center gap-2.5 text-sm text-saldo-muted">
             <input id="remember_me" type="checkbox" name="remember" class="size-4 rounded border-saldo-line-strong text-saldo-ink focus:ring-saldo-ink">

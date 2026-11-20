@@ -32,7 +32,7 @@
                 </p>
             </div>
 
-            <x-saldo.field label="Password" name="password" id="delete_user_password" type="password" bag="userDeletion" placeholder="Password" />
+            <x-forms.field label="Password" name="password" id="delete_user_password" type="password" bag="userDeletion" placeholder="Password" />
 
             <div class="flex justify-end gap-3">
                 <x-saldo.button as="button" type="button" variant="outline" x-on:click="$dispatch('close')">

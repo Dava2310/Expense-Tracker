@@ -6,6 +6,6 @@
             <x-slot:subtitle>You can use it for both expenses and incomes.</x-slot:subtitle>
         </x-saldo.page-header>
 
-        <x-saldo.category-form :action="route('categories.store')" cta="Create category" />
+        <x-forms.category :action="route('categories.store')" cta="Create category" />
     </div>
 </x-app-layout>

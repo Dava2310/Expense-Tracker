@@ -6,6 +6,6 @@
             <x-slot:subtitle>Add a currency so you can open accounts in it.</x-slot:subtitle>
         </x-saldo.page-header>
 
-        <x-saldo.currency-form :action="route('currencies.store')" cta="Create currency" />
+        <x-forms.currency :action="route('currencies.store')" cta="Create currency" />
     </div>
 </x-app-layout>

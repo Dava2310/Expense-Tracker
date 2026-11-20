@@ -25,7 +25,7 @@
                 <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-[3px] bg-saldo-green"></span>Income</span>
                 <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-[3px] bg-saldo-indigo"></span>Expenses</span>
             </div>
-            <x-saldo.account-filter name="inc_exp" :accounts="$accounts" :selected="$account?->id" :preserve="$preserve" />
+            <x-forms.account-filter name="inc_exp" :accounts="$accounts" :selected="$account?->id" :preserve="$preserve" />
         </div>
     </div>
 

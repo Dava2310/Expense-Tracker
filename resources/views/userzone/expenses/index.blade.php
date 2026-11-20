@@ -20,7 +20,7 @@
             <x-saldo.status status="Expense updated." />
         @endif
 
-        <x-saldo.entry-filters
+        <x-forms.entry-filters
             :action="route('expenses.index')"
             :periods="$periods"
             :period="$period"
