@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\Userzone\AccountController;
 use App\Http\Controllers\Userzone\CategoryController;
+use App\Http\Controllers\Userzone\CurrencyController;
 use App\Http\Controllers\Userzone\DashboardController;
 use App\Http\Controllers\Userzone\ExpenseController;
 use App\Http\Controllers\Userzone\IncomeController;
