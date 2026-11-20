@@ -4,6 +4,6 @@
 
         <x-forms.field label="Password" name="password" type="password" required autofocus autocomplete="current-password" />
 
-        <x-saldo.button as="button" size="form" class="mt-2">Confirm</x-saldo.button>
+        <x-ui.button as="button" size="form" class="mt-2">Confirm</x-ui.button>
     </form>
 </x-saldo.auth-layout>

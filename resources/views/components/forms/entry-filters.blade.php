@@ -42,6 +42,6 @@
     </div>
 
     <noscript>
-        <x-saldo.button as="button" class="self-start">Apply</x-saldo.button>
+        <x-ui.button as="button" class="self-start">Apply</x-ui.button>
     </noscript>
 </form>

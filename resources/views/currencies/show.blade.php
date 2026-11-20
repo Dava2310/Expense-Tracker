@@ -2,10 +2,10 @@
 
 <x-app-layout>
     <div class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-7">
-        <x-saldo.back-link :href="route('currencies.index')">Currencies</x-saldo.back-link>
+        <x-ui.back-link :href="route('currencies.index')">Currencies</x-ui.back-link>
 
         @if (session('status') === 'currency-updated')
-            <x-saldo.status status="Currency updated." />
+            <x-ui.status status="Currency updated." />
         @endif
 
         <div class="-mt-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
@@ -15,15 +15,15 @@
             </div>
 
             <div class="flex flex-wrap gap-2">
-                <x-saldo.button variant="outline" :href="route('currencies.edit', $currency)" class="gap-2 pl-3.5 pr-4">
+                <x-ui.button variant="outline" :href="route('currencies.edit', $currency)" class="gap-2 pl-3.5 pr-4">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.83 2.83 0 0 0-4-4L4 16v4Z"></path><path d="m13.5 6.5 4 4"></path></svg>
                     <span>Edit</span>
-                </x-saldo.button>
+                </x-ui.button>
 
-                <x-saldo.button as="button" type="button" variant="outline" class="gap-2 pl-3.5 pr-4" x-data="" :disabled="$isInUse" :title="$isInUse ? 'In use by '.$accountsCount.' '.str('account')->plural($accountsCount).', so it can’t be deleted' : null" :class="$isInUse ? 'cursor-not-allowed opacity-50 hover:border-saldo-line-strong' : ''" aria-haspopup="dialog" x-on:click.prevent="$dispatch('open-modal', 'confirm-currency-deletion')">
+                <x-ui.button as="button" type="button" variant="outline" class="gap-2 pl-3.5 pr-4" x-data="" :disabled="$isInUse" :title="$isInUse ? 'In use by '.$accountsCount.' '.str('account')->plural($accountsCount).', so it can’t be deleted' : null" :class="$isInUse ? 'cursor-not-allowed opacity-50 hover:border-saldo-line-strong' : ''" aria-haspopup="dialog" x-on:click.prevent="$dispatch('open-modal', 'confirm-currency-deletion')">
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"></path><path d="M9 7V4h6v3"></path></svg>
                     <span>Delete</span>
-                </x-saldo.button>
+                </x-ui.button>
             </div>
         </div>
 
@@ -94,7 +94,7 @@
         </section>
     </div>
 
-    <x-saldo.modal name="confirm-currency-deletion" labelledby="delete-title" describedby="delete-text">
+    <x-ui.modal name="confirm-currency-deletion" labelledby="delete-title" describedby="delete-text">
         <span aria-hidden="true" class="flex size-11 items-center justify-center rounded-xl bg-[#fdecea] text-saldo-danger">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"></path><path d="M9 7V4h6v3"></path></svg>
         </span>
@@ -108,8 +108,8 @@
             @csrf
             @method('DELETE')
 
-            <x-saldo.button as="button" type="button" variant="outline" x-on:click="$dispatch('close')">Cancel</x-saldo.button>
-            <x-saldo.button as="button" variant="danger" class="px-4.5">Delete currency</x-saldo.button>
+            <x-ui.button as="button" type="button" variant="outline" x-on:click="$dispatch('close')">Cancel</x-ui.button>
+            <x-ui.button as="button" variant="danger" class="px-4.5">Delete currency</x-ui.button>
         </form>
-    </x-saldo.modal>
+    </x-ui.modal>
 </x-app-layout>

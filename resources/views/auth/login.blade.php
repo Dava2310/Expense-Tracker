@@ -1,5 +1,5 @@
 <x-saldo.auth-layout title="Welcome back" subtitle="Log in to see your balances.">
-    <x-saldo.status :status="session('status')" />
+    <x-ui.status :status="session('status')" />
 
     <form method="POST" action="{{ route('login') }}" class="flex flex-col gap-4">
         @csrf
@@ -21,7 +21,7 @@
             <span>Remember me</span>
         </label>
 
-        <x-saldo.button as="button" size="form" class="mt-2">Log in</x-saldo.button>
+        <x-ui.button as="button" size="form" class="mt-2">Log in</x-ui.button>
     </form>
 
     <x-slot:footer>

@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="mx-auto flex max-w-[1184px] flex-col gap-7 px-8 pb-18 pt-10">
-        <x-saldo.page-header title="Dashboard">
+        <x-ui.page-header title="Dashboard">
             <x-slot:subtitle>
                 @if ($accounts->isEmpty())
                     Add your first account to start tracking your balance.
@@ -10,18 +10,18 @@
             </x-slot:subtitle>
 
             <x-slot:actions>
-                <x-saldo.button :href="route('accounts.create')" class="gap-2 pl-3.5 pr-4.5">
+                <x-ui.button :href="route('accounts.create')" class="gap-2 pl-3.5 pr-4.5">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
                     <span>New account</span>
-                </x-saldo.button>
+                </x-ui.button>
             </x-slot:actions>
-        </x-saldo.page-header>
+        </x-ui.page-header>
 
         @if ($accounts->isEmpty())
             <div class="flex flex-col items-start gap-4 rounded-2xl border border-dashed border-saldo-line-strong bg-white p-8">
                 <p class="font-display text-xl font-semibold tracking-[-0.02em]">No accounts yet</p>
                 <p class="max-w-md text-[15px] leading-normal text-saldo-muted">Add a bank account or your cash wallet and set a minimum balance. Saldo will flag it whenever it dips below.</p>
-                <x-saldo.button :href="route('accounts.create')">Create your first account</x-saldo.button>
+                <x-ui.button :href="route('accounts.create')">Create your first account</x-ui.button>
             </div>
         @else
             <ul class="grid grid-cols-[repeat(auto-fit,minmax(min(240px,100%),1fr))] gap-4">
@@ -57,8 +57,8 @@
             </ul>
 
             <div class="grid grid-cols-[repeat(auto-fit,minmax(min(460px,100%),1fr))] gap-4">
-                <x-saldo.flow-chart :months="$monthlyFlow" :max="$chartMax" :account="$flowAccount" :accounts="$accounts" :preserve="['cat' => $categoryAccount?->id]" />
-                <x-saldo.category-spending :categories="$categorySpending" :total="$categoryTotal" :month="$currentMonth" :account="$categoryAccount" :accounts="$accounts" :preserve="['inc_exp' => $flowAccount?->id]" />
+                <x-ui.flow-chart :months="$monthlyFlow" :max="$chartMax" :account="$flowAccount" :accounts="$accounts" :preserve="['cat' => $categoryAccount?->id]" />
+                <x-ui.category-spending :categories="$categorySpending" :total="$categoryTotal" :month="$currentMonth" :account="$categoryAccount" :accounts="$accounts" :preserve="['inc_exp' => $flowAccount?->id]" />
             </div>
         @endif
 

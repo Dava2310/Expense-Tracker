@@ -1,27 +1,27 @@
 <x-app-layout>
     {{-- "currency" holds the row whose delete button was clicked, for the confirmation dialog below --}}
     <div x-data="{ currency: {} }" class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-10">
-        <x-saldo.page-header title="Currencies">
+        <x-ui.page-header title="Currencies">
             <x-slot:subtitle>
                 {{ $currencies->count() }} {{ str('currency')->plural($currencies->count()) }}. Every account uses one of them.
             </x-slot:subtitle>
 
             <x-slot:actions>
-                <x-saldo.button :href="route('currencies.create')" class="gap-2 pl-3.5 pr-4.5">
+                <x-ui.button :href="route('currencies.create')" class="gap-2 pl-3.5 pr-4.5">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
                     <span>New currency</span>
-                </x-saldo.button>
+                </x-ui.button>
             </x-slot:actions>
-        </x-saldo.page-header>
+        </x-ui.page-header>
 
         @if (session('status') === 'currency-created')
-            <x-saldo.status status="Currency created." />
+            <x-ui.status status="Currency created." />
         @endif
         @if (session('status') === 'currency-updated')
-            <x-saldo.status status="Currency updated." />
+            <x-ui.status status="Currency updated." />
         @endif
         @if (session('status') === 'currency-deleted')
-            <x-saldo.status status="Currency deleted." />
+            <x-ui.status status="Currency deleted." />
         @endif
         @error('currency')
             <p role="alert" class="rounded-[10px] border border-saldo-danger bg-saldo-danger-bg px-3.5 py-3 text-sm font-medium leading-normal text-saldo-danger">{{ $message }}</p>
@@ -100,7 +100,7 @@
             </section>
         @endif
 
-        <x-saldo.modal name="confirm-currency-deletion" labelledby="delete-title" describedby="delete-text">
+        <x-ui.modal name="confirm-currency-deletion" labelledby="delete-title" describedby="delete-text">
             <span aria-hidden="true" class="flex size-11 items-center justify-center rounded-xl bg-[#fdecea] text-saldo-danger">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"></path><path d="M9 7V4h6v3"></path></svg>
             </span>
@@ -114,9 +114,9 @@
                 @csrf
                 @method('DELETE')
 
-                <x-saldo.button as="button" type="button" variant="outline" x-on:click="$dispatch('close')">Cancel</x-saldo.button>
-                <x-saldo.button as="button" variant="danger" class="px-4.5">Delete currency</x-saldo.button>
+                <x-ui.button as="button" type="button" variant="outline" x-on:click="$dispatch('close')">Cancel</x-ui.button>
+                <x-ui.button as="button" variant="danger" class="px-4.5">Delete currency</x-ui.button>
             </form>
-        </x-saldo.modal>
+        </x-ui.modal>
     </div>
 </x-app-layout>

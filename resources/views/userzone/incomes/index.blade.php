@@ -1,23 +1,23 @@
 <x-app-layout>
     <div class="mx-auto flex max-w-[1184px] flex-col gap-6 px-8 pb-18 pt-10">
-        <x-saldo.page-header title="Incomes">
+        <x-ui.page-header title="Incomes">
             <x-slot:subtitle>
                 Received {{ $periodPhrase }} {{ $scope }}
             </x-slot:subtitle>
 
             <x-slot:actions>
-                <x-saldo.button :href="route('incomes.create')" class="gap-2 pl-3.5 pr-4.5">
+                <x-ui.button :href="route('incomes.create')" class="gap-2 pl-3.5 pr-4.5">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
                     <span>New income</span>
-                </x-saldo.button>
+                </x-ui.button>
             </x-slot:actions>
-        </x-saldo.page-header>
+        </x-ui.page-header>
 
         @if (session('status') === 'income-created')
-            <x-saldo.status status="Income created." />
+            <x-ui.status status="Income created." />
         @endif
         @if (session('status') === 'income-updated')
-            <x-saldo.status status="Income updated." />
+            <x-ui.status status="Income updated." />
         @endif
 
         <x-forms.entry-filters
@@ -66,11 +66,11 @@
                 @if ($outsideCount > 0)
                     <p class="text-base font-semibold">No incomes in this period</p>
                     <p class="text-[14.5px] text-saldo-muted">There {{ $outsideCount === 1 ? 'is 1 income' : 'are '.$outsideCount.' incomes' }} outside it.</p>
-                    <x-saldo.button variant="ghost" :href="$showAllUrl" class="mt-2 border border-saldo-line-strong bg-white">Show all incomes</x-saldo.button>
+                    <x-ui.button variant="ghost" :href="$showAllUrl" class="mt-2 border border-saldo-line-strong bg-white">Show all incomes</x-ui.button>
                 @elseif ($activeFilters > 0)
                     <p class="text-base font-semibold">No incomes match these filters</p>
                     <p class="text-[14.5px] text-saldo-muted">Try another account, category or period.</p>
-                    <x-saldo.button variant="ghost" :href="route('incomes.index')" class="mt-2 border border-saldo-line-strong bg-white">Clear filters</x-saldo.button>
+                    <x-ui.button variant="ghost" :href="route('incomes.index')" class="mt-2 border border-saldo-line-strong bg-white">Clear filters</x-ui.button>
                 @else
                     <p class="text-base font-semibold">No incomes yet</p>
                     <p class="text-[14.5px] text-saldo-muted">Money you receive will show up here, grouped by month.</p>

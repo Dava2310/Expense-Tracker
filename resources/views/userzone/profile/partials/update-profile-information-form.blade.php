@@ -42,7 +42,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-saldo.button as="button">Save</x-saldo.button>
+            <x-ui.button as="button">Save</x-ui.button>
 
             @if (session('status') === 'profile-updated')
                 <p

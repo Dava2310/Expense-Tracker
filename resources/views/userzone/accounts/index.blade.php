@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="mx-auto flex max-w-[1184px] flex-col gap-7 px-8 pb-18 pt-10">
-        <x-saldo.page-header title="Accounts">
+        <x-ui.page-header title="Accounts">
             <x-slot:subtitle>
                 @if ($accounts->isEmpty())
                     Add your first account to start tracking your balance.
@@ -10,21 +10,21 @@
             </x-slot:subtitle>
 
             <x-slot:actions>
-                <x-saldo.button :href="route('accounts.create')" class="gap-2 pl-3.5 pr-4.5">
+                <x-ui.button :href="route('accounts.create')" class="gap-2 pl-3.5 pr-4.5">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
                     <span>New account</span>
-                </x-saldo.button>
+                </x-ui.button>
             </x-slot:actions>
-        </x-saldo.page-header>
+        </x-ui.page-header>
 
         @if (session('status') === 'account-created')
-            <x-saldo.status status="Account created." />
+            <x-ui.status status="Account created." />
         @endif
         @if (session('status') === 'account-updated')
-            <x-saldo.status status="Account updated." />
+            <x-ui.status status="Account updated." />
         @endif
         @if (session('status') === 'account-deactivated')
-            <x-saldo.status status="Account deactivated." />
+            <x-ui.status status="Account deactivated." />
         @endif
 
         <div class="overflow-hidden rounded-2xl border border-saldo-line bg-white">

@@ -45,16 +45,16 @@
 
     <header class="mx-auto flex max-w-[1184px] flex-wrap items-center justify-between gap-4 px-8 py-5">
         <a href="{{ route('welcome') }}" aria-label="Saldo home" class="flex items-center gap-2.5 text-saldo-ink no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">
-            <x-saldo.logo />
+            <x-ui.logo />
             <span class="font-display text-xl font-semibold tracking-[-0.02em]">Saldo</span>
         </a>
 
         <nav aria-label="Account" class="flex items-center gap-2">
             @auth
-                <x-saldo.button :href="route('dashboard')">Dashboard</x-saldo.button>
+                <x-ui.button :href="route('dashboard')">Dashboard</x-ui.button>
             @else
-                <x-saldo.button variant="ghost" :href="route('login')">Log in</x-saldo.button>
-                <x-saldo.button :href="route('register')" class="px-4.5">Get started</x-saldo.button>
+                <x-ui.button variant="ghost" :href="route('login')">Log in</x-ui.button>
+                <x-ui.button :href="route('register')" class="px-4.5">Get started</x-ui.button>
             @endauth
         </nav>
     </header>
@@ -75,10 +75,10 @@
             </p>
 
             <div class="flex flex-col items-center gap-3.5 pt-2">
-                <x-saldo.button size="lg" :href="$primaryHref">
+                <x-ui.button size="lg" :href="$primaryHref">
                     {{ $primaryLabel }}
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-                </x-saldo.button>
+                </x-ui.button>
 
                 @guest
                     <p class="text-sm text-saldo-subtle">
@@ -93,7 +93,7 @@
             <div class="overflow-hidden rounded-[22px] border border-saldo-line bg-white shadow-[0_40px_80px_-32px_rgba(22,24,27,0.22),0_2px_6px_rgba(22,24,27,0.04)]">
                 <div aria-hidden="true" class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-b border-saldo-line-soft px-6 py-3.5">
                     <span class="flex items-center gap-2 font-display text-base font-semibold tracking-[-0.02em]">
-                        <x-saldo.logo :size="22" />
+                        <x-ui.logo :size="22" />
                         <span>Saldo</span>
                     </span>
 
@@ -185,14 +185,14 @@
                 <p class="max-w-[480px] text-[17px] leading-[1.6] text-saldo-dark-text">
                     Add it, log today’s spending, and let the balance keep itself up to date.
                 </p>
-                <x-saldo.button variant="light" size="lg" :href="$primaryHref">{{ $primaryLabel }}</x-saldo.button>
+                <x-ui.button variant="light" size="lg" :href="$primaryHref">{{ $primaryLabel }}</x-ui.button>
             </div>
         </section>
     </main>
 
     <footer class="mx-auto flex max-w-[1184px] flex-wrap items-center justify-between gap-3 px-8 pb-12 pt-8 text-[13.5px] text-saldo-subtle">
         <span class="flex items-center gap-2 font-display text-[15px] font-semibold text-saldo-ink">
-            <x-saldo.logo :size="20" />
+            <x-ui.logo :size="20" />
             <span>Saldo</span>
         </span>
         <span>© {{ now()->year }} Saldo</span>

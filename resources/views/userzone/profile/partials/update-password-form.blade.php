@@ -20,7 +20,7 @@
         <x-forms.field label="Confirm Password" name="password_confirmation" id="update_password_password_confirmation" type="password" bag="updatePassword" autocomplete="new-password" />
 
         <div class="flex items-center gap-4">
-            <x-saldo.button as="button">Save</x-saldo.button>
+            <x-ui.button as="button">Save</x-ui.button>
 
             @if (session('status') === 'password-updated')
                 <p
