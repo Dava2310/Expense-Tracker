@@ -19,7 +19,7 @@
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.1/dist/cdn.min.js"></script>
     @endif
 </head>
-<body class="min-h-screen bg-saldo-surface font-inter text-saldo-ink antialiased">
+<body class="flex min-h-screen flex-col bg-saldo-surface font-inter text-saldo-ink antialiased">
     <x-layout.navigation />
 
     @isset($header)
@@ -28,8 +28,10 @@
         </header>
     @endisset
 
-    <main>
+    <main class="flex-1">
         {{ $slot }}
     </main>
+
+    <x-layout.footer />
 </body>
 </html>
