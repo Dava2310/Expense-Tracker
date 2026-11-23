@@ -124,6 +124,31 @@ test('the name of another category of the user is rejected, whatever the letter 
     expect($category->refresh()->name)->toBe('Rent');
 });
 
+test('renaming a category to exactly the name of another one is rejected with the validation message', function () {
+    $user = User::factory()->create();
+    Category::factory()->for($user)->create(['name' => 'Groceries']);
+    $category = Category::factory()->for($user)->create(['name' => 'Rent']);
+
+    $this->actingAs($user)
+        ->patch(route('categories.update', $category), ['name' => 'Groceries'])
+        ->assertSessionHasErrors(['name' => 'You already have a category called Groceries.']);
+
+    expect($category->refresh()->name)->toBe('Rent');
+});
+
+test('a category can be saved with its name unchanged', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->for($user)->create(['name' => 'Groceries', 'description' => 'Old details']);
+
+    $this->actingAs($user)
+        ->patch(route('categories.update', $category), ['name' => 'Groceries', 'description' => 'New details'])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('categories.index'));
+
+    expect($category->refresh())->name->toBe('Groceries')
+        ->description->toBe('New details');
+});
+
 test('a category can keep its own name', function () {
     $user = User::factory()->create();
     $category = Category::factory()->for($user)->create(['name' => 'Groceries']);
