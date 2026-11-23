@@ -66,7 +66,10 @@ class CurrencyController extends Controller
     {
         $this->ensureOwnedBy($request, $currency);
 
-        $accounts = $request->user()->accounts()->withTrashed()->where('currency_id', $currency->id)->get();
+        $accounts = $request->user()->accounts()->withTrashed()
+            ->select('id', 'name', 'bank', 'balance_in_cents', 'min_balance_in_cents', 'deleted_at')
+            ->where('currency_id', $currency->id)
+            ->get();
         $accountsCount = $accounts->count();
         $activeAccountsCount = $accounts->filter(fn (Account $account): bool => ! $account->trashed())->count();
         $inactiveAccountsCount = $accounts->filter(fn (Account $account): bool => $account->trashed())->count();

@@ -122,11 +122,11 @@ class IncomeController extends Controller
      */
     public function edit(Request $request, Income $income): View
     {
+        $income->load(['account:id,name,bank,currency_id,user_id', 'account.currency:id,symbol', 'category:id,name']);
+
         $this->ensureOwnedBy($request, $income);
 
-        return view('userzone.incomes.edit', [
-            'income' => $income->load(['account.currency', 'category']),
-        ]);
+        return view('userzone.incomes.edit', ['income' => $income]);
     }
 
     /***

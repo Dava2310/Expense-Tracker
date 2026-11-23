@@ -122,11 +122,11 @@ class ExpenseController extends Controller
      */
     public function edit(Request $request, Expense $expense): View
     {
+        $expense->load(['account:id,name,bank,currency_id,user_id', 'account.currency:id,symbol', 'category:id,name']);
+
         $this->ensureOwnedBy($request, $expense);
 
-        return view('userzone.expenses.edit', [
-            'expense' => $expense->load(['account.currency', 'category']),
-        ]);
+        return view('userzone.expenses.edit', ['expense' => $expense]);
     }
 
     /***

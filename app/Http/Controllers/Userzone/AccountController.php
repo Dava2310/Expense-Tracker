@@ -69,7 +69,7 @@ class AccountController extends Controller
         $this->ensureOwnedBy($request, $account);
 
         return view('userzone.accounts.show', [
-            'account' => $account->load('currency'),
+            'account' => $account->load('currency:id,symbol'),
             'activity' => $account->recentActivity(),
             'monthIncome' => $account->monthTotal('incomes'),
             'monthExpenses' => $account->monthTotal('expenses'),
