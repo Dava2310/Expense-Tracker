@@ -182,3 +182,25 @@ test('the new expense form puts the account before the amount and uses each acco
         ->assertSee('x-text="symbol"', false)
         ->assertSee('\u0022'.$account->id.'\u0022:\u0022$\u0022', false);
 });
+
+test('an expense is accepted when it equals the balance to the cent and rejected one cent above it', function (string $amount, bool $accepted) {
+    $user = User::factory()->create();
+    $account = Account::factory()->for($user)->create(['name' => 'Wallet', 'balance' => '10.00']);
+    $category = Category::factory()->for($user)->create();
+
+    $response = $this->actingAs($user)
+        ->from(route('expenses.create'))
+        ->post(route('expenses.store'), validExpenseInput($account, $category, ['amount' => $amount]));
+
+    if ($accepted) {
+        $response->assertSessionHasNoErrors();
+        expect($account->refresh()->balance)->toBe('0.00');
+    } else {
+        $response->assertSessionHasErrors(['amount' => 'Wallet only has €10.00 available.']);
+        expect(Expense::count())->toBe(0)
+            ->and($account->refresh()->balance)->toBe('10.00');
+    }
+})->with([
+    'equal to the balance' => ['10.00', true],
+    'one cent more' => ['10.01', false],
+]);

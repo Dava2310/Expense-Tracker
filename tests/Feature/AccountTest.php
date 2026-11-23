@@ -111,3 +111,59 @@ test('the monthly flow gives each month its net and whether income covered the e
         ->and($flow->get(4))->toMatchArray(['net' => 0.2, 'surplus' => false])
         ->and($flow->first())->toMatchArray(['net' => 0.0, 'surplus' => true]);
 });
+
+test('depositing 0.10 one hundred times gives exactly 10.00', function () {
+    $account = Account::factory()->create(['balance' => 0]);
+
+    foreach (range(1, 100) as $ignored) {
+        $account->deposit(0.10);
+    }
+
+    expect($account->balance)->toBe('10.00')
+        ->and($account->fresh()->balance_in_cents)->toBe(1000);
+});
+
+test('0.10 plus 0.20 gives exactly 0.30', function () {
+    $account = Account::factory()->create(['balance' => 0]);
+
+    $account->deposit('0.10');
+    $account->deposit('0.20');
+
+    expect($account->fresh()->balance_in_cents)->toBe(30)
+        ->and($account->balance)->toBe('0.30');
+});
+
+test('withdrawing 0.10 one hundred times empties a balance of 10.00 exactly', function () {
+    $account = Account::factory()->create(['balance' => 10]);
+
+    foreach (range(1, 100) as $ignored) {
+        $account->withdraw(0.10);
+    }
+
+    expect($account->balance)->toBe('0.00')
+        ->and($account->hasEnoughBalanceFor('0.01'))->toBeFalse();
+});
+
+test('the balance covers an amount equal to it to the cent but not one cent more', function () {
+    $account = Account::factory()->create(['balance' => '10.00']);
+
+    expect($account->hasEnoughBalanceFor('10.00'))->toBeTrue()
+        ->and($account->hasEnoughBalanceFor('10.01'))->toBeFalse();
+});
+
+test('a balance far above the input maximum is stored and changed without overflow', function () {
+    $account = Account::factory()->create(['balance' => '5000000000.00']);
+
+    $account->deposit('0.01');
+
+    expect($account->fresh()->balance_in_cents)->toBe(500000000001)
+        ->and($account->balance)->toBe('5000000000.01');
+});
+
+test('many small entries add up to an exact month total', function () {
+    $account = Account::factory()->create();
+    $category = Category::factory()->create();
+    Income::factory()->count(100)->for($account)->for($category)->create(['amount' => '0.10', 'date' => now()->startOfMonth()]);
+
+    expect($account->monthTotal('incomes'))->toBe(10.0);
+});
