@@ -177,3 +177,37 @@ test('deposits made through different instances of the same account are both kep
 
     expect($account->fresh()->balance_in_cents)->toBe(1500);
 });
+
+test('spending by category adds up each category exactly and lists the biggest first', function () {
+    $account = Account::factory()->create();
+    $groceries = Category::factory()->create(['name' => 'Groceries']);
+    $rent = Category::factory()->create(['name' => 'Rent']);
+    Expense::factory()->count(3)->for($account)->for($groceries)->create(['amount' => '0.10', 'date' => now()->startOfMonth()]);
+    Expense::factory()->for($account)->for($rent)->create(['amount' => '0.50', 'date' => now()->startOfMonth()]);
+
+    expect($account->monthSpendingByCategory()->all())->toBe([
+        ['name' => 'Rent', 'amount' => 0.5],
+        ['name' => 'Groceries', 'amount' => 0.3],
+    ]);
+});
+
+test('spending by category orders categories with the same total by name', function () {
+    $account = Account::factory()->create();
+    $travel = Category::factory()->create(['name' => 'Travel']);
+    $books = Category::factory()->create(['name' => 'Books']);
+    Expense::factory()->for($account)->for($travel)->create(['amount' => '20', 'date' => now()->startOfMonth()]);
+    Expense::factory()->for($account)->for($books)->create(['amount' => '20', 'date' => now()->startOfMonth()]);
+
+    expect($account->monthSpendingByCategory()->pluck('name')->all())->toBe(['Books', 'Travel']);
+});
+
+test('spending by category only counts the chosen month and the chosen account', function () {
+    $account = Account::factory()->create();
+    $category = Category::factory()->create(['name' => 'Groceries']);
+    Expense::factory()->for($account)->for($category)->create(['amount' => '10', 'date' => now()->startOfMonth()]);
+    Expense::factory()->for($account)->for($category)->create(['amount' => '99', 'date' => now()->subMonth()->startOfMonth()]);
+    Expense::factory()->for(Account::factory())->for($category)->create(['amount' => '77', 'date' => now()->startOfMonth()]);
+
+    expect($account->monthSpendingByCategory()->all())->toBe([['name' => 'Groceries', 'amount' => 10.0]])
+        ->and($account->monthSpendingByCategory(now()->subMonth())->all())->toBe([['name' => 'Groceries', 'amount' => 99.0]]);
+});

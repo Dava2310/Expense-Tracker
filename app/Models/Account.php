@@ -198,16 +198,18 @@ class Account extends Model
         $month ??= now();
 
         return $this->expenses()
-            ->with('category')
-            ->whereBetween('date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()])
+            ->join('categories', 'categories.id', '=', 'expenses.category_id')
+            ->whereBetween('expenses.date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()])
+            ->groupBy('expenses.category_id', 'categories.name')
+            ->selectRaw('categories.name, SUM(expenses.amount_in_cents) as total')
+            ->orderByDesc('total')
+            ->orderBy('categories.name')
+            ->toBase()
             ->get()
-            ->groupBy('category_id')
-            ->map(fn (Collection $expenses): array => [
-                'name' => $expenses->first()->category->name,
-                'amount' => $this->toDecimal($expenses->sum('amount_in_cents')),
-            ])
-            ->sortByDesc('amount')
-            ->values();
+            ->map(fn (object $row): array => [
+                'name' => $row->name,
+                'amount' => $this->toDecimal((int) $row->total),
+            ]);
     }
 
     /**
