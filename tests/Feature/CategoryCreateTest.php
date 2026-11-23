@@ -81,6 +81,17 @@ test('a user cannot have two categories with the same name, whatever the letter 
     expect(Category::count())->toBe(1);
 });
 
+test('a category with exactly the same name as an existing one is rejected with the validation message', function () {
+    $user = User::factory()->create();
+    Category::factory()->for($user)->create(['name' => 'Groceries']);
+
+    $this->actingAs($user)
+        ->post(route('categories.store'), ['name' => 'Groceries'])
+        ->assertSessionHasErrors(['name' => 'You already have a category called Groceries.']);
+
+    expect(Category::count())->toBe(1);
+});
+
 test('two users can have categories with the same name', function () {
     Category::factory()->create(['name' => 'Groceries']);
 
