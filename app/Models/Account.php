@@ -132,7 +132,7 @@ class Account extends Model
             ->map(fn (Expense $expense): array => $this->activityEntry('expense', $expense));
 
         return $incomes->concat($expenses)
-            ->sortByDesc(fn (array $entry): string => $entry['date']->format('Y-m-d').str_pad((string) $entry['id'], 10, '0', STR_PAD_LEFT))
+            ->sortBy([['date', 'desc'], ['id', 'desc']])
             ->take($limit)
             ->values();
     }
