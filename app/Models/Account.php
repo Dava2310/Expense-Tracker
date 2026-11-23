@@ -82,7 +82,7 @@ class Account extends Model
      */
     public function deposit(string|float $amount): void
     {
-        $this->changeBalanceByCents((int) round((float) $amount * 100));
+        $this->increment('balance_in_cents', (int) round((float) $amount * 100));
     }
 
     /**
@@ -90,7 +90,7 @@ class Account extends Model
      */
     public function withdraw(string|float $amount): void
     {
-        $this->changeBalanceByCents(-(int) round((float) $amount * 100));
+        $this->decrement('balance_in_cents', (int) round((float) $amount * 100));
     }
 
     /**
@@ -238,17 +238,6 @@ class Account extends Model
     public function incomes(): HasMany
     {
         return $this->hasMany(Income::class);
-    }
-
-    /**
-     * Changes the balance by a number of cents with one database-side update, so it is exact
-     * and does not depend on the value loaded earlier. The model is refreshed afterwards.
-     */
-    private function changeBalanceByCents(int $cents): void
-    {
-        static::whereKey($this->getKey())->increment('balance_in_cents', $cents);
-
-        $this->refresh();
     }
 
     /**
