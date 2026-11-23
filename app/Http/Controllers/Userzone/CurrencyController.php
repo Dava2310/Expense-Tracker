@@ -23,6 +23,7 @@ class CurrencyController extends Controller
     public function index(Request $request): View
     {
         $currencies = $request->user()->currencies()
+            ->select('id', 'name', 'symbol')
             ->withCount(['accounts' => fn ($query) => $query->withTrashed()])
             ->latest()
             ->get();

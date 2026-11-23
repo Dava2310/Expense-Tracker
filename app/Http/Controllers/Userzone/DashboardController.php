@@ -14,7 +14,8 @@ class DashboardController extends Controller
     public function __invoke(Request $request): View
     {
         $user = $request->user();
-        $accounts = $user->accounts()->with('currency')->orderBy('name')->get();
+        $accountColumns = ['id', 'name', 'bank', 'balance_in_cents', 'min_balance_in_cents', 'currency_id'];
+        $accounts = $user->accounts()->select($accountColumns)->with('currency:id,symbol')->orderBy('name')->get();
 
         // Each chart only queries its data once an account was chosen in its own filter
         $flowAccount = $accounts->firstWhere('id', $request->integer('inc_exp'));
@@ -26,7 +27,7 @@ class DashboardController extends Controller
 
         return view('userzone.dashboard', [
             'accounts' => $accounts,
-            'inactiveAccounts' => $user->accounts()->onlyTrashed()->with('currency')->orderBy('name')->get(),
+            'inactiveAccounts' => $user->accounts()->onlyTrashed()->select([...$accountColumns, 'deleted_at'])->with('currency:id,symbol')->orderBy('name')->get(),
             'monthlyFlow' => $monthlyFlow,
             'chartMax' => $highestAmount > 0 ? $this->roundUpToScale($highestAmount) : 0,
             'categorySpending' => $monthSpending->take(7),
