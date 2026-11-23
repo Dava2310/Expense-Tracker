@@ -33,17 +33,32 @@ class Account extends Model
      * @var array<string, int|string>
      */
     protected $attributes = [
-        'balance' => 0,
+        'balance_in_cents' => 0,
         'details' => '',
-        'min_balance' => 0,
+        'min_balance_in_cents' => 0,
     ];
 
     /**
-     * The minimum balance is optional; an empty value means no minimum (0).
+     * The balance is read and written as a decimal (12.34) but stored as whole cents (1234).
+     */
+    protected function balance(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes): string => number_format($attributes['balance_in_cents'] / 100, 2, '.', ''),
+            set: fn (string|float $decimal): array => ['balance_in_cents' => (int) round((float) $decimal * 100)],
+        );
+    }
+
+    /**
+     * The minimum balance is read and written as a decimal but stored as whole cents.
+     * It is optional; an empty value means no minimum (0).
      */
     protected function minBalance(): Attribute
     {
-        return Attribute::set(fn (mixed $value): mixed => $value ?? 0);
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes): string => number_format($attributes['min_balance_in_cents'] / 100, 2, '.', ''),
+            set: fn (string|float|null $decimal): array => ['min_balance_in_cents' => (int) round((float) ($decimal ?? 0) * 100)],
+        );
     }
 
     /**
@@ -55,19 +70,6 @@ class Account extends Model
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'balance' => 'decimal:2',
-            'min_balance' => 'decimal:2',
-        ];
-    }
-
-    /**
      * Formats an amount with the symbol of the currency this account is held in.
      */
     public function formatMoney(string|float $amount, int $precision = 2): string
@@ -76,11 +78,27 @@ class Account extends Model
     }
 
     /**
+     * Adds the given decimal amount to the balance.
+     */
+    public function deposit(string|float $amount): void
+    {
+        $this->changeBalanceByCents((int) round((float) $amount * 100));
+    }
+
+    /**
+     * Takes the given decimal amount out of the balance.
+     */
+    public function withdraw(string|float $amount): void
+    {
+        $this->changeBalanceByCents(-(int) round((float) $amount * 100));
+    }
+
+    /**
      * Determines whether the balance is enough to pay the given amount.
      */
     public function hasEnoughBalanceFor(string|float $amount): bool
     {
-        return round((float) $this->balance - (float) $amount, 2) >= 0;
+        return $this->balance_in_cents >= (int) round((float) $amount * 100);
     }
 
     /**
@@ -88,7 +106,7 @@ class Account extends Model
      */
     public function isBelowMinimum(): bool
     {
-        return round((float) $this->balance - (float) $this->min_balance, 2) < 0;
+        return $this->balance_in_cents < $this->min_balance_in_cents;
     }
 
     /**
@@ -206,6 +224,17 @@ class Account extends Model
     public function incomes(): HasMany
     {
         return $this->hasMany(Income::class);
+    }
+
+    /**
+     * Changes the balance by a number of cents with one database-side update, so it is exact
+     * and does not depend on the value loaded earlier. The model is refreshed afterwards.
+     */
+    private function changeBalanceByCents(int $cents): void
+    {
+        static::whereKey($this->getKey())->increment('balance_in_cents', $cents);
+
+        $this->refresh();
     }
 
     /**

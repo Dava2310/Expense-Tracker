@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('bank');
             $table->string('details');
-            $table->decimal('balance');
-            $table->decimal('min_balance');
+            $table->bigInteger('balance_in_cents');
+            $table->bigInteger('min_balance_in_cents');
             $table->foreignId('user_id')->constrained();
             $table->foreignId('currency_id')->constrained();
             $table->timestamps();

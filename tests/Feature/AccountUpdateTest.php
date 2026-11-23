@@ -33,7 +33,7 @@ test('owner updates the editable fields', function () {
         'name' => 'New name',
         'bank' => 'New bank',
         'details' => 'New details',
-        'min_balance' => 25.50,
+        'min_balance_in_cents' => 2550,
     ]);
 });
 

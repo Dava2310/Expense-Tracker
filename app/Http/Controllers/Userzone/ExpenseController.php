@@ -87,7 +87,7 @@ class ExpenseController extends Controller
     public function create(Request $request): View
     {
         return view('userzone.expenses.create', [
-            'accounts' => $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance', 'currency_id']),
+            'accounts' => $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance_in_cents', 'currency_id']),
             'categories' => $request->user()->categories()->orderBy('name')->get(['id', 'name']),
         ]);
     }
@@ -106,7 +106,7 @@ class ExpenseController extends Controller
         DB::transaction(function () use ($data): void {
             Expense::create($data);
 
-            Account::whereKey($data['account_id'])->decrement('balance', $data['amount']);
+            Account::findOrFail($data['account_id'])->withdraw($data['amount']);
         });
 
         return redirect()->route('expenses.index')->with('status', 'expense-created');
