@@ -211,3 +211,34 @@ test('spending by category only counts the chosen month and the chosen account',
     expect($account->monthSpendingByCategory()->all())->toBe([['name' => 'Groceries', 'amount' => 10.0]])
         ->and($account->monthSpendingByCategory(now()->subMonth())->all())->toBe([['name' => 'Groceries', 'amount' => 99.0]]);
 });
+
+test('the monthly flow lists the last six months oldest first, with zero for months without entries', function () {
+    $this->travelTo('2026-11-15');
+    $account = Account::factory()->create();
+    $category = Category::factory()->create();
+    Income::factory()->count(100)->for($account)->for($category)->create(['amount' => '0.10', 'date' => '2026-08-10']);
+    Expense::factory()->for($account)->for($category)->create(['amount' => '5.50', 'date' => '2026-11-02']);
+
+    $flow = $account->monthlyFlow();
+
+    expect($flow->pluck('label')->all())->toBe(['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'])
+        ->and($flow->pluck('income')->all())->toBe([0.0, 0.0, 10.0, 0.0, 0.0, 0.0])
+        ->and($flow->pluck('expenses')->all())->toBe([0.0, 0.0, 0.0, 0.0, 0.0, 5.5]);
+});
+
+test('the monthly flow only counts the six months and the chosen account', function () {
+    $this->travelTo('2026-11-15');
+    $account = Account::factory()->create();
+    $category = Category::factory()->create();
+    Income::factory()->for($account)->for($category)->create(['amount' => '1', 'date' => '2026-05-31']);
+    Income::factory()->for($account)->for($category)->create(['amount' => '2', 'date' => '2026-06-01']);
+    Income::factory()->for($account)->for($category)->create(['amount' => '4', 'date' => '2026-11-30']);
+    Income::factory()->for($account)->for($category)->create(['amount' => '8', 'date' => '2026-12-01']);
+    Income::factory()->for(Account::factory())->for($category)->create(['amount' => '16', 'date' => '2026-11-10']);
+
+    $flow = $account->monthlyFlow();
+
+    expect($flow->first()['income'])->toBe(2.0)
+        ->and($flow->last()['income'])->toBe(4.0)
+        ->and($flow->sum('income'))->toBe(6.0);
+});
