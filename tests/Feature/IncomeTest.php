@@ -43,5 +43,22 @@ test('incomes can be mass assigned with their own fields', function () {
         'category_id' => Category::factory()->create()->id,
     ]);
 
-    $this->assertDatabaseHas('incomes', ['id' => $income->id, 'concept' => 'Gift', 'amount' => 25.50]);
+    $this->assertDatabaseHas('incomes', ['id' => $income->id, 'concept' => 'Gift', 'amount_in_cents' => 2550]);
 });
+
+test('an income amount is stored as whole cents and read back as a decimal', function () {
+    $income = Income::factory()->create(['amount' => 12.34])->fresh();
+
+    expect($income->amount_in_cents)->toBe(1234)
+        ->and($income->amount)->toBe('12.34');
+});
+
+test('income amounts that floats cannot hold exactly are stored to the cent', function (string|float $amount, int $cents) {
+    $income = Income::factory()->create(['amount' => $amount])->fresh();
+
+    expect($income->amount_in_cents)->toBe($cents);
+})->with([
+    'a tenth' => [0.1, 10],
+    'a string from a form' => ['0.30', 30],
+    'the input maximum' => ['999999.99', 99999999],
+]);
