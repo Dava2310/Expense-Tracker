@@ -27,7 +27,7 @@ class Expense extends Model
     protected function amount(): Attribute
     {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes): string => number_format($attributes['amount_in_cents'] / 100, 2, '.', ''),
+            get: fn (mixed $value, array $attributes): float => $attributes['amount_in_cents'] / 100,
             set: fn (string|float $decimal): array => ['amount_in_cents' => (int) round((float) $decimal * 100)],
         );
     }

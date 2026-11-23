@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 test('amount is kept with two decimals and date is a date', function () {
     $income = Income::factory()->create(['amount' => 150, 'date' => '2026-11-10'])->fresh();
 
-    expect($income->amount)->toBe('150.00')
+    expect($income->amount)->toBe(150.00)
         ->and($income->date)->toBeInstanceOf(Carbon::class)
         ->and($income->date->toDateString())->toBe('2026-11-10');
 });
@@ -50,7 +50,7 @@ test('an income amount is stored as whole cents and read back as a decimal', fun
     $income = Income::factory()->create(['amount' => 12.34])->fresh();
 
     expect($income->amount_in_cents)->toBe(1234)
-        ->and($income->amount)->toBe('12.34');
+        ->and($income->amount)->toBe(12.34);
 });
 
 test('income amounts that floats cannot hold exactly are stored to the cent', function (string|float $amount, int $cents) {

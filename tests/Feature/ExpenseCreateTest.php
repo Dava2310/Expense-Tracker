@@ -194,11 +194,11 @@ test('an expense is accepted when it equals the balance to the cent and rejected
 
     if ($accepted) {
         $response->assertSessionHasNoErrors();
-        expect($account->refresh()->balance)->toBe('0.00');
+        expect($account->refresh()->balance)->toBe(0.00);
     } else {
         $response->assertSessionHasErrors(['amount' => 'Wallet only has €10.00 available.']);
         expect(Expense::count())->toBe(0)
-            ->and($account->refresh()->balance)->toBe('10.00');
+            ->and($account->refresh()->balance)->toBe(10.00);
     }
 })->with([
     'equal to the balance' => ['10.00', true],

@@ -70,7 +70,7 @@ class CurrencyController extends Controller
         $activeAccountsCount = $accounts->filter(fn (Account $account): bool => ! $account->trashed())->count();
         $inactiveAccountsCount = $accounts->filter(fn (Account $account): bool => $account->trashed())->count();
         $isInUse = $accountsCount > 0;
-        $totalBalance = $currency->symbol.number_format((float) $currency->totalBalance(), 2);
+        $totalBalance = $currency->symbol.number_format($currency->totalBalance(), 2);
 
         return view('userzone.currencies.show', [
             'currency' => $currency,

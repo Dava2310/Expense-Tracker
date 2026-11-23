@@ -47,7 +47,7 @@
             name="min_balance"
             prefix-model="symbol"
             inputmode="decimal"
-            :value="$account?->min_balance"
+            :value="$account ? number_format($account->min_balance, 2, '.', '') : null"
             optional
             placeholder="0.00"
             hint="We’ll flag this account whenever its balance drops below this amount. Leave it empty for no minimum."

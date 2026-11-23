@@ -178,3 +178,17 @@ test('clearing the minimum balance resets it to zero', function () {
 
     expect($account->fresh()->min_balance)->toEqual(0);
 });
+
+test('the edit form shows the minimum balance with two decimals', function (string|float $minimum, string $shown) {
+    $user = User::factory()->create();
+    $account = Account::factory()->for($user)->create(['min_balance' => $minimum]);
+
+    $this->actingAs($user)
+        ->get(route('accounts.edit', $account))
+        ->assertOk()
+        ->assertSee('value="'.$shown.'"', false);
+})->with([
+    'a whole amount' => [500, '500.00'],
+    'one decimal' => [25.5, '25.50'],
+    'no minimum' => [0, '0.00'],
+]);

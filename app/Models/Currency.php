@@ -48,9 +48,9 @@ class Currency extends Model
      *
      * @return string
      */
-    public function totalBalance(): string
+    public function totalBalance(): float
     {
-        return number_format((int) $this->accounts()->withTrashed()->sum('balance_in_cents') / 100, 2, '.', '');
+        return (int) $this->accounts()->withTrashed()->sum('balance_in_cents') / 100;
     }
 
     /***

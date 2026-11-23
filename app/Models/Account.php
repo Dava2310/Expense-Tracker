@@ -44,7 +44,7 @@ class Account extends Model
     protected function balance(): Attribute
     {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes): string => number_format($attributes['balance_in_cents'] / 100, 2, '.', ''),
+            get: fn (mixed $value, array $attributes): float => $attributes['balance_in_cents'] / 100,
             set: fn (string|float $decimal): array => ['balance_in_cents' => (int) round((float) $decimal * 100)],
         );
     }
@@ -56,7 +56,7 @@ class Account extends Model
     protected function minBalance(): Attribute
     {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes): string => number_format($attributes['min_balance_in_cents'] / 100, 2, '.', ''),
+            get: fn (mixed $value, array $attributes): float => $attributes['min_balance_in_cents'] / 100,
             set: fn (string|float|null $decimal): array => ['min_balance_in_cents' => (int) round((float) ($decimal ?? 0) * 100)],
         );
     }
@@ -72,9 +72,9 @@ class Account extends Model
     /**
      * Formats an amount with the symbol of the currency this account is held in.
      */
-    public function formatMoney(string|float $amount, int $precision = 2): string
+    public function formatMoney(float $amount, int $precision = 2): string
     {
-        return $this->currency->symbol.Number::format((float) $amount, $precision, locale: 'en');
+        return $this->currency->symbol.Number::format($amount, $precision, locale: 'en');
     }
 
     /**
@@ -113,9 +113,9 @@ class Account extends Model
      * Gets how far the balance is from the minimum balance as a decimal, whether above or below it.
      * Use isBelowMinimum() to know which side the balance is on.
      */
-    public function distanceToMinimum(): string
+    public function distanceToMinimum(): float
     {
-        return number_format(abs($this->balance_in_cents - $this->min_balance_in_cents) / 100, 2, '.', '');
+        return abs($this->balance_in_cents - $this->min_balance_in_cents) / 100;
     }
 
     /**
@@ -272,7 +272,7 @@ class Account extends Model
             'concept' => $entry->concept,
             'date' => $entry->date,
             'category' => $entry->category->name,
-            'amount' => (float) $entry->amount,
+            'amount' => $entry->amount,
         ];
     }
 }
