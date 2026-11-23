@@ -167,3 +167,13 @@ test('many small entries add up to an exact month total', function () {
 
     expect($account->monthTotal('incomes'))->toBe(10.0);
 });
+
+test('deposits made through different instances of the same account are both kept', function () {
+    $account = Account::factory()->create(['balance' => 0]);
+    $sameAccount = Account::find($account->id);
+
+    $account->deposit('10.00');
+    $sameAccount->deposit('5.00');
+
+    expect($account->fresh()->balance_in_cents)->toBe(1500);
+});
