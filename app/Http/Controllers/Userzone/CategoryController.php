@@ -21,7 +21,11 @@ class CategoryController extends Controller
     public function index(Request $request): View
     {
         return view('userzone.categories.index', [
-            'categories' => $request->user()->categories()->withCount(['incomes', 'expenses'])->orderBy('name')->get(),
+            'categories' => $request->user()->categories()
+                ->select('id', 'name', 'description')
+                ->withCount(['incomes', 'expenses'])
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 

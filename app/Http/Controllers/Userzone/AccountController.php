@@ -21,7 +21,11 @@ class AccountController extends Controller
     public function index(Request $request): View
     {
         return view('userzone.accounts.index', [
-            'accounts' => $request->user()->accounts()->with('currency')->latest()->get(),
+            'accounts' => $request->user()->accounts()
+                ->select('id', 'name', 'bank', 'details', 'balance_in_cents', 'min_balance_in_cents', 'currency_id')
+                ->with('currency:id,symbol')
+                ->latest()
+                ->get(),
         ]);
     }
 
