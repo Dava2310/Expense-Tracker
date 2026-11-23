@@ -162,28 +162,19 @@ class Account extends Model
     public function monthlyFlow(int $months = 6): Collection
     {
         $firstMonth = now()->startOfMonth()->subMonths($months - 1);
-        $range = [$firstMonth, now()->endOfMonth()];
+        $monthList = collect(range(0, $months - 1))->map(fn (int $offset): CarbonInterface => $firstMonth->copy()->addMonths($offset));
 
-        $incomes = $this->incomes()->whereBetween('date', $range)->get(['date', 'amount_in_cents'])
-            ->groupBy(fn (Income $income): string => $income->date->format('Y-m'));
+        $incomes = $this->monthlyTotalsInCents($this->incomes(), $monthList);
+        $expenses = $this->monthlyTotalsInCents($this->expenses(), $monthList);
 
-        $expenses = $this->expenses()->whereBetween('date', $range)->get(['date', 'amount_in_cents'])
-            ->groupBy(fn (Expense $expense): string => $expense->date->format('Y-m'));
-
-        return collect(range(0, $months - 1))->map(function (int $offset) use ($firstMonth, $incomes, $expenses): array {
-            $month = $firstMonth->copy()->addMonths($offset);
-            $key = $month->format('Y-m');
-
-            $incomeCents = $incomes->get($key, collect())->sum('amount_in_cents');
-            $expenseCents = $expenses->get($key, collect())->sum('amount_in_cents');
-
+        return $monthList->map(function (CarbonInterface $month, int $index) use ($incomes, $expenses): array {
             return [
                 'label' => $month->format('M'),
                 'name' => $month->format('F Y'),
-                'income' => $this->toDecimal($incomeCents),
-                'expenses' => $this->toDecimal($expenseCents),
-                'net' => $this->toDecimal(abs($incomeCents - $expenseCents)),
-                'surplus' => $incomeCents >= $expenseCents,
+                'income' => $this->toDecimal($incomes[$index]),
+                'expenses' => $this->toDecimal($expenses[$index]),
+                'net' => $this->toDecimal(abs($incomes[$index] - $expenses[$index])),
+                'surplus' => $incomes[$index] >= $expenses[$index],
             ];
         });
     }
@@ -242,6 +233,25 @@ class Account extends Model
     public function incomes(): HasMany
     {
         return $this->hasMany(Income::class);
+    }
+
+    /**
+     * Totals the given incomes or expenses of each month in cents with a single query, in the order of the months.
+     *
+     * @param  HasMany<Income|Expense, $this>  $entries
+     * @param  Collection<int, CarbonInterface>  $months
+     * @return list<int>
+     */
+    private function monthlyTotalsInCents(HasMany $entries, Collection $months): array
+    {
+        foreach ($months as $index => $month) {
+            $entries->selectRaw(
+                'SUM(CASE WHEN date BETWEEN ? AND ? THEN amount_in_cents ELSE 0 END) as month_'.$index,
+                [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()],
+            );
+        }
+
+        return array_map('intval', array_values((array) $entries->toBase()->first()));
     }
 
     /**
