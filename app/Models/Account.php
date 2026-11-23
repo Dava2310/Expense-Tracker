@@ -44,8 +44,8 @@ class Account extends Model
     protected function balance(): Attribute
     {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes): float => $attributes['balance_in_cents'] / 100,
-            set: fn (string|float $decimal): array => ['balance_in_cents' => (int) round((float) $decimal * 100)],
+            get: fn (mixed $value, array $attributes): float => $this->toDecimal($attributes['balance_in_cents']),
+            set: fn (string|float $decimal): array => ['balance_in_cents' => $this->toCents($decimal)],
         );
     }
 
@@ -56,8 +56,8 @@ class Account extends Model
     protected function minBalance(): Attribute
     {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes): float => $attributes['min_balance_in_cents'] / 100,
-            set: fn (string|float|null $decimal): array => ['min_balance_in_cents' => (int) round((float) ($decimal ?? 0) * 100)],
+            get: fn (mixed $value, array $attributes): float => $this->toDecimal($attributes['min_balance_in_cents']),
+            set: fn (string|float|null $decimal): array => ['min_balance_in_cents' => $this->toCents($decimal ?? 0)],
         );
     }
 
@@ -82,7 +82,7 @@ class Account extends Model
      */
     public function deposit(string|float $amount): void
     {
-        $this->increment('balance_in_cents', (int) round((float) $amount * 100));
+        $this->increment('balance_in_cents', $this->toCents($amount));
     }
 
     /**
@@ -90,7 +90,7 @@ class Account extends Model
      */
     public function withdraw(string|float $amount): void
     {
-        $this->decrement('balance_in_cents', (int) round((float) $amount * 100));
+        $this->decrement('balance_in_cents', $this->toCents($amount));
     }
 
     /**
@@ -98,7 +98,7 @@ class Account extends Model
      */
     public function hasEnoughBalanceFor(string|float $amount): bool
     {
-        return $this->balance_in_cents >= (int) round((float) $amount * 100);
+        return $this->balance_in_cents >= $this->toCents($amount);
     }
 
     /**
@@ -115,7 +115,7 @@ class Account extends Model
      */
     public function distanceToMinimum(): float
     {
-        return abs($this->balance_in_cents - $this->min_balance_in_cents) / 100;
+        return $this->toDecimal(abs($this->balance_in_cents - $this->min_balance_in_cents));
     }
 
     /**
@@ -146,7 +146,7 @@ class Account extends Model
     {
         $month ??= now();
 
-        return $this->centsToFloat((int) $this->{$relation}()
+        return $this->toDecimal((int) $this->{$relation}()
             ->whereBetween('date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()])
             ->sum('amount_in_cents'));
     }
@@ -178,9 +178,9 @@ class Account extends Model
             return [
                 'label' => $month->format('M'),
                 'name' => $month->format('F Y'),
-                'income' => $this->centsToFloat($incomeCents),
-                'expenses' => $this->centsToFloat($expenseCents),
-                'net' => $this->centsToFloat(abs($incomeCents - $expenseCents)),
+                'income' => $this->toDecimal($incomeCents),
+                'expenses' => $this->toDecimal($expenseCents),
+                'net' => $this->toDecimal(abs($incomeCents - $expenseCents)),
                 'surplus' => $incomeCents >= $expenseCents,
             ];
         });
@@ -202,7 +202,7 @@ class Account extends Model
             ->groupBy('category_id')
             ->map(fn (Collection $expenses): array => [
                 'name' => $expenses->first()->category->name,
-                'amount' => $this->centsToFloat($expenses->sum('amount_in_cents')),
+                'amount' => $this->toDecimal($expenses->sum('amount_in_cents')),
             ])
             ->sortByDesc('amount')
             ->values();
@@ -241,9 +241,17 @@ class Account extends Model
     }
 
     /**
-     * Converts a total in whole cents into a decimal amount for display.
+     * Converts a decimal amount (12.34) into whole cents (1234). The only place that knows how many cents make a unit.
      */
-    private function centsToFloat(int $cents): float
+    private function toCents(string|float $decimal): int
+    {
+        return (int) round((float) $decimal * 100);
+    }
+
+    /**
+     * Converts whole cents (1234) into a decimal amount (12.34).
+     */
+    private function toDecimal(int $cents): float
     {
         return $cents / 100;
     }
