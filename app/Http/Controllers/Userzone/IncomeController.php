@@ -37,7 +37,8 @@ class IncomeController extends Controller
             ->when($categoryId, fn ($query) => $query->where('incomes.category_id', $categoryId));
 
         $incomes = $filteredIncomes()
-            ->with(['account.currency', 'category'])
+            ->select('incomes.id', 'incomes.amount_in_cents', 'incomes.concept', 'incomes.date', 'incomes.account_id', 'incomes.category_id')
+            ->with(['account:id,name,currency_id', 'account.currency:id,symbol', 'category:id,name'])
             ->when($period->start(), fn ($query, $start) => $query->where('incomes.date', '>=', $start))
             ->when($period->end(), fn ($query, $end) => $query->where('incomes.date', '<=', $end))
             ->orderByDesc('incomes.date')
