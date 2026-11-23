@@ -119,9 +119,9 @@ class Account extends Model
     {
         $month ??= now();
 
-        return (float) $this->{$relation}()
+        return $this->centsToFloat((int) $this->{$relation}()
             ->whereBetween('date', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()])
-            ->sum('amount');
+            ->sum('amount_in_cents'));
     }
 
     /**
@@ -135,10 +135,10 @@ class Account extends Model
         $firstMonth = now()->startOfMonth()->subMonths($months - 1);
         $range = [$firstMonth, now()->endOfMonth()];
 
-        $incomes = $this->incomes()->whereBetween('date', $range)->get(['date', 'amount'])
+        $incomes = $this->incomes()->whereBetween('date', $range)->get(['date', 'amount_in_cents'])
             ->groupBy(fn (Income $income): string => $income->date->format('Y-m'));
 
-        $expenses = $this->expenses()->whereBetween('date', $range)->get(['date', 'amount'])
+        $expenses = $this->expenses()->whereBetween('date', $range)->get(['date', 'amount_in_cents'])
             ->groupBy(fn (Expense $expense): string => $expense->date->format('Y-m'));
 
         return collect(range(0, $months - 1))->map(function (int $offset) use ($firstMonth, $incomes, $expenses): array {
@@ -148,8 +148,8 @@ class Account extends Model
             return [
                 'label' => $month->format('M'),
                 'name' => $month->format('F Y'),
-                'income' => (float) $incomes->get($key, collect())->sum('amount'),
-                'expenses' => (float) $expenses->get($key, collect())->sum('amount'),
+                'income' => $this->centsToFloat($incomes->get($key, collect())->sum('amount_in_cents')),
+                'expenses' => $this->centsToFloat($expenses->get($key, collect())->sum('amount_in_cents')),
             ];
         });
     }
@@ -170,7 +170,7 @@ class Account extends Model
             ->groupBy('category_id')
             ->map(fn (Collection $expenses): array => [
                 'name' => $expenses->first()->category->name,
-                'amount' => (float) $expenses->sum('amount'),
+                'amount' => $this->centsToFloat($expenses->sum('amount_in_cents')),
             ])
             ->sortByDesc('amount')
             ->values();
@@ -206,6 +206,14 @@ class Account extends Model
     public function incomes(): HasMany
     {
         return $this->hasMany(Income::class);
+    }
+
+    /**
+     * Converts a total in whole cents into a decimal amount for display.
+     */
+    private function centsToFloat(int $cents): float
+    {
+        return $cents / 100;
     }
 
     /**
