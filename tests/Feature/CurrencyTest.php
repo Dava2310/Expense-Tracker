@@ -11,11 +11,11 @@ test('the total balance adds up the accounts of the currency, inactive ones incl
     Account::factory()->for($currency)->inactive()->create(['balance' => '1000.05']);
     Account::factory()->create(['balance' => '999']);
 
-    expect($currency->totalBalance())->toBe('1000.35');
+    expect($currency->totalBalance())->toBe(1000.35);
 });
 
 test('the total balance is zero for a currency without accounts', function () {
-    expect(Currency::factory()->create()->totalBalance())->toBe('0.00');
+    expect(Currency::factory()->create()->totalBalance())->toBe(0.00);
 });
 
 test('the currency page shows the total balance with the symbol', function () {

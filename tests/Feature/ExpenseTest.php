@@ -6,7 +6,7 @@ test('an expense amount is stored as whole cents and read back as a decimal', fu
     $expense = Expense::factory()->create(['amount' => 84.30])->fresh();
 
     expect($expense->amount_in_cents)->toBe(8430)
-        ->and($expense->amount)->toBe('84.30');
+        ->and($expense->amount)->toBe(84.30);
 });
 
 test('expense amounts that floats cannot hold exactly are stored to the cent', function (string|float $amount, int $cents) {

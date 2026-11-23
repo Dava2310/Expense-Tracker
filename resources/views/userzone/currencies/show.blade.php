@@ -83,7 +83,7 @@
                                     @endif
                                 </span>
 
-                                <span class="text-[15px] font-medium tabular-nums">{{ $currency->symbol }}{{ Number::format((float) $account->balance, 2, locale: 'en') }}</span>
+                                <span class="text-[15px] font-medium tabular-nums">{{ $currency->symbol }}{{ Number::format($account->balance, 2, locale: 'en') }}</span>
 
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="text-saldo-subtle"><path d="m9 6 6 6-6 6"></path></svg>
                             </a>

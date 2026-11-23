@@ -57,9 +57,9 @@ test('balance and minimum balance are stored as whole cents and read back as dec
     $account = Account::factory()->create(['balance' => 12.34, 'min_balance' => '0.10'])->fresh();
 
     expect($account->balance_in_cents)->toBe(1234)
-        ->and($account->balance)->toBe('12.34')
+        ->and($account->balance)->toBe(12.34)
         ->and($account->min_balance_in_cents)->toBe(10)
-        ->and($account->min_balance)->toBe('0.10');
+        ->and($account->min_balance)->toBe(0.10);
 });
 
 test('an empty minimum balance is stored as zero cents', function () {
@@ -74,7 +74,7 @@ test('depositing and withdrawing change the stored cents and the loaded balance'
     $account->deposit('25.50');
     $account->withdraw(0.25);
 
-    expect($account->balance)->toBe('125.25')
+    expect($account->balance)->toBe(125.25)
         ->and($account->fresh()->balance_in_cents)->toBe(12525);
 });
 
@@ -82,7 +82,7 @@ test('the distance to the minimum is the same amount above and below it', functi
     $account = Account::factory()->create(['balance' => $balance, 'min_balance' => '100.10']);
 
     expect($account->isBelowMinimum())->toBe($isBelow)
-        ->and($account->distanceToMinimum())->toBe('50.05');
+        ->and($account->distanceToMinimum())->toBe(50.05);
 })->with([
     'above the minimum' => ['150.15', false],
     'below the minimum' => ['50.05', true],
@@ -92,7 +92,7 @@ test('the distance to the minimum is zero when the balance equals the minimum', 
     $account = Account::factory()->create(['balance' => '0.30', 'min_balance' => '0.30']);
 
     expect($account->isBelowMinimum())->toBeFalse()
-        ->and($account->distanceToMinimum())->toBe('0.00');
+        ->and($account->distanceToMinimum())->toBe(0.00);
 });
 
 test('the monthly flow gives each month its net and whether income covered the expenses', function () {
@@ -119,7 +119,7 @@ test('depositing 0.10 one hundred times gives exactly 10.00', function () {
         $account->deposit(0.10);
     }
 
-    expect($account->balance)->toBe('10.00')
+    expect($account->balance)->toBe(10.00)
         ->and($account->fresh()->balance_in_cents)->toBe(1000);
 });
 
@@ -130,7 +130,7 @@ test('0.10 plus 0.20 gives exactly 0.30', function () {
     $account->deposit('0.20');
 
     expect($account->fresh()->balance_in_cents)->toBe(30)
-        ->and($account->balance)->toBe('0.30');
+        ->and($account->balance)->toBe(0.30);
 });
 
 test('withdrawing 0.10 one hundred times empties a balance of 10.00 exactly', function () {
@@ -140,7 +140,7 @@ test('withdrawing 0.10 one hundred times empties a balance of 10.00 exactly', fu
         $account->withdraw(0.10);
     }
 
-    expect($account->balance)->toBe('0.00')
+    expect($account->balance)->toBe(0.00)
         ->and($account->hasEnoughBalanceFor('0.01'))->toBeFalse();
 });
 
@@ -157,7 +157,7 @@ test('a balance far above the input maximum is stored and changed without overfl
     $account->deposit('0.01');
 
     expect($account->fresh()->balance_in_cents)->toBe(500000000001)
-        ->and($account->balance)->toBe('5000000000.01');
+        ->and($account->balance)->toBe(5000000000.01);
 });
 
 test('many small entries add up to an exact month total', function () {
