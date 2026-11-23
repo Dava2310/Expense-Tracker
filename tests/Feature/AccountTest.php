@@ -52,3 +52,28 @@ test('a deactivated account is hidden by default but keeps its history', functio
         ->and($expense->fresh()->account->trashed())->toBeTrue()
         ->and($user->incomes)->toHaveCount(1);
 });
+
+test('balance and minimum balance are stored as whole cents and read back as decimals', function () {
+    $account = Account::factory()->create(['balance' => 12.34, 'min_balance' => '0.10'])->fresh();
+
+    expect($account->balance_in_cents)->toBe(1234)
+        ->and($account->balance)->toBe('12.34')
+        ->and($account->min_balance_in_cents)->toBe(10)
+        ->and($account->min_balance)->toBe('0.10');
+});
+
+test('an empty minimum balance is stored as zero cents', function () {
+    $account = Account::factory()->create(['min_balance' => null])->fresh();
+
+    expect($account->min_balance_in_cents)->toBe(0);
+});
+
+test('depositing and withdrawing change the stored cents and the loaded balance', function () {
+    $account = Account::factory()->create(['balance' => 100]);
+
+    $account->deposit('25.50');
+    $account->withdraw(0.25);
+
+    expect($account->balance)->toBe('125.25')
+        ->and($account->fresh()->balance_in_cents)->toBe(12525);
+});
