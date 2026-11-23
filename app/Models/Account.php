@@ -110,6 +110,15 @@ class Account extends Model
     }
 
     /**
+     * Gets how far the balance is from the minimum balance as a decimal, whether above or below it.
+     * Use isBelowMinimum() to know which side the balance is on.
+     */
+    public function distanceToMinimum(): string
+    {
+        return number_format(abs($this->balance_in_cents - $this->min_balance_in_cents) / 100, 2, '.', '');
+    }
+
+    /**
      * Gets the latest incomes and expenses of this account, newest first.
      *
      * @return Collection<int, array{type: string, concept: string, date: CarbonInterface, category: string, amount: float}>
@@ -146,7 +155,7 @@ class Account extends Model
      * Totals the incomes and expenses of this account in each of the last months, oldest first.
      * Months without movements are included with zero totals.
      *
-     * @return Collection<int, array{label: string, name: string, income: float, expenses: float}>
+     * @return Collection<int, array{label: string, name: string, income: float, expenses: float, net: float, surplus: bool}>
      */
     public function monthlyFlow(int $months = 6): Collection
     {
@@ -163,11 +172,16 @@ class Account extends Model
             $month = $firstMonth->copy()->addMonths($offset);
             $key = $month->format('Y-m');
 
+            $incomeCents = $incomes->get($key, collect())->sum('amount_in_cents');
+            $expenseCents = $expenses->get($key, collect())->sum('amount_in_cents');
+
             return [
                 'label' => $month->format('M'),
                 'name' => $month->format('F Y'),
-                'income' => $this->centsToFloat($incomes->get($key, collect())->sum('amount_in_cents')),
-                'expenses' => $this->centsToFloat($expenses->get($key, collect())->sum('amount_in_cents')),
+                'income' => $this->centsToFloat($incomeCents),
+                'expenses' => $this->centsToFloat($expenseCents),
+                'net' => $this->centsToFloat(abs($incomeCents - $expenseCents)),
+                'surplus' => $incomeCents >= $expenseCents,
             ];
         });
     }

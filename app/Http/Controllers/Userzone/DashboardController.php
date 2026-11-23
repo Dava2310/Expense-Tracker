@@ -30,7 +30,7 @@ class DashboardController extends Controller
             'monthlyFlow' => $monthlyFlow,
             'chartMax' => $highestAmount > 0 ? $this->roundUpToScale($highestAmount) : 0,
             'categorySpending' => $monthSpending->take(7),
-            'categoryTotal' => $monthSpending->sum('amount'),
+            'categoryTotal' => $categoryAccount?->monthTotal('expenses') ?? 0,
             'categoryAccount' => $categoryAccount,
             'flowAccount' => $flowAccount,
             'currentMonth' => now()->format('F'),
