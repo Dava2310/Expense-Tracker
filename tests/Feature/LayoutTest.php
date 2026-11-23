@@ -17,18 +17,18 @@ test('the header renders every item of the menu definition', function () {
     }
 });
 
-test('the footer shows the same menu items as the header for signed-in users', function () {
-    $response = $this->actingAs(User::factory()->create())->get(route('dashboard'));
-
-    foreach (Navigation::menuItems(authenticated: true) as $item) {
-        $response->assertSeeInOrder(['aria-label="Main"', $item['label'], 'aria-label="Footer"', $item['label']], false);
-    }
+test('the footer only shows the copyright and the creator, without a menu', function () {
+    $this->actingAs(User::factory()->create())
+        ->get(route('dashboard'))
+        ->assertSee('© '.now()->year.' Saldo')
+        ->assertSee('Created by Daniel Vetencourt')
+        ->assertDontSee('aria-label="Footer"', false);
 });
 
-test('guests see the public menu items in the footer of the landing page', function () {
-    $response = $this->get(route('welcome'));
-
-    foreach (Navigation::menuItems(authenticated: false) as $item) {
-        $response->assertSee('href="'.route($item['route']).'"', false)->assertSee($item['label']);
-    }
+test('the landing page footer shows the copyright and the creator, without a menu', function () {
+    $this->get(route('welcome'))
+        ->assertOk()
+        ->assertSee('© '.now()->year.' Saldo')
+        ->assertSee('Created by Daniel Vetencourt')
+        ->assertDontSee('aria-label="Footer"', false);
 });
