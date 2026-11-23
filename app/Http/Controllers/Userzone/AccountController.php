@@ -69,7 +69,6 @@ class AccountController extends Controller
             'activity' => $account->recentActivity(),
             'monthIncome' => $account->monthTotal('incomes'),
             'monthExpenses' => $account->monthTotal('expenses'),
-            'aboveMinimum' => (float) $account->balance - (float) $account->min_balance,
         ]);
     }
 

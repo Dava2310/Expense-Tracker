@@ -8,7 +8,7 @@
         'name' => $month['name'],
         'income' => '+'.$money($month['income']),
         'expenses' => '−'.$money($month['expenses']),
-        'net' => ($month['income'] >= $month['expenses'] ? '+' : '−').$money(abs($month['income'] - $month['expenses'])),
+        'net' => ($month['surplus'] ? '+' : '−').$money($month['net']),
     ])->values();
 
     $tickValues = [0, 0.25, 0.5, 0.75, 1];

@@ -42,12 +42,12 @@
                 @if ($account->isBelowMinimum())
                     <span class="inline-flex items-center gap-1.5 text-[13px] text-saldo-warn-fg">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path><path d="M12 9v4M12 17h.01"></path></svg>
-                        <span>{{ $account->formatMoney(abs($aboveMinimum)) }} below minimum</span>
+                        <span>{{ $account->formatMoney($account->distanceToMinimum()) }} below minimum</span>
                     </span>
                 @else
                     <span class="inline-flex items-center gap-1.5 text-[13px] text-saldo-green">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>
-                        <span>{{ $account->formatMoney($aboveMinimum) }} above minimum</span>
+                        <span>{{ $account->formatMoney($account->distanceToMinimum()) }} above minimum</span>
                     </span>
                 @endif
             </div>

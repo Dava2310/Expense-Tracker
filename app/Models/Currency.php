@@ -43,6 +43,17 @@ class Currency extends Model
     }
 
     /***
+     * Gets the total balance of the accounts held in this currency, inactive accounts included,
+     * as a decimal.
+     *
+     * @return string
+     */
+    public function totalBalance(): string
+    {
+        return number_format((int) $this->accounts()->withTrashed()->sum('balance_in_cents') / 100, 2, '.', '');
+    }
+
+    /***
      * Determines whether the currency can be deleted, which is only when no account
      * (active or inactive) uses it.
      *

@@ -77,3 +77,37 @@ test('depositing and withdrawing change the stored cents and the loaded balance'
     expect($account->balance)->toBe('125.25')
         ->and($account->fresh()->balance_in_cents)->toBe(12525);
 });
+
+test('the distance to the minimum is the same amount above and below it', function (string $balance, bool $isBelow) {
+    $account = Account::factory()->create(['balance' => $balance, 'min_balance' => '100.10']);
+
+    expect($account->isBelowMinimum())->toBe($isBelow)
+        ->and($account->distanceToMinimum())->toBe('50.05');
+})->with([
+    'above the minimum' => ['150.15', false],
+    'below the minimum' => ['50.05', true],
+]);
+
+test('the distance to the minimum is zero when the balance equals the minimum', function () {
+    $account = Account::factory()->create(['balance' => '0.30', 'min_balance' => '0.30']);
+
+    expect($account->isBelowMinimum())->toBeFalse()
+        ->and($account->distanceToMinimum())->toBe('0.00');
+});
+
+test('the monthly flow gives each month its net and whether income covered the expenses', function () {
+    $account = Account::factory()->create();
+    $category = Category::factory()->create();
+    $thisMonth = now()->startOfMonth()->addDay()->toDateString();
+    $lastMonth = now()->startOfMonth()->subMonth()->addDay()->toDateString();
+    Income::factory()->for($account)->for($category)->create(['amount' => '0.30', 'date' => $thisMonth]);
+    Expense::factory()->for($account)->for($category)->create(['amount' => '0.10', 'date' => $thisMonth]);
+    Income::factory()->for($account)->for($category)->create(['amount' => '0.10', 'date' => $lastMonth]);
+    Expense::factory()->for($account)->for($category)->create(['amount' => '0.30', 'date' => $lastMonth]);
+
+    $flow = $account->monthlyFlow();
+
+    expect($flow->last())->toMatchArray(['income' => 0.3, 'expenses' => 0.1, 'net' => 0.2, 'surplus' => true])
+        ->and($flow->get(4))->toMatchArray(['net' => 0.2, 'surplus' => false])
+        ->and($flow->first())->toMatchArray(['net' => 0.0, 'surplus' => true]);
+});
