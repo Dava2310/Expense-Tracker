@@ -125,10 +125,12 @@ class Account extends Model
      */
     public function recentActivity(int $limit = 20): Collection
     {
-        $incomes = $this->incomes()->with('category')->latest('date')->latest('id')->limit($limit)->get()
+        $entryColumns = ['id', 'concept', 'date', 'amount_in_cents', 'category_id'];
+
+        $incomes = $this->incomes()->select($entryColumns)->with('category:id,name')->latest('date')->latest('id')->limit($limit)->get()
             ->map(fn (Income $income): array => $this->activityEntry('income', $income));
 
-        $expenses = $this->expenses()->with('category')->latest('date')->latest('id')->limit($limit)->get()
+        $expenses = $this->expenses()->select($entryColumns)->with('category:id,name')->latest('date')->latest('id')->limit($limit)->get()
             ->map(fn (Expense $expense): array => $this->activityEntry('expense', $expense));
 
         return $incomes->concat($expenses)
