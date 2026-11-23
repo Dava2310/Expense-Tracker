@@ -37,7 +37,8 @@ class ExpenseController extends Controller
             ->when($categoryId, fn ($query) => $query->where('expenses.category_id', $categoryId));
 
         $expenses = $filteredExpenses()
-            ->with(['account.currency', 'category'])
+            ->select('expenses.id', 'expenses.amount_in_cents', 'expenses.concept', 'expenses.date', 'expenses.account_id', 'expenses.category_id')
+            ->with(['account:id,name,currency_id', 'account.currency:id,symbol', 'category:id,name'])
             ->when($period->start(), fn ($query, $start) => $query->where('expenses.date', '>=', $start))
             ->when($period->end(), fn ($query, $end) => $query->where('expenses.date', '<=', $end))
             ->orderByDesc('expenses.date')
