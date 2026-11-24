@@ -98,6 +98,14 @@ class User extends Authenticatable implements HasMedia
     }
 
     /**
+     * Removes the profile photo, so the initials are shown again.
+     */
+    public function removeProfilePhoto(): void
+    {
+        $this->clearMediaCollection('avatar');
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

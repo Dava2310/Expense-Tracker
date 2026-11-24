@@ -50,6 +50,16 @@ class ProfileController extends Controller
     }
 
     /**
+     * Remove the user's profile photo.
+     */
+    public function destroyPhoto(Request $request): RedirectResponse
+    {
+        $request->user()->removeProfilePhoto();
+
+        return Redirect::route('profile.edit')->with('status', 'photo-removed');
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse
