@@ -59,7 +59,7 @@ test('another user cannot see or update the account', function () {
 
     $this->actingAs($intruder)
         ->get(route('accounts.edit', $account))
-        ->assertNotFound();
+        ->assertForbidden();
 
     $this->actingAs($intruder)
         ->patch(route('accounts.update', $account), [
@@ -68,7 +68,7 @@ test('another user cannot see or update the account', function () {
             'details' => 'New details',
             'min_balance' => '25.50',
         ])
-        ->assertNotFound();
+        ->assertForbidden();
 
     expect($account->fresh()->name)->toBe('Original');
 });

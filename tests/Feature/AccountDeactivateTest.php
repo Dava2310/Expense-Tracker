@@ -92,7 +92,7 @@ test('another user\'s account cannot be deactivated', function () {
 
     $this->actingAs(User::factory()->create())
         ->delete(route('accounts.destroy', $account))
-        ->assertNotFound();
+        ->assertForbidden();
 
     $this->assertNotSoftDeleted($account);
 });

@@ -110,7 +110,7 @@ test('the updated banner is shown after editing the account', function () {
         ->assertSee('Account updated.');
 });
 
-test('accounts of other users, deactivated accounts and unknown accounts are not found', function (string $case) {
+test('accounts of other users are forbidden, deactivated and unknown accounts are not found', function (string $case, int $status) {
     $user = User::factory()->create();
 
     $account = match ($case) {
@@ -121,5 +121,9 @@ test('accounts of other users, deactivated accounts and unknown accounts are not
 
     $this->actingAs($user)
         ->get(route('accounts.show', $account?->id ?? 999999))
-        ->assertNotFound();
-})->with(['someone else\'s account', 'deactivated account', 'unknown account']);
+        ->assertStatus($status);
+})->with([
+    'someone else\'s account' => ['someone else\'s account', 403],
+    'deactivated account' => ['deactivated account', 404],
+    'unknown account' => ['unknown account', 404],
+]);

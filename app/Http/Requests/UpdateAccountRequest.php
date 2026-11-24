@@ -8,12 +8,10 @@ use Illuminate\Foundation\Http\FormRequest;
 class UpdateAccountRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Who can update an account is decided by the account policy, which the controller asks.
      */
     public function authorize(): bool
     {
-        abort_unless($this->route('account')->user_id === $this->user()->id, 404);
-
         return true;
     }
 

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateAccountRequest;
 use App\Models\Account;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class AccountController extends Controller
@@ -37,6 +38,8 @@ class AccountController extends Controller
      */
     public function create(Request $request): View
     {
+        Gate::authorize('create', Account::class);
+
         return view('userzone.accounts.create', [
             'currencies' => $request->user()->currencies()->orderBy('name')->get(),
         ]);
@@ -50,6 +53,8 @@ class AccountController extends Controller
      */
     public function store(StoreAccountRequest $request): RedirectResponse
     {
+        Gate::authorize('create', Account::class);
+
         // Creation of the account
         $request->user()->accounts()->create($request->validated());
 
@@ -60,13 +65,12 @@ class AccountController extends Controller
     /***
      * Shows one of the user's accounts with its summary and latest activity
      *
-     * @param Request $request
      * @param Account $account
      * @return View
      */
-    public function show(Request $request, Account $account): View
+    public function show(Account $account): View
     {
-        $this->ensureOwnedBy($request, $account);
+        Gate::authorize('view', $account);
 
         return view('userzone.accounts.show', [
             'account' => $account->load('currency:id,symbol'),
@@ -79,13 +83,12 @@ class AccountController extends Controller
     /***
      * Renders the form to edit one of the user's accounts
      *
-     * @param Request $request
      * @param Account $account
      * @return View
      */
-    public function edit(Request $request, Account $account): View
+    public function edit(Account $account): View
     {
-        $this->ensureOwnedBy($request, $account);
+        Gate::authorize('update', $account);
 
         return view('userzone.accounts.edit', ['account' => $account->load('currency')]);
     }
@@ -99,6 +102,8 @@ class AccountController extends Controller
      */
     public function update(UpdateAccountRequest $request, Account $account): RedirectResponse
     {
+        Gate::authorize('update', $account);
+
         $account->update($request->validated());
 
         return redirect()->route('accounts.show', $account)->with('status', 'account-updated');
@@ -107,24 +112,15 @@ class AccountController extends Controller
     /***
      * Deactivates one of the user's accounts. Its incomes and expenses are kept.
      *
-     * @param Request $request
      * @param Account $account
      * @return RedirectResponse
      */
-    public function destroy(Request $request, Account $account): RedirectResponse
+    public function destroy(Account $account): RedirectResponse
     {
-        $this->ensureOwnedBy($request, $account);
+        Gate::authorize('delete', $account);
 
         $account->delete();
 
         return redirect()->route('accounts.index')->with('status', 'account-deactivated');
-    }
-
-    /**
-     * Accounts that belong to somebody else are reported as not found.
-     */
-    private function ensureOwnedBy(Request $request, Account $account): void
-    {
-        abort_unless($account->user_id === $request->user()->id, 404);
     }
 }
