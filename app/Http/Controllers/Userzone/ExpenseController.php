@@ -11,6 +11,7 @@ use App\Support\PeriodFilter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class ExpenseController extends Controller
@@ -87,6 +88,8 @@ class ExpenseController extends Controller
      */
     public function create(Request $request): View
     {
+        Gate::authorize('create', Expense::class);
+
         return view('userzone.expenses.create', [
             'accounts' => $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance_in_cents', 'currency_id']),
             'categories' => $request->user()->categories()->orderBy('name')->get(['id', 'name']),
@@ -101,6 +104,8 @@ class ExpenseController extends Controller
      */
     public function store(StoreExpenseRequest $request): RedirectResponse
     {
+        Gate::authorize('create', Expense::class);
+
         $data = $request->validated();
 
         // The expense and the balance update succeed or fail together
@@ -116,15 +121,14 @@ class ExpenseController extends Controller
     /***
      * Shows one of the user's expenses and the form to edit its concept
      *
-     * @param Request $request
      * @param Expense $expense
      * @return View
      */
-    public function edit(Request $request, Expense $expense): View
+    public function edit(Expense $expense): View
     {
-        $expense->load(['account:id,name,bank,currency_id,user_id', 'account.currency:id,symbol', 'category:id,name']);
+        Gate::authorize('update', $expense);
 
-        $this->ensureOwnedBy($request, $expense);
+        $expense->loadMissing(['account.currency:id,symbol', 'category:id,name']);
 
         return view('userzone.expenses.edit', ['expense' => $expense]);
     }
@@ -138,16 +142,10 @@ class ExpenseController extends Controller
      */
     public function update(UpdateExpenseRequest $request, Expense $expense): RedirectResponse
     {
+        Gate::authorize('update', $expense);
+
         $expense->update($request->validated());
 
         return redirect()->route('expenses.index')->with('status', 'expense-updated');
-    }
-
-    /**
-     * Expenses that belong to somebody else's account are reported as not found.
-     */
-    private function ensureOwnedBy(Request $request, Expense $expense): void
-    {
-        abort_unless($expense->account->user_id === $request->user()->id, 404);
     }
 }
