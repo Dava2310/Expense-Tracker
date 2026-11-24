@@ -81,11 +81,11 @@ test('another user cannot see or update the income', function () {
 
     $this->actingAs($intruder)
         ->get(route('incomes.edit', $income))
-        ->assertNotFound();
+        ->assertForbidden();
 
     $this->actingAs($intruder)
         ->patch(route('incomes.update', $income), ['concept' => 'Hacked'])
-        ->assertNotFound();
+        ->assertForbidden();
 
     expect($income->refresh()->concept)->toBe('Original');
 });

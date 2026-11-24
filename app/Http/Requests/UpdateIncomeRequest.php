@@ -8,12 +8,10 @@ use Illuminate\Foundation\Http\FormRequest;
 class UpdateIncomeRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Who can update an income is decided by the income policy, which the controller asks.
      */
     public function authorize(): bool
     {
-        abort_unless($this->route('income')->account->user_id === $this->user()->id, 404);
-
         return true;
     }
 

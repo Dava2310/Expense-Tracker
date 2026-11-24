@@ -11,6 +11,7 @@ use App\Support\PeriodFilter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class IncomeController extends Controller
@@ -87,6 +88,8 @@ class IncomeController extends Controller
      */
     public function create(Request $request): View
     {
+        Gate::authorize('create', Income::class);
+
         return view('userzone.incomes.create', [
             'accounts' => $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance_in_cents', 'currency_id']),
             'categories' => $request->user()->categories()->orderBy('name')->get(['id', 'name']),
@@ -101,6 +104,8 @@ class IncomeController extends Controller
      */
     public function store(StoreIncomeRequest $request): RedirectResponse
     {
+        Gate::authorize('create', Income::class);
+
         $data = $request->validated();
 
         // The income and the balance update succeed or fail together
@@ -116,15 +121,14 @@ class IncomeController extends Controller
     /***
      * Shows one of the user's incomes and the form to edit its concept
      *
-     * @param Request $request
      * @param Income $income
      * @return View
      */
-    public function edit(Request $request, Income $income): View
+    public function edit(Income $income): View
     {
-        $income->load(['account:id,name,bank,currency_id,user_id', 'account.currency:id,symbol', 'category:id,name']);
+        Gate::authorize('update', $income);
 
-        $this->ensureOwnedBy($request, $income);
+        $income->loadMissing(['account.currency:id,symbol', 'category:id,name']);
 
         return view('userzone.incomes.edit', ['income' => $income]);
     }
@@ -138,16 +142,10 @@ class IncomeController extends Controller
      */
     public function update(UpdateIncomeRequest $request, Income $income): RedirectResponse
     {
+        Gate::authorize('update', $income);
+
         $income->update($request->validated());
 
         return redirect()->route('incomes.index')->with('status', 'income-updated');
-    }
-
-    /**
-     * Incomes that belong to somebody else's account are reported as not found.
-     */
-    private function ensureOwnedBy(Request $request, Income $income): void
-    {
-        abort_unless($income->account->user_id === $request->user()->id, 404);
     }
 }
