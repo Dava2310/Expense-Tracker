@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -51,6 +52,27 @@ class User extends Authenticatable implements HasMedia
         $this->addMediaCollection('avatar')
             ->singleFile()
             ->acceptsMimeTypes(['image/webp']);
+    }
+
+    /**
+     * The user's initials (up to two letters), shown when there is no photo.
+     */
+    protected function initials(): Attribute
+    {
+        return Attribute::get(fn (): string => str($this->name)
+            ->explode(' ')
+            ->filter()
+            ->take(2)
+            ->map(fn (string $part): string => mb_strtoupper(mb_substr($part, 0, 1)))
+            ->implode(''));
+    }
+
+    /**
+     * The address of the profile photo, or null when the user has none.
+     */
+    protected function profilePhotoUrl(): Attribute
+    {
+        return Attribute::get(fn (): ?string => $this->getFirstMediaUrl('avatar') ?: null);
     }
 
     /**

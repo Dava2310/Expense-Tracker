@@ -41,7 +41,13 @@
             @endif
         </div>
 
-        <x-forms.field label="Photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 2 MB." optional />
+        <div class="flex items-start gap-4">
+            <x-ui.avatar :user="$user" size="size-16" text="text-xl" />
+
+            <div class="flex-1">
+                <x-forms.field label="Photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 2 MB." optional />
+            </div>
+        </div>
 
         <div class="flex items-center gap-4">
             <x-ui.button as="button">Save</x-ui.button>
