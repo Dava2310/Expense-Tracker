@@ -46,7 +46,7 @@ test('another user cannot delete the category', function () {
 
     $this->actingAs(User::factory()->create())
         ->delete(route('categories.destroy', $category))
-        ->assertNotFound();
+        ->assertForbidden();
 
     $this->assertModelExists($category);
 });

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class CategoryController extends Controller
@@ -36,6 +37,8 @@ class CategoryController extends Controller
      */
     public function create(): View
     {
+        Gate::authorize('create', Category::class);
+
         return view('userzone.categories.create');
     }
 
@@ -47,6 +50,8 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request): RedirectResponse
     {
+        Gate::authorize('create', Category::class);
+
         $request->user()->categories()->create($request->validated());
 
         return redirect()->route('categories.index')->with('status', 'category-created');
@@ -55,13 +60,12 @@ class CategoryController extends Controller
     /***
      * Renders the form to edit one of the user's categories
      *
-     * @param Request $request
      * @param Category $category
      * @return View
      */
-    public function edit(Request $request, Category $category): View
+    public function edit(Category $category): View
     {
-        $this->ensureOwnedBy($request, $category);
+        Gate::authorize('update', $category);
 
         return view('userzone.categories.edit', [
             'category' => $category->loadCount(['incomes', 'expenses']),
@@ -77,6 +81,8 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category): RedirectResponse
     {
+        Gate::authorize('update', $category);
+
         $category->update($request->validated());
 
         return redirect()->route('categories.index')->with('status', 'category-updated');
@@ -85,13 +91,12 @@ class CategoryController extends Controller
     /***
      * Deletes one of the user's categories, unless an income or an expense uses it
      *
-     * @param Request $request
      * @param Category $category
      * @return RedirectResponse
      */
-    public function destroy(Request $request, Category $category): RedirectResponse
+    public function destroy(Category $category): RedirectResponse
     {
-        $this->ensureOwnedBy($request, $category);
+        Gate::authorize('delete', $category);
 
         // The page already hides the option, but the category may have been used since it was loaded
         if ($category->isInUse()) {
@@ -102,13 +107,5 @@ class CategoryController extends Controller
         $category->delete();
 
         return redirect()->route('categories.index')->with('status', 'category-deleted');
-    }
-
-    /**
-     * Categories that belong to somebody else are reported as not found.
-     */
-    private function ensureOwnedBy(Request $request, Category $category): void
-    {
-        abort_unless($category->user_id === $request->user()->id, 404);
     }
 }

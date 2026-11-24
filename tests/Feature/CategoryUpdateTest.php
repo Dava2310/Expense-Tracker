@@ -82,11 +82,11 @@ test('another user cannot see or update the category', function () {
 
     $this->actingAs($intruder)
         ->get(route('categories.edit', $category))
-        ->assertNotFound();
+        ->assertForbidden();
 
     $this->actingAs($intruder)
         ->patch(route('categories.update', $category), ['name' => 'Hacked'])
-        ->assertNotFound();
+        ->assertForbidden();
 
     expect($category->refresh()->name)->toBe('Original');
 });
