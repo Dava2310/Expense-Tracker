@@ -9,12 +9,10 @@ use Illuminate\Foundation\Http\FormRequest;
 class UpdateCategoryRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Who can update a category is decided by the category policy, which the controller asks.
      */
     public function authorize(): bool
     {
-        abort_unless($this->route('category')->user_id === $this->user()->id, 404);
-
         return true;
     }
 
