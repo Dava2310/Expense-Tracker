@@ -23,7 +23,7 @@ require __DIR__.'/auth.php';
 /*
  * Userzone routes
  */
-Route::middleware('auth')->group(function () {
+Route::middleware('userzone')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::resource('currencies', CurrencyController::class);
     Route::resource('accounts', AccountController::class);
