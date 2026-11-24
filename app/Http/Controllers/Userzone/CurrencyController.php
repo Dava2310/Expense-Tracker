@@ -9,6 +9,7 @@ use App\Models\Account;
 use App\Models\Currency;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class CurrencyController extends Controller
@@ -38,6 +39,8 @@ class CurrencyController extends Controller
      */
     public function create(): View
     {
+        Gate::authorize('create', Currency::class);
+
         return view('userzone.currencies.create');
     }
 
@@ -49,6 +52,8 @@ class CurrencyController extends Controller
      */
     public function store(StoreCurrencyRequest $request): RedirectResponse
     {
+        Gate::authorize('create', Currency::class);
+
         $request->user()->currencies()->create($request->validated());
 
         return redirect()->route('currencies.index')->with('status', 'currency-created');
@@ -64,7 +69,7 @@ class CurrencyController extends Controller
      */
     public function show(Request $request, Currency $currency): View
     {
-        $this->ensureOwnedBy($request, $currency);
+        Gate::authorize('view', $currency);
 
         $accounts = $request->user()->accounts()->withTrashed()
             ->select('id', 'name', 'bank', 'balance_in_cents', 'min_balance_in_cents', 'deleted_at')
@@ -90,13 +95,12 @@ class CurrencyController extends Controller
     /***
      * Renders the form to edit one of the user's currencies
      *
-     * @param Request $request
      * @param Currency $currency
      * @return View
      */
-    public function edit(Request $request, Currency $currency): View
+    public function edit(Currency $currency): View
     {
-        $this->ensureOwnedBy($request, $currency);
+        Gate::authorize('update', $currency);
 
         $accountsCount = $currency->accounts()->withTrashed()->count();
 
@@ -115,7 +119,7 @@ class CurrencyController extends Controller
      */
     public function update(UpdateCurrencyRequest $request, Currency $currency): RedirectResponse
     {
-        $this->ensureOwnedBy($request, $currency);
+        Gate::authorize('update', $currency);
 
         $currency->update($request->validated());
 
@@ -125,13 +129,12 @@ class CurrencyController extends Controller
     /***
      * Deletes a currency. A currency used by any account, active or inactive, can't be deleted
      *
-     * @param Request $request
      * @param Currency $currency
      * @return RedirectResponse
      */
-    public function destroy(Request $request, Currency $currency): RedirectResponse
+    public function destroy(Currency $currency): RedirectResponse
     {
-        $this->ensureOwnedBy($request, $currency);
+        Gate::authorize('delete', $currency);
 
         // If currency has at least one account assigned to it, it can not be deleted
         if (! $currency->canBeDeleted()) {
@@ -141,17 +144,5 @@ class CurrencyController extends Controller
         $currency->delete();
 
         return redirect()->route('currencies.index')->with('status', 'currency-deleted');
-    }
-
-    /***
-     * Reports a currency that belongs to somebody else as not found
-     *
-     * @param Request $request
-     * @param Currency $currency
-     * @return void
-     */
-    private function ensureOwnedBy(Request $request, Currency $currency): void
-    {
-        abort_unless($currency->user_id === $request->user()->id, 404);
     }
 }

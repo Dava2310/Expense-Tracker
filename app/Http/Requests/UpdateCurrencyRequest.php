@@ -8,12 +8,10 @@ use Illuminate\Foundation\Http\FormRequest;
 class UpdateCurrencyRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Who can update a currency is decided by the currency policy, which the controller asks.
      */
     public function authorize(): bool
     {
-        abort_unless($this->route('currency')->user_id === $this->user()->id, 404);
-
         return true;
     }
 
