@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+use Spatie\Image\Enums\Fit;
+use Spatie\Image\Enums\ImageDriver;
+use Spatie\Image\Image;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -46,6 +51,28 @@ class User extends Authenticatable implements HasMedia
         $this->addMediaCollection('avatar')
             ->singleFile()
             ->acceptsMimeTypes(['image/webp']);
+    }
+
+    /**
+     * Replaces the profile photo with a centred 256 px square WebP made from the uploaded image.
+     * The upload itself is never stored, only the processed copy, so no location data survives.
+     * Loading the file already turns a sideways phone photo upright (the library reads its EXIF orientation).
+     */
+    public function setProfilePhoto(UploadedFile $photo): void
+    {
+        $processed = sys_get_temp_dir().'/'.Str::uuid().'.webp';
+
+        Image::useImageDriver(ImageDriver::Gd)
+            ->loadFile($photo->getRealPath())
+            ->fit(Fit::Crop, 256, 256)
+            ->quality(85)
+            ->format('webp')
+            ->save($processed);
+
+        $this->addMedia($processed)
+            ->usingFileName(Str::uuid().'.webp')
+            ->usingName('Profile photo')
+            ->toMediaCollection('avatar');
     }
 
     /**

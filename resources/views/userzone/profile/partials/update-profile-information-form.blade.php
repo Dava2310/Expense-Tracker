@@ -13,7 +13,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="mt-6 space-y-6">
         @csrf
         @method('patch')
 
@@ -40,6 +40,8 @@
                 </div>
             @endif
         </div>
+
+        <x-forms.field label="Photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 2 MB." optional />
 
         <div class="flex items-center gap-4">
             <x-ui.button as="button">Save</x-ui.button>

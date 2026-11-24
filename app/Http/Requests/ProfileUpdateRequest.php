@@ -26,6 +26,22 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'photo' => ['nullable', 'image', 'mimes:jpg,png,webp', 'max:2048'],
+        ];
+    }
+
+    /**
+     * Plain-language messages for the photo field.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'photo.uploaded' => 'The photo could not be uploaded. It may be larger than the server allows.',
+            'photo.image' => 'Choose a JPG, PNG or WebP picture.',
+            'photo.mimes' => 'Choose a JPG, PNG or WebP picture.',
+            'photo.max' => 'The photo must be 2 MB or smaller.',
         ];
     }
 }
