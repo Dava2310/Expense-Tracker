@@ -7,6 +7,7 @@ use App\Http\Controllers\Userzone\DashboardController;
 use App\Http\Controllers\Userzone\ExpenseController;
 use App\Http\Controllers\Userzone\IncomeController;
 use App\Http\Controllers\Userzone\ProfileController;
+use App\Http\Controllers\Userzone\TransferController;
 use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,7 @@ Route::middleware('userzone')->group(function () {
     Route::resource('accounts', AccountController::class);
     Route::resource('incomes', IncomeController::class)->except(['show']);
     Route::resource('expenses', ExpenseController::class)->except(['show']);
+    Route::resource('transfers', TransferController::class)->only(['create', 'store']);
     Route::resource('categories', CategoryController::class)->except('show');
 
     // User's profile management

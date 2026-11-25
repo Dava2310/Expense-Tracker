@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class Transfer extends Model
 {
@@ -42,6 +43,23 @@ class Transfer extends Model
         return [
             'date' => 'date',
         ];
+    }
+
+    /**
+     * Creates the transfer and moves its amount from one balance to the other, both or neither.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public static function createAndSyncBalances(array $attributes): self
+    {
+        return DB::transaction(function () use ($attributes): self {
+            $transfer = self::create($attributes);
+
+            $transfer->fromAccount->withdraw($transfer->amount);
+            $transfer->toAccount->deposit($transfer->amount);
+
+            return $transfer;
+        });
     }
 
     /**

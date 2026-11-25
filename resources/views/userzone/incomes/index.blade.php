@@ -7,10 +7,16 @@
             </x-slot:subtitle>
 
             <x-slot:actions>
-                <x-ui.button :href="route('incomes.create')" class="gap-2 pl-3.5 pr-4.5">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
-                    <span>New income</span>
-                </x-ui.button>
+                <div class="flex flex-wrap gap-2">
+                    <x-ui.button variant="outline" :href="route('transfers.create')" class="gap-2 px-4.5">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h14l-4-4M20 16H6l4 4"></path></svg>
+                        <span>Transfer</span>
+                    </x-ui.button>
+                    <x-ui.button :href="route('incomes.create')" class="gap-2 pl-3.5 pr-4.5">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                        <span>New income</span>
+                    </x-ui.button>
+                </div>
             </x-slot:actions>
         </x-ui.page-header>
 
