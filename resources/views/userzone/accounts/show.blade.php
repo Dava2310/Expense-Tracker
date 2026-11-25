@@ -72,19 +72,22 @@
             </div>
 
             @if ($activity->isEmpty())
-                <p class="px-5 py-10 text-center text-[14.5px] text-saldo-muted">No activity yet. Incomes and expenses of this account will show up here.</p>
+                <p class="px-5 py-10 text-center text-[14.5px] text-saldo-muted">No activity yet. Incomes, expenses and transfers of this account will show up here.</p>
             @else
                 <ul>
                     @foreach ($activity as $entry)
-                        @php($isIncome = $entry['type'] === 'income')
+                        @php($isTransfer = str_starts_with($entry['type'], 'transfer'))
+                        @php($isMoneyIn = in_array($entry['type'], ['income', 'transfer-in']))
                         <li class="grid min-h-16 grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-3.5 border-t border-saldo-line-soft px-5 py-2.5 first:border-t-0">
                             <span aria-hidden="true" @class([
                                 'flex size-9 items-center justify-center rounded-[10px]',
-                                'bg-saldo-green-tint text-saldo-green' => $isIncome,
-                                'bg-[#f0f0ec] text-saldo-muted' => ! $isIncome,
+                                'bg-saldo-green-tint text-saldo-green' => $isMoneyIn,
+                                'bg-[#f0f0ec] text-saldo-muted' => ! $isMoneyIn,
                             ])>
                                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                                    @if ($isIncome)
+                                    @if ($isTransfer)
+                                        <path d="M4 8h14l-4-4M20 16H6l4 4"></path>
+                                    @elseif ($isMoneyIn)
                                         <path d="M17 7 7 17"></path><path d="M16 17H7V8"></path>
                                     @else
                                         <path d="M7 17 17 7"></path><path d="M8 7h9v9"></path>
@@ -97,8 +100,8 @@
                             </span>
                             <span @class([
                                 'text-[15px] font-medium tabular-nums',
-                                'text-saldo-green' => $isIncome,
-                            ])>{{ $isIncome ? '+' : '−' }}{{ $account->formatMoney($entry['amount']) }}</span>
+                                'text-saldo-green' => $isMoneyIn,
+                            ])>{{ $isMoneyIn ? '+' : '−' }}{{ $account->formatMoney($entry['amount']) }}</span>
                         </li>
                     @endforeach
                 </ul>
