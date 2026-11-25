@@ -78,7 +78,7 @@
                     @foreach ($activity as $entry)
                         @php($isTransfer = str_starts_with($entry['type'], 'transfer'))
                         @php($isMoneyIn = in_array($entry['type'], ['income', 'transfer-in']))
-                        <li class="grid min-h-16 grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-3.5 border-t border-saldo-line-soft px-5 py-2.5 first:border-t-0">
+                        <li @class(['relative' => $isTransfer, 'grid min-h-16 grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-3.5 border-t border-saldo-line-soft px-5 py-2.5 first:border-t-0'])>
                             <span aria-hidden="true" @class([
                                 'flex size-9 items-center justify-center rounded-[10px]',
                                 'bg-saldo-green-tint text-saldo-green' => $isMoneyIn,
@@ -95,7 +95,11 @@
                                 </svg>
                             </span>
                             <span class="flex min-w-0 flex-col gap-0.5">
-                                <span class="truncate text-[15px] font-medium">{{ $entry['concept'] }}</span>
+                                @if ($isTransfer)
+                                    <a href="{{ route('transfers.edit', $entry['id']) }}" class="truncate text-[15px] font-medium text-saldo-ink no-underline after:absolute after:inset-0 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-saldo-ink">{{ $entry['concept'] }}</a>
+                                @else
+                                    <span class="truncate text-[15px] font-medium">{{ $entry['concept'] }}</span>
+                                @endif
                                 <span class="text-[13px] text-saldo-subtle">{{ $entry['date']->format('M j') }} · {{ $entry['category'] }}</span>
                             </span>
                             <span @class([

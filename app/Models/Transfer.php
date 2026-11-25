@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class Transfer extends Model
 {
@@ -59,6 +60,42 @@ class Transfer extends Model
             $transfer->toAccount->deposit($transfer->amount);
 
             return $transfer;
+        });
+    }
+
+    /**
+     * Gives the old amount back, applies the changes and moves the new amount, all or nothing.
+     * An edit can touch up to four accounts, so the balances are checked once the change is applied:
+     * if any account ends below zero, nothing is saved.
+     *
+     * @param  array<string, mixed>  $attributes
+     *
+     * @throws ValidationException
+     */
+    public function updateAndSyncBalances(array $attributes): void
+    {
+        DB::transaction(function () use ($attributes): void {
+            $touchedAccountIds = [$this->from_account_id, $this->to_account_id];
+
+            $this->fromAccount->deposit($this->amount);
+            $this->toAccount->withdraw($this->amount);
+
+            $this->update($attributes);
+
+            $this->load(['fromAccount', 'toAccount']);
+            $this->fromAccount->withdraw($this->amount);
+            $this->toAccount->deposit($this->amount);
+
+            $accountBelowZero = Account::withTrashed()
+                ->whereIn('id', [...$touchedAccountIds, $this->from_account_id, $this->to_account_id])
+                ->where('balance_in_cents', '<', 0)
+                ->first();
+
+            if ($accountBelowZero) {
+                throw ValidationException::withMessages([
+                    'amount' => $accountBelowZero->name.' would end up with a negative balance.',
+                ]);
+            }
         });
     }
 

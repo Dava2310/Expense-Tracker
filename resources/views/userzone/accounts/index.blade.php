@@ -26,6 +26,9 @@
         @if (session('status') === 'transfer-created')
             <x-ui.status status="Transfer saved." />
         @endif
+        @if (session('status') === 'transfer-updated')
+            <x-ui.status status="Transfer updated." />
+        @endif
         @if (session('status') === 'account-deactivated')
             <x-ui.status status="Account deactivated." />
         @endif
