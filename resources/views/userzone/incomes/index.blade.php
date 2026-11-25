@@ -19,6 +19,12 @@
         @if (session('status') === 'income-updated')
             <x-ui.status status="Income updated." />
         @endif
+        @if (session('status') === 'income-deleted')
+            <x-ui.status status="Income deleted." />
+        @endif
+        @error('income')
+            <p role="alert" class="rounded-[10px] border border-saldo-danger bg-saldo-danger-bg px-3.5 py-3 text-sm font-medium leading-normal text-saldo-danger">{{ $message }}</p>
+        @enderror
 
         <x-forms.entry-filters
             :action="route('incomes.index')"

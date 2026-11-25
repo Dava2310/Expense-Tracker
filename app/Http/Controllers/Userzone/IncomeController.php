@@ -141,6 +141,7 @@ class IncomeController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'balance_in_cents', 'currency_id']);
         $categories = $user->categories()->orderBy('name')->get(['id', 'name']);
+        $income->loadMissing('account.currency:id,symbol');
 
         return view('userzone.incomes.edit', [
             'income' => $income,
@@ -171,5 +172,26 @@ class IncomeController extends Controller
         $income->updateAndSyncBalance($data);
 
         return redirect()->route('incomes.index')->with('status', 'income-updated');
+    }
+
+    /***
+     * Deletes one of the user's incomes and takes its amount out of the account,
+     * unless that would leave the account with a negative balance
+     *
+     * @param Income $income
+     * @return RedirectResponse
+     */
+    public function destroy(Income $income): RedirectResponse
+    {
+        Gate::authorize('delete', $income);
+
+        if (! $income->canBeDeleted()) {
+            return redirect()->route('incomes.index')
+                ->withErrors(['income' => $income->account->name.' would end up with a negative balance, so this income can’t be deleted.']);
+        }
+
+        $income->deleteAndRestoreBalance();
+
+        return redirect()->route('incomes.index')->with('status', 'income-deleted');
     }
 }

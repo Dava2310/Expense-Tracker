@@ -76,6 +76,26 @@ class Income extends Model
     }
 
     /**
+     * Determines whether the account can give the money of this income back, without ending up below zero.
+     */
+    public function canBeDeleted(): bool
+    {
+        return $this->account->hasEnoughBalanceFor($this->amount);
+    }
+
+    /**
+     * Deletes the income and takes its amount out of the account, both or neither.
+     */
+    public function deleteAndRestoreBalance(): void
+    {
+        DB::transaction(function (): void {
+            $this->account->withdraw($this->amount);
+
+            $this->delete();
+        });
+    }
+
+    /**
      * Gets the associated account for the Income.
      */
     public function account(): BelongsTo
