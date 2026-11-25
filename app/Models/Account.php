@@ -236,6 +236,22 @@ class Account extends Model
     }
 
     /**
+     * Gets the transfers that take money out of this bank account.
+     */
+    public function outgoingTransfers(): HasMany
+    {
+        return $this->hasMany(Transfer::class, 'from_account_id');
+    }
+
+    /**
+     * Gets the transfers that bring money into this bank account.
+     */
+    public function incomingTransfers(): HasMany
+    {
+        return $this->hasMany(Transfer::class, 'to_account_id');
+    }
+
+    /**
      * Totals the given incomes or expenses of each month in cents with a single query, in the order of the months.
      *
      * @param  HasMany<Income|Expense, $this>  $entries
