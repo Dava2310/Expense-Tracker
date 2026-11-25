@@ -5,6 +5,24 @@ use App\Models\Category;
 use App\Models\Income;
 use App\Models\User;
 
+/**
+ * A valid update for the given income (its own values), which each test can override.
+ *
+ * @param  array<string, mixed>  $overrides
+ * @return array<string, mixed>
+ */
+function validIncomeChange(Income $income, array $overrides = []): array
+{
+    return [
+        'amount' => number_format($income->amount, 2, '.', ''),
+        'concept' => $income->concept,
+        'date' => $income->date->format('Y-m-d'),
+        'account_id' => $income->account_id,
+        'category_id' => $income->category_id,
+        ...$overrides,
+    ];
+}
+
 test('guests are redirected to the login page', function () {
     $income = Income::factory()->create();
 
@@ -12,10 +30,10 @@ test('guests are redirected to the login page', function () {
     $this->patch(route('incomes.update', $income), [])->assertRedirect(route('login'));
 });
 
-test('the owner sees the income with an editable concept and its locked details', function () {
+test('the owner sees the income with every field filled in', function () {
     $user = User::factory()->create();
     $account = Account::factory()->for($user)->create(['name' => 'Everyday', 'bank' => 'Harbor Bank']);
-    $income = Income::factory()->for($account)->for(Category::factory()->create(['name' => 'Salary']))->create([
+    $income = Income::factory()->for($account)->for(Category::factory()->for($user)->create(['name' => 'Salary']))->create([
         'amount' => 3200,
         'concept' => 'Monthly salary',
         'date' => '2026-11-01',
@@ -24,67 +42,75 @@ test('the owner sees the income with an editable concept and its locked details'
     $this->actingAs($user)
         ->get(route('incomes.edit', $income))
         ->assertOk()
-        ->assertSee('+€3,200.00')
-        ->assertSee('Added to Everyday on Sunday, Nov 1, 2026')
+        ->assertSee('Edit income')
+        ->assertSee('value="3200.00"', false)
         ->assertSee('value="Monthly salary"', false)
+        ->assertSee('value="2026-11-01"', false)
         ->assertSee('name="_method" value="PATCH"', false)
+        ->assertSee('name="account_id"', false)
+        ->assertSee('name="category_id"', false)
+        ->assertSee('Everyday')
         ->assertSee('Salary')
-        ->assertSee('Everyday · Harbor Bank')
-        ->assertDontSee('name="amount"', false)
-        ->assertDontSee('name="date"', false)
-        ->assertDontSee('name="account_id"', false)
-        ->assertDontSee('name="category_id"', false);
+        ->assertSee('Save changes');
 });
 
 test('the owner updates the concept', function () {
     $user = User::factory()->create();
-    $income = Income::factory()->for(Account::factory()->for($user))->create(['concept' => 'Old concept']);
+    $income = Income::factory()->for(Account::factory()->for($user))->for(Category::factory()->for($user))->create(['concept' => 'Old concept']);
 
     $this->actingAs($user)
-        ->patch(route('incomes.update', $income), ['concept' => 'New concept'])
+        ->patch(route('incomes.update', $income), validIncomeChange($income, ['concept' => 'New concept']))
         ->assertRedirect(route('incomes.index'))
         ->assertSessionHas('status', 'income-updated');
 
     expect($income->refresh()->concept)->toBe('New concept');
 });
 
-test('submitted amount, date, account and category are ignored', function () {
+test('the amount, date, account and category are saved and the balances follow', function () {
     $user = User::factory()->create();
-    $account = Account::factory()->for($user)->create(['balance' => 100]);
-    $category = Category::factory()->create();
-    $income = Income::factory()->for($account)->for($category)->create([
-        'amount' => 50,
-        'date' => '2026-11-01',
-    ]);
+    $checking = Account::factory()->for($user)->create(['balance' => 100]);
+    $card = Account::factory()->for($user)->create(['balance' => 100]);
+    $oldCategory = Category::factory()->for($user)->create();
+    $newCategory = Category::factory()->for($user)->create();
+    $income = Income::factory()->for($checking)->for($oldCategory)->create(['amount' => 50, 'date' => '2026-11-01']);
 
     $this->actingAs($user)->patch(route('incomes.update', $income), [
         'concept' => 'New concept',
-        'amount' => '999',
-        'date' => '2020-01-01',
-        'account_id' => Account::factory()->for($user)->create()->id,
-        'category_id' => Category::factory()->create()->id,
-    ]);
+        'amount' => '70',
+        'date' => '2026-12-02',
+        'account_id' => $card->id,
+        'category_id' => $newCategory->id,
+    ])->assertRedirect(route('incomes.index'));
 
     $income->refresh();
 
     expect($income->concept)->toBe('New concept')
-        ->and($income->amount)->toEqual(50)
-        ->and($income->date->toDateString())->toBe('2026-11-01')
-        ->and($income->account_id)->toBe($account->id)
-        ->and($income->category_id)->toBe($category->id)
-        ->and($account->refresh()->balance)->toEqual(100);
+        ->and($income->amount)->toEqual(70)
+        ->and($income->date->toDateString())->toBe('2026-12-02')
+        ->and($income->account_id)->toBe($card->id)
+        ->and($income->category_id)->toBe($newCategory->id)
+        ->and($checking->refresh()->balance)->toEqual(50)
+        ->and($card->refresh()->balance)->toEqual(170);
 });
 
 test('another user cannot see or update the income', function () {
     $income = Income::factory()->create(['concept' => 'Original']);
     $intruder = User::factory()->create();
+    $intruderAccount = Account::factory()->for($intruder)->create(['balance' => 1000]);
+    $intruderCategory = Category::factory()->for($intruder)->create();
 
     $this->actingAs($intruder)
         ->get(route('incomes.edit', $income))
         ->assertForbidden();
 
     $this->actingAs($intruder)
-        ->patch(route('incomes.update', $income), ['concept' => 'Hacked'])
+        ->patch(route('incomes.update', $income), [
+            'amount' => '10',
+            'concept' => 'Hacked',
+            'date' => '2026-11-01',
+            'account_id' => $intruderAccount->id,
+            'category_id' => $intruderCategory->id,
+        ])
         ->assertForbidden();
 
     expect($income->refresh()->concept)->toBe('Original');
@@ -112,10 +138,10 @@ test('an invalid concept is rejected, the income is unchanged and the errors are
 
 test('an income of a deactivated account can still be edited', function () {
     $user = User::factory()->create();
-    $income = Income::factory()->for(Account::factory()->for($user)->inactive())->create(['concept' => 'Old concept']);
+    $income = Income::factory()->for(Account::factory()->for($user)->inactive())->for(Category::factory()->for($user))->create(['concept' => 'Old concept']);
 
     $this->actingAs($user)
-        ->patch(route('incomes.update', $income), ['concept' => 'New concept'])
+        ->patch(route('incomes.update', $income), validIncomeChange($income, ['concept' => 'New concept']))
         ->assertRedirect(route('incomes.index'));
 
     expect($income->refresh()->concept)->toBe('New concept');

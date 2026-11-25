@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class Income extends Model
 {
@@ -42,6 +43,36 @@ class Income extends Model
         return [
             'date' => 'date',
         ];
+    }
+
+    /**
+     * Determines whether the account of this income can give the old amount back. Only that account can end up
+     * short: the new amount also arrives there when the account stays the same, and another account only gains.
+     */
+    public function canBeChangedTo(Account $account, string|float $amount): bool
+    {
+        $incoming = $account->is($this->account) ? $amount : 0;
+
+        return $this->account->hasEnoughBalanceFor($this->amount, $incoming);
+    }
+
+    /**
+     * Saves the changes and keeps the balances right: the old amount is taken out of the old account
+     * and the new amount is added to the new one, which may be the same account.
+     * The income and both balance changes succeed or fail together.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public function updateAndSyncBalance(array $attributes): void
+    {
+        DB::transaction(function () use ($attributes): void {
+            $this->account->withdraw($this->amount);
+
+            $this->update($attributes);
+
+            $this->load('account');
+            $this->account->deposit($this->amount);
+        });
     }
 
     /**
