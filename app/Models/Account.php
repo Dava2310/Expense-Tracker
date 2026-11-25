@@ -119,7 +119,7 @@ class Account extends Model
     }
 
     /**
-     * Gets the latest incomes and expenses of this account, newest first.
+     * Gets the latest incomes, expenses and transfers of this account, newest first.
      *
      * @return Collection<int, array{type: string, concept: string, date: CarbonInterface, category: string, amount: float}>
      */
@@ -133,7 +133,13 @@ class Account extends Model
         $expenses = $this->expenses()->select($entryColumns)->with('category:id,name')->latest('date')->latest('id')->limit($limit)->get()
             ->map(fn (Expense $expense): array => $this->activityEntry('expense', $expense));
 
-        return $incomes->concat($expenses)
+        $outgoing = $this->outgoingTransfers()->select(['id', 'to_account_id', 'date', 'amount_in_cents', 'note'])->with('toAccount:id,name')->latest('date')->latest('id')->limit($limit)->get()
+            ->map(fn (Transfer $transfer): array => $this->transferEntry('transfer-out', 'Transfer to '.$transfer->toAccount->name, $transfer));
+
+        $incoming = $this->incomingTransfers()->select(['id', 'from_account_id', 'date', 'amount_in_cents', 'note'])->with('fromAccount:id,name')->latest('date')->latest('id')->limit($limit)->get()
+            ->map(fn (Transfer $transfer): array => $this->transferEntry('transfer-in', 'Transfer from '.$transfer->fromAccount->name, $transfer));
+
+        return $incomes->concat($expenses)->concat($outgoing)->concat($incoming)
             ->sortBy([['date', 'desc'], ['id', 'desc']])
             ->take($limit)
             ->values();
@@ -236,6 +242,22 @@ class Account extends Model
     }
 
     /**
+     * Gets the transfers that take money out of this bank account.
+     */
+    public function outgoingTransfers(): HasMany
+    {
+        return $this->hasMany(Transfer::class, 'from_account_id');
+    }
+
+    /**
+     * Gets the transfers that bring money into this bank account.
+     */
+    public function incomingTransfers(): HasMany
+    {
+        return $this->hasMany(Transfer::class, 'to_account_id');
+    }
+
+    /**
      * Totals the given incomes or expenses of each month in cents with a single query, in the order of the months.
      *
      * @param  HasMany<Income|Expense, $this>  $entries
@@ -284,6 +306,23 @@ class Account extends Model
             'date' => $entry->date,
             'category' => $entry->category->name,
             'amount' => $entry->amount,
+        ];
+    }
+
+    /**
+     * Shapes a transfer like an income or expense for the activity list. The note, if any, takes the place of the category.
+     *
+     * @return array{id: int, type: string, concept: string, date: CarbonInterface, category: string, amount: float}
+     */
+    private function transferEntry(string $type, string $concept, Transfer $transfer): array
+    {
+        return [
+            'id' => $transfer->id,
+            'type' => $type,
+            'concept' => $concept,
+            'date' => $transfer->date,
+            'category' => $transfer->note ?? 'Transfer',
+            'amount' => $transfer->amount,
         ];
     }
 }

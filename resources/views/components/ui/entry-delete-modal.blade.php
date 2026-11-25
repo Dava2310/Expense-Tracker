@@ -1,4 +1,4 @@
-{{-- Asks for confirmation before an income or an expense is deleted.
+{{-- Asks for confirmation before an income, an expense or a transfer is deleted.
      The page keeps the chosen entry in Alpine as: entry = { amount, date, concept, account, action } --}}
 @props(['kind'])
 
@@ -13,7 +13,11 @@
         <h2 id="delete-entry-title" class="font-display text-[22px] font-semibold tracking-[-0.02em]">Delete this {{ $kind }}?</h2>
         <p id="delete-entry-text" class="text-[15px] leading-[1.55] text-saldo-muted">
             <strong class="font-semibold text-saldo-ink" x-text="entry.amount"></strong> on <span x-text="entry.date"></span> · “<span x-text="entry.concept"></span>”.
-            {{ $isIncome ? 'The amount is taken out of' : 'The amount goes back to' }} <span x-text="entry.account"></span>. This can’t be undone.
+            @if ($kind === 'transfer')
+                Both balances go back to what they were. This can’t be undone.
+            @else
+                {{ $isIncome ? 'The amount is taken out of' : 'The amount goes back to' }} <span x-text="entry.account"></span>. This can’t be undone.
+            @endif
         </p>
     </div>
 
