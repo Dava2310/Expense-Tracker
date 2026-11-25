@@ -16,6 +16,9 @@
         @if (session('status') === 'expense-created')
             <x-ui.status status="Expense created." />
         @endif
+        @if (session('status') === 'expense-deleted')
+            <x-ui.status status="Expense deleted." />
+        @endif
         @if (session('status') === 'expense-updated')
             <x-ui.status status="Expense updated." />
         @endif

@@ -76,6 +76,18 @@ class Expense extends Model
     }
 
     /**
+     * Deletes the expense and gives its amount back to the account, both or neither.
+     */
+    public function deleteAndRestoreBalance(): void
+    {
+        DB::transaction(function (): void {
+            $this->account->deposit($this->amount);
+
+            $this->delete();
+        });
+    }
+
+    /**
      * Gets the associated account for the expense.
      */
     public function account(): BelongsTo

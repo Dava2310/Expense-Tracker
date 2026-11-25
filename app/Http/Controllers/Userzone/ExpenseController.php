@@ -141,6 +141,7 @@ class ExpenseController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'balance_in_cents', 'currency_id']);
         $categories = $user->categories()->orderBy('name')->get(['id', 'name']);
+        $expense->loadMissing('account.currency:id,symbol');
 
         return view('userzone.expenses.edit', [
             'expense' => $expense,
@@ -171,5 +172,20 @@ class ExpenseController extends Controller
         $expense->updateAndSyncBalance($data);
 
         return redirect()->route('expenses.index')->with('status', 'expense-updated');
+    }
+
+    /***
+     * Deletes one of the user's expenses and gives its amount back to the account
+     *
+     * @param Expense $expense
+     * @return RedirectResponse
+     */
+    public function destroy(Expense $expense): RedirectResponse
+    {
+        Gate::authorize('delete', $expense);
+
+        $expense->deleteAndRestoreBalance();
+
+        return redirect()->route('expenses.index')->with('status', 'expense-deleted');
     }
 }
