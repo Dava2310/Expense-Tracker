@@ -84,4 +84,24 @@ class TransferController extends Controller
 
         return redirect()->route('accounts.index')->with('status', 'transfer-updated');
     }
+
+    /***
+     * Deletes one of the user's transfers and puts the amount back where it came from
+     *
+     * @param Transfer $transfer
+     * @return RedirectResponse
+     */
+    public function destroy(Transfer $transfer): RedirectResponse
+    {
+        Gate::authorize('delete', $transfer);
+
+        if (! $transfer->canBeDeleted()) {
+            return redirect()->route('accounts.index')
+                ->withErrors(['transfer' => $transfer->toAccount->name.' would end up with a negative balance, so this transfer can’t be deleted.']);
+        }
+
+        $transfer->deleteAndRestoreBalances();
+
+        return redirect()->route('accounts.index')->with('status', 'transfer-deleted');
+    }
 }

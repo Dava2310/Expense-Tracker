@@ -47,6 +47,10 @@
     </div>
 
     <div class="flex flex-wrap items-center justify-end gap-2 border-t border-saldo-line-soft bg-[#fafaf8] px-6 py-4">
+        @isset($delete)
+            <div class="mr-auto">{{ $delete }}</div>
+        @endisset
+
         <a href="{{ route('accounts.index') }}" class="inline-flex h-11 items-center justify-center rounded-[11px] border border-saldo-line-strong bg-white px-4 text-[14.5px] font-medium text-saldo-ink no-underline transition-colors hover:border-[#c9c8c1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink">Cancel</a>
         <x-ui.button as="button" class="px-4.5">{{ $transfer ? 'Save changes' : 'Transfer' }}</x-ui.button>
     </div>

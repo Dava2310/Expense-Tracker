@@ -22,4 +22,12 @@ class TransferPolicy
     {
         return $transfer->fromAccount->user_id === $user->id;
     }
+
+    /**
+     * Only the owner of the account the money leaves can delete a transfer.
+     */
+    public function delete(User $user, Transfer $transfer): bool
+    {
+        return $transfer->fromAccount->user_id === $user->id;
+    }
 }

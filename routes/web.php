@@ -30,7 +30,7 @@ Route::middleware('userzone')->group(function () {
     Route::resource('accounts', AccountController::class);
     Route::resource('incomes', IncomeController::class)->except(['show']);
     Route::resource('expenses', ExpenseController::class)->except(['show']);
-    Route::resource('transfers', TransferController::class)->only(['create', 'store', 'edit', 'update']);
+    Route::resource('transfers', TransferController::class)->only(['create', 'store', 'edit', 'update', 'destroy']);
     Route::resource('categories', CategoryController::class)->except('show');
 
     // User's profile management

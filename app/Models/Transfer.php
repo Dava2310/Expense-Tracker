@@ -100,6 +100,27 @@ class Transfer extends Model
     }
 
     /**
+     * Determines whether the destination can give the money back, without ending up below zero.
+     */
+    public function canBeDeleted(): bool
+    {
+        return $this->toAccount->hasEnoughBalanceFor($this->amount);
+    }
+
+    /**
+     * Deletes the transfer and puts the amount back from the destination to the source, both or neither.
+     */
+    public function deleteAndRestoreBalances(): void
+    {
+        DB::transaction(function (): void {
+            $this->fromAccount->deposit($this->amount);
+            $this->toAccount->withdraw($this->amount);
+
+            $this->delete();
+        });
+    }
+
+    /**
      * Gets the account the money leaves.
      */
     public function fromAccount(): BelongsTo
