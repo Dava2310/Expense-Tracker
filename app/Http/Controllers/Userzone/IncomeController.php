@@ -90,9 +90,12 @@ class IncomeController extends Controller
     {
         Gate::authorize('create', Income::class);
 
+        $accounts = $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance_in_cents', 'currency_id']);
+        $categories = $request->user()->categories()->orderBy('name')->get(['id', 'name']);
+
         return view('userzone.incomes.create', [
-            'accounts' => $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance_in_cents', 'currency_id']),
-            'categories' => $request->user()->categories()->orderBy('name')->get(['id', 'name']),
+            'accounts' => $accounts,
+            'categories' => $categories,
         ]);
     }
 

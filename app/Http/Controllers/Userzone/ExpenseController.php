@@ -90,9 +90,12 @@ class ExpenseController extends Controller
     {
         Gate::authorize('create', Expense::class);
 
+        $accounts = $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance_in_cents', 'currency_id']);
+        $categories = $request->user()->categories()->orderBy('name')->get(['id', 'name']);
+
         return view('userzone.expenses.create', [
-            'accounts' => $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance_in_cents', 'currency_id']),
-            'categories' => $request->user()->categories()->orderBy('name')->get(['id', 'name']),
+            'accounts' => $accounts,
+            'categories' => $categories,
         ]);
     }
 
@@ -131,15 +134,18 @@ class ExpenseController extends Controller
 
         $user = $request->user();
 
+        // The active accounts, plus the account the expense already belongs to even if it was deactivated
+        $accounts = $user->accounts()->withTrashed()
+            ->where(fn ($query) => $query->whereNull('deleted_at')->orWhere('id', $expense->account_id))
+            ->with('currency:id,symbol')
+            ->orderBy('name')
+            ->get(['id', 'name', 'balance_in_cents', 'currency_id']);
+        $categories = $user->categories()->orderBy('name')->get(['id', 'name']);
+
         return view('userzone.expenses.edit', [
             'expense' => $expense,
-            // The active accounts, plus the account the expense already belongs to even if it was deactivated
-            'accounts' => $user->accounts()->withTrashed()
-                ->where(fn ($query) => $query->whereNull('deleted_at')->orWhere('id', $expense->account_id))
-                ->with('currency:id,symbol')
-                ->orderBy('name')
-                ->get(['id', 'name', 'balance_in_cents', 'currency_id']),
-            'categories' => $user->categories()->orderBy('name')->get(['id', 'name']),
+            'accounts' => $accounts,
+            'categories' => $categories,
         ]);
     }
 
