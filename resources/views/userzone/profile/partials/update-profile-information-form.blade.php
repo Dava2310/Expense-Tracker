@@ -13,7 +13,12 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form id="remove-photo" method="post" action="{{ route('profile.photo.destroy') }}">
+        @csrf
+        @method('delete')
+    </form>
+
+    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="mt-6 space-y-6">
         @csrf
         @method('patch')
 
@@ -39,6 +44,24 @@
                     @endif
                 </div>
             @endif
+        </div>
+
+        <div class="flex items-start gap-4">
+            <x-ui.avatar :user="$user" size="size-16" text="text-xl" />
+
+            <div class="flex-1">
+                <x-forms.field label="Photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" hint="JPG, PNG or WebP, up to 2 MB." optional />
+
+                @if ($user->profile_photo_url)
+                    <button form="remove-photo" class="mt-2 underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Remove photo
+                    </button>
+                @endif
+
+                @if (session('status') === 'photo-removed')
+                    <p class="mt-2 text-sm text-gray-600">Photo removed.</p>
+                @endif
+            </div>
         </div>
 
         <div class="flex items-center gap-4">

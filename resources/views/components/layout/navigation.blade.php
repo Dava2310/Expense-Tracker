@@ -28,7 +28,7 @@
                     x-bind:aria-expanded="open"
                     class="flex h-11 cursor-pointer items-center gap-2.5 rounded-[10px] px-2 text-sm font-medium transition-colors hover:bg-saldo-ghost-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-saldo-ink"
                 >
-                    <span aria-hidden="true" class="flex size-8 items-center justify-center rounded-full bg-saldo-green-tint text-[12.5px] font-semibold text-saldo-green">{{ $initials }}</span>
+                    <x-ui.avatar :user="$user" />
                     <span class="hidden max-w-40 truncate sm:block">{{ $user->name }}</span>
                     <x-ui.icon name="chevron-down" width="16" height="16" class="text-saldo-subtle" />
                 </button>

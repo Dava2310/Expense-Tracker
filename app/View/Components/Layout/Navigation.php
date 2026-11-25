@@ -15,11 +15,6 @@ class Navigation extends Component
     public User $user;
 
     /**
-     * The user's initials, shown in the avatar (up to two letters).
-     */
-    public string $initials;
-
-    /**
      * The menu entries rendered by the view.
      *
      * @var list<array{label: string, route: string, pattern: string, icon: string|null}>
@@ -64,13 +59,6 @@ class Navigation extends Component
     {
         $this->user = $request->user();
         $this->items = self::menuItems(authenticated: true);
-
-        $this->initials = str($this->user->name)
-            ->explode(' ')
-            ->filter()
-            ->take(2)
-            ->map(fn (string $part): string => mb_strtoupper(mb_substr($part, 0, 1)))
-            ->implode('');
     }
 
     /**
