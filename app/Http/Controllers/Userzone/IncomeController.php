@@ -90,9 +90,12 @@ class IncomeController extends Controller
     {
         Gate::authorize('create', Income::class);
 
+        $accounts = $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance_in_cents', 'currency_id']);
+        $categories = $request->user()->categories()->orderBy('name')->get(['id', 'name']);
+
         return view('userzone.incomes.create', [
-            'accounts' => $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance_in_cents', 'currency_id']),
-            'categories' => $request->user()->categories()->orderBy('name')->get(['id', 'name']),
+            'accounts' => $accounts,
+            'categories' => $categories,
         ]);
     }
 
@@ -119,22 +122,36 @@ class IncomeController extends Controller
     }
 
     /***
-     * Shows one of the user's incomes and the form to edit its concept
+     * Shows one of the user's incomes and the form to edit all of its details
      *
+     * @param Request $request
      * @param Income $income
      * @return View
      */
-    public function edit(Income $income): View
+    public function edit(Request $request, Income $income): View
     {
         Gate::authorize('update', $income);
 
-        $income->loadMissing(['account.currency:id,symbol', 'category:id,name']);
+        $user = $request->user();
 
-        return view('userzone.incomes.edit', ['income' => $income]);
+        // The active accounts, plus the account the income already belongs to even if it was deactivated
+        $accounts = $user->accounts()->withTrashed()
+            ->where(fn ($query) => $query->whereNull('deleted_at')->orWhere('id', $income->account_id))
+            ->with('currency:id,symbol')
+            ->orderBy('name')
+            ->get(['id', 'name', 'balance_in_cents', 'currency_id']);
+        $categories = $user->categories()->orderBy('name')->get(['id', 'name']);
+        $income->loadMissing('account.currency:id,symbol');
+
+        return view('userzone.incomes.edit', [
+            'income' => $income,
+            'accounts' => $accounts,
+            'categories' => $categories,
+        ]);
     }
 
     /***
-     * Handles the update of an income (only its concept can be changed)
+     * Handles the update of an income and keeps the balances of the accounts right
      *
      * @param UpdateIncomeRequest $request
      * @param Income $income
@@ -144,8 +161,37 @@ class IncomeController extends Controller
     {
         Gate::authorize('update', $income);
 
-        $income->update($request->validated());
+        $data = $request->validated();
+        $account = Account::withTrashed()->findOrFail($data['account_id']);
+
+        // Checked here, after the Gate, so the message about an account is only ever shown to its owner
+        if (! $income->canBeChangedTo($account, $data['amount'])) {
+            return back()->withInput()->withErrors(['amount' => $income->account->name.' would end up with a negative balance.']);
+        }
+
+        $income->updateAndSyncBalance($data);
 
         return redirect()->route('incomes.index')->with('status', 'income-updated');
+    }
+
+    /***
+     * Deletes one of the user's incomes and takes its amount out of the account,
+     * unless that would leave the account with a negative balance
+     *
+     * @param Income $income
+     * @return RedirectResponse
+     */
+    public function destroy(Income $income): RedirectResponse
+    {
+        Gate::authorize('delete', $income);
+
+        if (! $income->canBeDeleted()) {
+            return redirect()->route('incomes.index')
+                ->withErrors(['income' => $income->account->name.' would end up with a negative balance, so this income can’t be deleted.']);
+        }
+
+        $income->deleteAndRestoreBalance();
+
+        return redirect()->route('incomes.index')->with('status', 'income-deleted');
     }
 }

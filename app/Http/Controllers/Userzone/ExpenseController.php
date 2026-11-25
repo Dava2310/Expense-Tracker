@@ -90,9 +90,12 @@ class ExpenseController extends Controller
     {
         Gate::authorize('create', Expense::class);
 
+        $accounts = $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance_in_cents', 'currency_id']);
+        $categories = $request->user()->categories()->orderBy('name')->get(['id', 'name']);
+
         return view('userzone.expenses.create', [
-            'accounts' => $request->user()->accounts()->with('currency')->orderBy('name')->get(['id', 'name', 'balance_in_cents', 'currency_id']),
-            'categories' => $request->user()->categories()->orderBy('name')->get(['id', 'name']),
+            'accounts' => $accounts,
+            'categories' => $categories,
         ]);
     }
 
@@ -119,22 +122,36 @@ class ExpenseController extends Controller
     }
 
     /***
-     * Shows one of the user's expenses and the form to edit its concept
+     * Shows one of the user's expenses and the form to edit all of its details
      *
+     * @param Request $request
      * @param Expense $expense
      * @return View
      */
-    public function edit(Expense $expense): View
+    public function edit(Request $request, Expense $expense): View
     {
         Gate::authorize('update', $expense);
 
-        $expense->loadMissing(['account.currency:id,symbol', 'category:id,name']);
+        $user = $request->user();
 
-        return view('userzone.expenses.edit', ['expense' => $expense]);
+        // The active accounts, plus the account the expense already belongs to even if it was deactivated
+        $accounts = $user->accounts()->withTrashed()
+            ->where(fn ($query) => $query->whereNull('deleted_at')->orWhere('id', $expense->account_id))
+            ->with('currency:id,symbol')
+            ->orderBy('name')
+            ->get(['id', 'name', 'balance_in_cents', 'currency_id']);
+        $categories = $user->categories()->orderBy('name')->get(['id', 'name']);
+        $expense->loadMissing('account.currency:id,symbol');
+
+        return view('userzone.expenses.edit', [
+            'expense' => $expense,
+            'accounts' => $accounts,
+            'categories' => $categories,
+        ]);
     }
 
     /***
-     * Handles the update of an expense (only its concept can be changed)
+     * Handles the update of an expense and keeps the balances of the accounts right
      *
      * @param UpdateExpenseRequest $request
      * @param Expense $expense
@@ -144,8 +161,31 @@ class ExpenseController extends Controller
     {
         Gate::authorize('update', $expense);
 
-        $expense->update($request->validated());
+        $data = $request->validated();
+        $account = Account::withTrashed()->findOrFail($data['account_id']);
+
+        // Checked here, after the Gate, so the message about an account is only ever shown to its owner
+        if (! $expense->canBeChangedTo($account, $data['amount'])) {
+            return back()->withInput()->withErrors(['amount' => $account->name.' doesn’t have enough balance for this amount.']);
+        }
+
+        $expense->updateAndSyncBalance($data);
 
         return redirect()->route('expenses.index')->with('status', 'expense-updated');
+    }
+
+    /***
+     * Deletes one of the user's expenses and gives its amount back to the account
+     *
+     * @param Expense $expense
+     * @return RedirectResponse
+     */
+    public function destroy(Expense $expense): RedirectResponse
+    {
+        Gate::authorize('delete', $expense);
+
+        $expense->deleteAndRestoreBalance();
+
+        return redirect()->route('expenses.index')->with('status', 'expense-deleted');
     }
 }

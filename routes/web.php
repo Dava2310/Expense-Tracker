@@ -27,8 +27,8 @@ Route::middleware('userzone')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::resource('currencies', CurrencyController::class);
     Route::resource('accounts', AccountController::class);
-    Route::resource('incomes', IncomeController::class)->except(['show', 'destroy']);
-    Route::resource('expenses', ExpenseController::class)->except(['show', 'destroy']);
+    Route::resource('incomes', IncomeController::class)->except(['show']);
+    Route::resource('expenses', ExpenseController::class)->except(['show']);
     Route::resource('categories', CategoryController::class)->except('show');
 
     // User's profile management
