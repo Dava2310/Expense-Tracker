@@ -94,11 +94,11 @@ class Account extends Model
     }
 
     /**
-     * Determines whether the balance is enough to pay the given amount.
+     * Determines whether the balance, plus an amount that is about to come back to it, is enough to pay the given amount.
      */
-    public function hasEnoughBalanceFor(string|float $amount): bool
+    public function hasEnoughBalanceFor(string|float $amount, string|float $returning = 0): bool
     {
-        return $this->balance_in_cents >= $this->toCents($amount);
+        return $this->balance_in_cents + $this->toCents($returning) >= $this->toCents($amount);
     }
 
     /**
