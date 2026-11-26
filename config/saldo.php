@@ -27,4 +27,20 @@ return [
         ['name' => 'Other', 'description' => 'Anything that does not fit another category'],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Starter Currencies
+    |--------------------------------------------------------------------------
+    |
+    | These currencies are created for every new user when they register, so
+    | they can open an account right away. Each one needs a name and a symbol,
+    | and the user can add more currencies or edit these afterwards.
+    |
+    */
+
+    'starter_currencies' => [
+        ['name' => 'US Dollar', 'symbol' => '$'],
+        ['name' => 'Euro', 'symbol' => '€'],
+    ],
+
 ];

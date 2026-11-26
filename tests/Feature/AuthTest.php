@@ -30,14 +30,15 @@ test('a signed-in user signs out', function () {
     $this->assertGuest();
 });
 
-test('a new user registers, is signed in and receives the starter categories', function () {
+test('a new user registers, is signed in and receives the starter categories and currencies', function () {
     $this->post(route('register'), ['name' => 'New User', 'email' => 'new@example.com', 'password' => 'password', 'password_confirmation' => 'password'])
         ->assertRedirect(route('dashboard', absolute: false));
 
     $user = User::firstWhere('email', 'new@example.com');
 
     $this->assertAuthenticatedAs($user);
-    expect($user->categories()->count())->toBe(11);
+    expect($user->categories()->count())->toBe(11)
+        ->and($user->currencies()->pluck('symbol')->all())->toBe(['$', '€']);
 });
 
 test('registering with an email that is already taken explains it and creates nothing', function () {

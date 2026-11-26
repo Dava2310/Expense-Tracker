@@ -171,6 +171,14 @@ class User extends Authenticatable implements HasMedia
     }
 
     /**
+     * Creates the starter currencies (dollar and euro) for a newly registered user.
+     */
+    public function createStarterCurrencies(): void
+    {
+        $this->currencies()->createMany(config('saldo.starter_currencies'));
+    }
+
+    /**
      * Deletes the user and everything they own, all or nothing; the photo is removed after the commit.
      */
     public function deleteWithData(): void
