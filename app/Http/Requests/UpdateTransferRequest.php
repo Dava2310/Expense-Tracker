@@ -4,11 +4,10 @@ namespace App\Http\Requests;
 
 use App\Models\Account;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
-class UpdateTransferRequest extends FormRequest
+class UpdateTransferRequest extends StoreTransferRequest
 {
     /**
      * Who can update a transfer is decided by the transfer policy, which the controller asks.
@@ -16,19 +15,6 @@ class UpdateTransferRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
-    }
-
-    /**
-     * Friendlier field names for the validation messages.
-     *
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'from_account_id' => 'source account',
-            'to_account_id' => 'destination account',
-        ];
     }
 
     /**
