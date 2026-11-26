@@ -49,13 +49,16 @@ class User extends Authenticatable implements HasMedia
     ];
 
     /**
-     * The profile photo is a single WebP file: a new photo replaces the old one.
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
      */
-    public function registerMediaCollections(): void
+    protected function casts(): array
     {
-        $this->addMediaCollection('avatar')
-            ->singleFile()
-            ->acceptsMimeTypes(['image/webp']);
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
     }
 
     /**
@@ -77,47 +80,6 @@ class User extends Authenticatable implements HasMedia
     protected function profilePhotoUrl(): Attribute
     {
         return Attribute::get(fn (): ?string => $this->getFirstMediaUrl('avatar') ?: null);
-    }
-
-    /**
-     * Replaces the profile photo with a centred 256 px WebP square; the upload itself is not kept.
-     */
-    public function setProfilePhoto(UploadedFile $photo): void
-    {
-        $processed = sys_get_temp_dir().'/'.Str::uuid().'.webp';
-
-        Image::useImageDriver(ImageDriver::Gd)
-            ->loadFile($photo->getRealPath())
-            ->fit(Fit::Crop, 256, 256)
-            ->quality(85)
-            ->format('webp')
-            ->save($processed);
-
-        $this->addMedia($processed)
-            ->usingFileName(Str::uuid().'.webp')
-            ->usingName('Profile photo')
-            ->toMediaCollection('avatar');
-    }
-
-    /**
-     * Removes the profile photo, so the initials are shown again.
-     */
-    public function removeProfilePhoto(): void
-    {
-        $this->clearMediaCollection('avatar');
-    }
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
     }
 
     /**
@@ -161,23 +123,59 @@ class User extends Authenticatable implements HasMedia
     }
 
     /**
+     * The profile photo is a single WebP file: a new photo replaces the old one.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/webp']);
+    }
+
+    /**
+     * Replaces the profile photo with a centred 256 px WebP square; the upload itself is not kept.
+     *
+     * @param  UploadedFile  $photo  The image the user uploaded
+     */
+    public function setProfilePhoto(UploadedFile $photo): void
+    {
+        $processed = sys_get_temp_dir().'/'.Str::uuid().'.webp';
+
+        Image::useImageDriver(ImageDriver::Gd)
+            ->loadFile($photo->getRealPath())
+            ->fit(Fit::Crop, 256, 256)
+            ->quality(85)
+            ->format('webp')
+            ->save($processed);
+
+        $this->addMedia($processed)
+            ->usingFileName(Str::uuid().'.webp')
+            ->usingName('Profile photo')
+            ->toMediaCollection('avatar');
+    }
+
+    /**
+     * Removes the profile photo, so the initials are shown again.
+     */
+    public function removeProfilePhoto(): void
+    {
+        $this->clearMediaCollection('avatar');
+    }
+
+    /**
      * Creates the starter categories (expenses and incomes) for a newly registered user.
      */
     public function createStarterCategories(): void
     {
-        $this->categories()->createMany([
-            ['name' => 'Groceries', 'description' => 'Supermarket and food shopping'],
-            ['name' => 'Rent', 'description' => 'Rent or mortgage payments'],
-            ['name' => 'Transport', 'description' => 'Public transport, fuel, taxis and parking'],
-            ['name' => 'Eating out', 'description' => 'Restaurants, cafés and food delivery'],
-            ['name' => 'Health', 'description' => 'Pharmacy, doctors and health insurance'],
-            ['name' => 'Subscriptions', 'description' => 'Streaming, apps and memberships'],
-            ['name' => 'Shopping', 'description' => 'Clothes, home goods and other purchases'],
-            ['name' => 'Entertainment', 'description' => 'Leisure, events, hobbies and travel'],
-            ['name' => 'Salary', 'description' => 'Regular pay from work'],
-            ['name' => 'Freelance', 'description' => 'Income from side jobs or clients'],
-            ['name' => 'Other', 'description' => 'Anything that does not fit another category'],
-        ]);
+        $this->categories()->createMany(config('saldo.starter_categories'));
+    }
+
+    /**
+     * Creates the starter currencies (dollar and euro) for a newly registered user.
+     */
+    public function createStarterCurrencies(): void
+    {
+        $this->currencies()->createMany(config('saldo.starter_currencies'));
     }
 
     /**

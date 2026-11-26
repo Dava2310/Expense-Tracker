@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('bank');
-            $table->string('details');
+            $table->string('details')->nullable();
             $table->bigInteger('balance_in_cents');
             $table->bigInteger('min_balance_in_cents');
             $table->foreignId('user_id')->constrained();

@@ -149,7 +149,7 @@ class ExpenseController extends Controller
         $data = $request->validated();
         $account = Account::withTrashed()->findOrFail($data['account_id']);
 
-        // Refuse the change if the account could not cover it
+        // Refuse the change if the account does not have enough balance for it
         if (! $expense->canBeChangedTo($account, $data['amount'])) {
             return back()->withInput()->withErrors(['amount' => $account->name.' doesn’t have enough balance for this amount.']);
         }

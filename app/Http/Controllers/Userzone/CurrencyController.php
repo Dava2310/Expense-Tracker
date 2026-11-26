@@ -60,14 +60,19 @@ class CurrencyController extends Controller
     {
         Gate::authorize('view', $currency);
 
+        // One query: the user's accounts in this currency, deactivated ones included
         $accounts = $request->user()->accounts()->withTrashed()
             ->select('id', 'name', 'bank', 'balance_in_cents', 'min_balance_in_cents', 'deleted_at')
             ->where('currency_id', $currency->id)
             ->get();
+
+        // The counts are taken from the loaded collection, with no extra queries
         $accountsCount = $accounts->count();
         $activeAccountsCount = $accounts->filter(fn (Account $account): bool => ! $account->trashed())->count();
         $inactiveAccountsCount = $accounts->filter(fn (Account $account): bool => $account->trashed())->count();
         $isInUse = $accountsCount > 0;
+
+        // A second query: the database sums the balances of every account in this currency
         $totalBalance = $currency->symbol.number_format($currency->totalBalance(), 2);
 
         return view('userzone.currencies.show', [

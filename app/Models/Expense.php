@@ -26,17 +26,6 @@ class Expense extends Model
     ];
 
     /**
-     * The amount is read and written as a decimal (12.34) but stored as whole cents (1234).
-     */
-    protected function amount(): Attribute
-    {
-        return Attribute::make(
-            get: fn (mixed $value, array $attributes): float => $attributes['amount_in_cents'] / 100,
-            set: fn (string|float $decimal): array => ['amount_in_cents' => (int) round((float) $decimal * 100)],
-        );
-    }
-
-    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -49,7 +38,37 @@ class Expense extends Model
     }
 
     /**
+     * The amount is read and written as a decimal (12.34) but stored as whole cents (1234).
+     */
+    protected function amount(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes): float => $attributes['amount_in_cents'] / 100,
+            set: fn (string|float $decimal): array => ['amount_in_cents' => (int) round((float) $decimal * 100)],
+        );
+    }
+
+    /**
+     * Gets the associated account for the expense.
+     */
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class)->withTrashed();
+    }
+
+    /**
+     * Gets the associated category for the expense.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    /**
      * Whether the given account can pay the new amount, counting this expense's own money as available.
+     *
+     * @param  Account  $account  The account picked in the form, the one that would pay
+     * @param  string|float  $amount  The new amount from the form
      */
     public function canBeChangedTo(Account $account, string|float $amount): bool
     {
@@ -61,7 +80,7 @@ class Expense extends Model
     /**
      * Saves the changes and moves the balances (old amount back, new amount out) in one transaction.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $attributes  The validated form data to save
      */
     public function updateAndSyncBalance(array $attributes): void
     {
@@ -85,21 +104,5 @@ class Expense extends Model
 
             $this->delete();
         });
-    }
-
-    /**
-     * Gets the associated account for the expense.
-     */
-    public function account(): BelongsTo
-    {
-        return $this->belongsTo(Account::class)->withTrashed();
-    }
-
-    /**
-     * Gets the associated category for the expense.
-     */
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
     }
 }
