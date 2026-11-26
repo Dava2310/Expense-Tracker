@@ -25,4 +25,62 @@ The balances are the heart of the app: every income, expense and transfer update
 | File uploads | Spatie Laravel Media Library, on a local disk or on Amazon S3 |
 | Tests and code style | Pest 5, Laravel Pint |
 
+
 Saldo is built with [Laravel](https://laravel.com).
+
+## Getting started
+
+### Requirements
+
+- **PHP 8.5** with the extensions `ctype`, `dom`, `exif`, `fileinfo`, `gd`, `mbstring`, `openssl`, `pdo_sqlite`, `sqlite3`, `tokenizer` and `xml` (check with `php -m`)
+- **Composer 2**
+- **Node.js 22** and npm
+- **Git**
+
+### Install
+
+```bash
+# 1. Get the code
+git clone https://github.com/Dava2310/Expense-Tracker.git saldo
+cd saldo
+
+# 2. Install the PHP packages (Laravel included)
+composer install
+
+# 3. Create the environment file and the application key
+cp .env.example .env
+php artisan key:generate
+
+# 4. Create the SQLite database and its tables
+touch database/database.sqlite
+php artisan migrate
+
+# 5. Install the JavaScript packages and build the CSS and JavaScript
+npm install
+npm run build
+
+# 6. Make the uploaded profile photos reachable from the browser
+php artisan storage:link
+```
+
+Optional: fill the database with example data (this wipes it first). You can then sign in with `test@example.com` and the password `password`.
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+### Run
+
+```bash
+composer dev
+```
+
+This starts the web server at <http://localhost:8000> together with the queue listener, the log viewer and Vite. It needs the `pcntl` PHP extension (available on Linux, macOS and WSL). To only browse the app, `php artisan serve` is enough.
+
+### Test and check the code style
+
+```bash
+composer test            # run the test suite
+vendor/bin/pint          # fix the code style
+vendor/bin/pint --test   # report style problems without changing anything
+```
