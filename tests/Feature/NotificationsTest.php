@@ -74,3 +74,22 @@ test('the low-balance email is queued and names the account, its balance and its
         ->toContain('€100.00')
         ->toContain('Hi Ada,');
 });
+
+test('a transfer that takes the source account below its minimum queues one email about the source only', function () {
+    Queue::fake();
+    $user = User::factory()->create();
+    $currency = Currency::factory()->for($user)->create();
+    $checking = Account::factory()->for($user)->for($currency)->create(['name' => 'Checking', 'balance' => 150, 'min_balance' => 100]);
+    $savings = Account::factory()->for($user)->for($currency)->create(['name' => 'Savings', 'balance' => 20, 'min_balance' => 100]);
+
+    $this->actingAs($user)
+        ->post(route('transfers.store'), ['from_account_id' => $checking->id, 'to_account_id' => $savings->id, 'amount' => '80', 'date' => '2026-11-25'])
+        ->assertSessionHasNoErrors();
+
+    $queued = Queue::pushed(SendQueuedNotifications::class);
+    $email = (string) $queued->first()->notification->toMail($user)->render();
+
+    expect($queued)->toHaveCount(1)
+        ->and($email)->toContain('Checking')
+        ->not->toContain('Savings');
+});
