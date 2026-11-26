@@ -3,10 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateIncomeRequest extends FormRequest
+class UpdateIncomeRequest extends StoreIncomeRequest
 {
     /**
      * Who can update an income is decided by the income policy, which the controller asks.
