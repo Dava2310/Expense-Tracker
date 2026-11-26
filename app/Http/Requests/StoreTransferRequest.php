@@ -85,7 +85,7 @@ class StoreTransferRequest extends FormRequest
     }
 
     /**
-     * Both accounts must share a currency and the source must cover the amount.
+     * Both accounts must share a currency and the source must have enough balance for the amount.
      *
      * @return array<int, callable(Validator): void>
      */
