@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCurrencyRequest extends FormRequest
+class UpdateCurrencyRequest extends StoreCurrencyRequest
 {
     /**
      * Who can update a currency is decided by the currency policy, which the controller asks.
