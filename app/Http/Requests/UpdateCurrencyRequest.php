@@ -4,10 +4,13 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 
+/**
+ * Validates the form that edits a currency.
+ */
 class UpdateCurrencyRequest extends StoreCurrencyRequest
 {
     /**
-     * Who can update a currency is decided by the currency policy, which the controller asks.
+     * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {

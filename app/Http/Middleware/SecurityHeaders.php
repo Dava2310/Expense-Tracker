@@ -6,6 +6,9 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Adds browser security headers to every response.
+ */
 class SecurityHeaders
 {
     /**

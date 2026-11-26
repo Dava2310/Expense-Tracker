@@ -11,13 +11,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
+/**
+ * Handles creating, correcting and deleting transfers between the user's accounts.
+ */
 class TransferController extends Controller
 {
-    /***
-     * Renders the form to move money between two of the user's accounts
-     *
-     * @param Request $request
-     * @return View
+    /**
+     * Shows the transfer form, or an explanation when there are fewer than two accounts.
      */
     public function create(Request $request): View
     {
@@ -30,11 +30,8 @@ class TransferController extends Controller
         ]);
     }
 
-    /***
-     * Handles the creation of the transfer and moves its amount between the two balances
-     *
-     * @param StoreTransferRequest $request
-     * @return RedirectResponse
+    /**
+     * Creates the transfer and moves the amount between the two balances.
      */
     public function store(StoreTransferRequest $request): RedirectResponse
     {
@@ -45,12 +42,8 @@ class TransferController extends Controller
         return redirect()->route('accounts.index')->with('status', 'transfer-created');
     }
 
-    /***
-     * Shows the form to edit all the details of one of the user's transfers
-     *
-     * @param Request $request
-     * @param Transfer $transfer
-     * @return View
+    /**
+     * Shows the edit form; the transfer's own accounts are offered even if deactivated.
      */
     public function edit(Request $request, Transfer $transfer): View
     {
@@ -69,12 +62,8 @@ class TransferController extends Controller
         ]);
     }
 
-    /***
-     * Handles the update of a transfer and keeps the balances of the accounts right
-     *
-     * @param UpdateTransferRequest $request
-     * @param Transfer $transfer
-     * @return RedirectResponse
+    /**
+     * Updates the transfer and both balances, checking them once the change is applied.
      */
     public function update(UpdateTransferRequest $request, Transfer $transfer): RedirectResponse
     {
@@ -85,11 +74,8 @@ class TransferController extends Controller
         return redirect()->route('accounts.index')->with('status', 'transfer-updated');
     }
 
-    /***
-     * Deletes one of the user's transfers and puts the amount back where it came from
-     *
-     * @param Transfer $transfer
-     * @return RedirectResponse
+    /**
+     * Deletes the transfer unless the destination already spent the money.
      */
     public function destroy(Transfer $transfer): RedirectResponse
     {

@@ -12,14 +12,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
+/**
+ * Handles listing, creating, showing, editing and deleting the user's currencies.
+ */
 class CurrencyController extends Controller
 {
-    /***
-     * Lists the currencies of the logged-in user with the number of accounts using each one,
-     * counting inactive accounts too
-     *
-     * @param Request $request
-     * @return View
+    /**
+     * Lists the user's currencies with the number of accounts using each one.
      */
     public function index(Request $request): View
     {
@@ -32,10 +31,8 @@ class CurrencyController extends Controller
         return view('userzone.currencies.index', compact('currencies'));
     }
 
-    /***
+    /**
      * Renders the form to create a new currency
-     *
-     * @return View
      */
     public function create(): View
     {
@@ -44,11 +41,8 @@ class CurrencyController extends Controller
         return view('userzone.currencies.create');
     }
 
-    /***
+    /**
      * Handles the creation of the new currency
-     *
-     * @param StoreCurrencyRequest $request
-     * @return RedirectResponse
      */
     public function store(StoreCurrencyRequest $request): RedirectResponse
     {
@@ -59,13 +53,8 @@ class CurrencyController extends Controller
         return redirect()->route('currencies.index')->with('status', 'currency-created');
     }
 
-    /***
-     * Shows one of the user's currencies with the accounts that use it (active and inactive),
-     * their counts and their total balance
-     *
-     * @param Request $request
-     * @param Currency $currency
-     * @return View
+    /**
+     * Shows a currency with its accounts, their counts and their total balance.
      */
     public function show(Request $request, Currency $currency): View
     {
@@ -92,11 +81,8 @@ class CurrencyController extends Controller
         ]);
     }
 
-    /***
+    /**
      * Renders the form to edit one of the user's currencies
-     *
-     * @param Currency $currency
-     * @return View
      */
     public function edit(Currency $currency): View
     {
@@ -110,12 +96,8 @@ class CurrencyController extends Controller
         ]);
     }
 
-    /***
+    /**
      * Handles the update of a currency
-     *
-     * @param UpdateCurrencyRequest $request
-     * @param Currency $currency
-     * @return RedirectResponse
      */
     public function update(UpdateCurrencyRequest $request, Currency $currency): RedirectResponse
     {
@@ -126,11 +108,8 @@ class CurrencyController extends Controller
         return redirect()->route('currencies.index')->with('status', 'currency-updated');
     }
 
-    /***
-     * Deletes a currency. A currency used by any account, active or inactive, can't be deleted
-     *
-     * @param Currency $currency
-     * @return RedirectResponse
+    /**
+     * Deletes a currency unless an account, active or inactive, uses it.
      */
     public function destroy(Currency $currency): RedirectResponse
     {

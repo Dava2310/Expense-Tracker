@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Money received into an account; creating, editing and deleting it moves the balance.
+ */
 class Income extends Model
 {
     /** @use HasFactory<IncomeFactory> */
@@ -46,8 +49,7 @@ class Income extends Model
     }
 
     /**
-     * Determines whether the account of this income can give the old amount back. Only that account can end up
-     * short: the new amount also arrives there when the account stays the same, and another account only gains.
+     * Whether the old account can give the old amount back once the change is applied.
      */
     public function canBeChangedTo(Account $account, string|float $amount): bool
     {
@@ -57,9 +59,7 @@ class Income extends Model
     }
 
     /**
-     * Saves the changes and keeps the balances right: the old amount is taken out of the old account
-     * and the new amount is added to the new one, which may be the same account.
-     * The income and both balance changes succeed or fail together.
+     * Saves the changes and moves the balances (old amount out, new amount in) in one transaction.
      *
      * @param  array<string, mixed>  $attributes
      */

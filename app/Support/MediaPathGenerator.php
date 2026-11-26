@@ -6,11 +6,13 @@ use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\MediaLibrary\Support\PathGenerator\DefaultPathGenerator;
 
+/**
+ * Builds the storage path of the uploaded media files.
+ */
 class MediaPathGenerator extends DefaultPathGenerator
 {
     /**
-     * Gives every file its own folder named after its owner, for example users/5/12 for file 12 of user 5.
-     * The library builds the other folders (conversions, responsive images) on top of this one.
+     * Gives every file its own folder named after its owner, for example users/5/12.
      */
     protected function getBasePath(Media $media): string
     {

@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Money spent from an account; creating, editing and deleting it moves the balance.
+ */
 class Expense extends Model
 {
     /** @use HasFactory<ExpenseFactory> */
@@ -46,8 +49,7 @@ class Expense extends Model
     }
 
     /**
-     * Determines whether the given account can pay the new amount of this expense. The money of this expense goes
-     * back to its account first, so it counts as available when the account stays the same.
+     * Whether the given account can pay the new amount, counting this expense's own money as available.
      */
     public function canBeChangedTo(Account $account, string|float $amount): bool
     {
@@ -57,9 +59,7 @@ class Expense extends Model
     }
 
     /**
-     * Saves the changes and keeps the balances right: the old amount goes back to the old account
-     * and the new amount is taken from the new one, which may be the same account.
-     * The expense and both balance changes succeed or fail together.
+     * Saves the changes and moves the balances (old amount back, new amount out) in one transaction.
      *
      * @param  array<string, mixed>  $attributes
      */

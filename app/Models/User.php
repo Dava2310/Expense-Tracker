@@ -18,6 +18,9 @@ use Spatie\Image\Image;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+/**
+ * A person who uses Saldo, owner of accounts, currencies and categories.
+ */
 class User extends Authenticatable implements HasMedia
 {
     /** @use HasFactory<UserFactory> */
@@ -76,9 +79,7 @@ class User extends Authenticatable implements HasMedia
     }
 
     /**
-     * Replaces the profile photo with a centred 256 px square WebP made from the uploaded image.
-     * The upload itself is never stored, only the processed copy, so no location data survives.
-     * Loading the file already turns a sideways phone photo upright (the library reads its EXIF orientation).
+     * Replaces the profile photo with a centred 256 px WebP square; the upload itself is not kept.
      */
     public function setProfilePhoto(UploadedFile $photo): void
     {

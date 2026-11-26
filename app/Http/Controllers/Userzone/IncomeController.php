@@ -14,14 +14,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
+/**
+ * Handles listing, registering, correcting and deleting the user's incomes.
+ */
 class IncomeController extends Controller
 {
-    /***
-     * Lists the incomes received into the logged-in user's accounts, grouped by month
-     * and optionally filtered by account, category and period
-     *
-     * @param Request $request
-     * @return View
+    /**
+     * Lists the incomes grouped by month, filtered by account, category and period.
      */
     public function index(Request $request): View
     {
@@ -80,11 +79,8 @@ class IncomeController extends Controller
         ]);
     }
 
-    /***
+    /**
      * Renders the form to register a new income
-     *
-     * @param Request $request
-     * @return View
      */
     public function create(Request $request): View
     {
@@ -99,11 +95,8 @@ class IncomeController extends Controller
         ]);
     }
 
-    /***
-     * Handles the creation of the new Income and adds its amount to the account balance
-     *
-     * @param StoreIncomeRequest $request
-     * @return RedirectResponse
+    /**
+     * Creates the income and adds its amount to the account in one transaction.
      */
     public function store(StoreIncomeRequest $request): RedirectResponse
     {
@@ -121,12 +114,8 @@ class IncomeController extends Controller
         return redirect()->route('incomes.index')->with('status', 'income-created');
     }
 
-    /***
-     * Shows one of the user's incomes and the form to edit all of its details
-     *
-     * @param Request $request
-     * @param Income $income
-     * @return View
+    /**
+     * Shows the edit form; the income's own account is offered even if deactivated.
      */
     public function edit(Request $request, Income $income): View
     {
@@ -150,12 +139,8 @@ class IncomeController extends Controller
         ]);
     }
 
-    /***
-     * Handles the update of an income and keeps the balances of the accounts right
-     *
-     * @param UpdateIncomeRequest $request
-     * @param Income $income
-     * @return RedirectResponse
+    /**
+     * Updates the income and its balances, refusing a change that would leave an account negative.
      */
     public function update(UpdateIncomeRequest $request, Income $income): RedirectResponse
     {
@@ -164,7 +149,7 @@ class IncomeController extends Controller
         $data = $request->validated();
         $account = Account::withTrashed()->findOrFail($data['account_id']);
 
-        // Checked here, after the Gate, so the message about an account is only ever shown to its owner
+        // Refuse the change if it would leave the account below zero
         if (! $income->canBeChangedTo($account, $data['amount'])) {
             return back()->withInput()->withErrors(['amount' => $income->account->name.' would end up with a negative balance.']);
         }
@@ -174,12 +159,8 @@ class IncomeController extends Controller
         return redirect()->route('incomes.index')->with('status', 'income-updated');
     }
 
-    /***
-     * Deletes one of the user's incomes and takes its amount out of the account,
-     * unless that would leave the account with a negative balance
-     *
-     * @param Income $income
-     * @return RedirectResponse
+    /**
+     * Deletes the income and takes its amount out, unless the account would go below zero.
      */
     public function destroy(Income $income): RedirectResponse
     {

@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Money moved between two accounts of the same user; it is neither an income nor an expense.
+ */
 class Transfer extends Model
 {
     /** @use HasFactory<TransferFactory> */
@@ -64,9 +67,7 @@ class Transfer extends Model
     }
 
     /**
-     * Gives the old amount back, applies the changes and moves the new amount, all or nothing.
-     * An edit can touch up to four accounts, so the balances are checked once the change is applied:
-     * if any account ends below zero, nothing is saved.
+     * Saves the change and the balances in one transaction; rolls back if an account ends below zero.
      *
      * @param  array<string, mixed>  $attributes
      *

@@ -5,10 +5,13 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 
+/**
+ * Validates the form that edits an expense.
+ */
 class UpdateExpenseRequest extends StoreExpenseRequest
 {
     /**
-     * Who can update an expense is decided by the expense policy, which the controller asks.
+     * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
@@ -42,7 +45,7 @@ class UpdateExpenseRequest extends StoreExpenseRequest
     }
 
     /**
-     * Not the balance check of StoreExpenseRequest: on an edit it runs in the controller, after the authorization check.
+     * Disables the balance check that only applies when an expense is created.
      *
      * @return array<int, callable>
      */

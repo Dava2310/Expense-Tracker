@@ -8,6 +8,9 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Translation\PotentiallyTranslatedString;
 
+/**
+ * Refuses a category name the user already has, whatever the letter case.
+ */
 class UniqueCategoryName implements ValidationRule
 {
     /**

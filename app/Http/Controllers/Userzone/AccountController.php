@@ -11,13 +11,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
+/**
+ * Handles listing, creating, showing, editing and deactivating the user's accounts.
+ */
 class AccountController extends Controller
 {
-    /***
-     * Lists the accounts that belong to the logged-in user
-     *
-     * @param Request $request
-     * @return View
+    /**
+     * Lists the user's active accounts.
      */
     public function index(Request $request): View
     {
@@ -30,11 +30,8 @@ class AccountController extends Controller
         ]);
     }
 
-    /***
+    /**
      * Renders the form to create a new account
-     *
-     * @param Request $request
-     * @return View
      */
     public function create(Request $request): View
     {
@@ -45,11 +42,8 @@ class AccountController extends Controller
         ]);
     }
 
-    /***
-     * Handles the creation of the new Account
-     *
-     * @param StoreAccountRequest $request
-     * @return RedirectResponse
+    /**
+     * Creates an account, whose balance starts at 0.
      */
     public function store(StoreAccountRequest $request): RedirectResponse
     {
@@ -62,11 +56,8 @@ class AccountController extends Controller
         return redirect()->route('accounts.index')->with('status', 'account-created');
     }
 
-    /***
+    /**
      * Shows one of the user's accounts with its summary and latest activity
-     *
-     * @param Account $account
-     * @return View
      */
     public function show(Account $account): View
     {
@@ -80,11 +71,8 @@ class AccountController extends Controller
         ]);
     }
 
-    /***
+    /**
      * Renders the form to edit one of the user's accounts
-     *
-     * @param Account $account
-     * @return View
      */
     public function edit(Account $account): View
     {
@@ -93,12 +81,8 @@ class AccountController extends Controller
         return view('userzone.accounts.edit', ['account' => $account->load('currency')]);
     }
 
-    /***
-     * Handles the update of an account (balance cannot be changed)
-     *
-     * @param UpdateAccountRequest $request
-     * @param Account $account
-     * @return RedirectResponse
+    /**
+     * Updates an account; the balance is not editable, only entries and transfers move it.
      */
     public function update(UpdateAccountRequest $request, Account $account): RedirectResponse
     {
@@ -109,11 +93,8 @@ class AccountController extends Controller
         return redirect()->route('accounts.show', $account)->with('status', 'account-updated');
     }
 
-    /***
-     * Deactivates one of the user's accounts. Its incomes and expenses are kept.
-     *
-     * @param Account $account
-     * @return RedirectResponse
+    /**
+     * Deactivates an account instead of deleting it, so its history is kept.
      */
     public function destroy(Account $account): RedirectResponse
     {

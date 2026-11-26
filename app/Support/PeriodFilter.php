@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Throwable;
 
 /**
- * The period the incomes or expenses list can be limited to, read from the query string.
+ * A period of time that limits the incomes or expenses list, read from the query string.
  */
 class PeriodFilter
 {

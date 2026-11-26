@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+/**
+ * Shows the public welcome page.
+ */
 class WelcomeController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Shows the welcome page.
      */
     public function __invoke()
     {

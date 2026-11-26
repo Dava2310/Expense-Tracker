@@ -12,6 +12,9 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Spatie\Image\Exceptions\CouldNotLoadImage;
 
+/**
+ * Handles the signed-in user's profile and account deletion.
+ */
 class ProfileController extends Controller
 {
     /**
@@ -25,7 +28,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information.
+     * Updates name, email and photo; an unreadable photo leaves the profile unchanged.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
@@ -50,7 +53,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Remove the user's profile photo.
+     * Deletes the account after confirming the password.
      */
     public function destroyPhoto(Request $request): RedirectResponse
     {
@@ -60,7 +63,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * Delete the user's account.
+     * Delete the user's account, after asking for the password again, and end the session.
      */
     public function destroy(Request $request): RedirectResponse
     {

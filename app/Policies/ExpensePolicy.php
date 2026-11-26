@@ -5,10 +5,13 @@ namespace App\Policies;
 use App\Models\Expense;
 use App\Models\User;
 
+/**
+ * Decides who can record, see, change and delete expenses.
+ */
 class ExpensePolicy
 {
     /**
-     * Any signed-in user can record expenses. The form only accepts their own accounts.
+     * Any signed-in user can record expenses.
      */
     public function create(User $user): bool
     {

@@ -5,10 +5,13 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 
+/**
+ * Validates the form that edits an income.
+ */
 class UpdateIncomeRequest extends StoreIncomeRequest
 {
     /**
-     * Who can update an income is decided by the income policy, which the controller asks.
+     * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {

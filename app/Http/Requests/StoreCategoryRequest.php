@@ -6,6 +6,9 @@ use App\Rules\UniqueCategoryName;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * Validates the form that creates a category.
+ */
 class StoreCategoryRequest extends FormRequest
 {
     /**
@@ -17,7 +20,8 @@ class StoreCategoryRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Rules for the name (unique per user) and the details.
+     * `bail` skips the uniqueness query when the name is already invalid.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -30,7 +34,7 @@ class StoreCategoryRequest extends FormRequest
     }
 
     /**
-     * The plain-words names of the fields, used by the messages of both the create and the edit form.
+     * Plain-words names of the fields, used in the messages.
      *
      * @return array<string, string>
      */
@@ -43,8 +47,7 @@ class StoreCategoryRequest extends FormRequest
     }
 
     /**
-     * Messages written for people, shared with the edit form (UpdateCategoryRequest extends this class).
-     * The message for a repeated name is written in the UniqueCategoryName rule.
+     * Messages shown next to a field when one of its rules fails.
      *
      * @return array<string, string>
      */

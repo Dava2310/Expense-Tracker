@@ -6,6 +6,9 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * Validates the form that registers an income.
+ */
 class StoreIncomeRequest extends FormRequest
 {
     /**
@@ -17,7 +20,7 @@ class StoreIncomeRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Rules for an income; amounts have at most two decimals because they are stored as cents.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -41,7 +44,7 @@ class StoreIncomeRequest extends FormRequest
     }
 
     /**
-     * The plain-words names of the fields, used by the messages of both the create and the edit form.
+     * Plain-words names of the fields, used in the messages.
      *
      * @return array<string, string>
      */
@@ -57,7 +60,7 @@ class StoreIncomeRequest extends FormRequest
     }
 
     /**
-     * Messages written for people, shared with the edit form (UpdateIncomeRequest extends this class).
+     * Messages shown next to a field when one of its rules fails.
      *
      * @return array<string, string>
      */

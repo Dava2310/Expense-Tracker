@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+ * Asks a signed-in user to confirm their password.
+ */
 class ConfirmablePasswordController extends Controller
 {
     /**
