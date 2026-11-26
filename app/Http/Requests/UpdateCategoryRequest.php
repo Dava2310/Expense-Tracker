@@ -4,9 +4,8 @@ namespace App\Http\Requests;
 
 use App\Rules\UniqueCategoryName;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCategoryRequest extends FormRequest
+class UpdateCategoryRequest extends StoreCategoryRequest
 {
     /**
      * Who can update a category is decided by the category policy, which the controller asks.
