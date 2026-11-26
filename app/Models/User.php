@@ -134,6 +134,8 @@ class User extends Authenticatable implements HasMedia
 
     /**
      * Replaces the profile photo with a centred 256 px WebP square; the upload itself is not kept.
+     *
+     * @param  UploadedFile  $photo  The image the user uploaded
      */
     public function setProfilePhoto(UploadedFile $photo): void
     {

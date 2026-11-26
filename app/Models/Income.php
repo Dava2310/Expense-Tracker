@@ -66,6 +66,9 @@ class Income extends Model
 
     /**
      * Whether the old account can give the old amount back once the change is applied.
+     *
+     * @param  Account  $account  The account picked in the form
+     * @param  string|float  $amount  The new amount from the form
      */
     public function canBeChangedTo(Account $account, string|float $amount): bool
     {
@@ -77,7 +80,7 @@ class Income extends Model
     /**
      * Saves the changes and moves the balances (old amount out, new amount in) in one transaction.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $attributes  The validated form data to save
      */
     public function updateAndSyncBalance(array $attributes): void
     {

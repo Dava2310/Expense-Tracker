@@ -112,6 +112,9 @@ class Account extends Model
 
     /**
      * Formats an amount with the symbol of the currency this account is held in.
+     *
+     * @param  float  $amount  The decimal amount to format
+     * @param  int  $precision  How many decimal places to show
      */
     public function formatMoney(float $amount, int $precision = 2): string
     {
@@ -120,6 +123,8 @@ class Account extends Model
 
     /**
      * Adds the given decimal amount to the balance.
+     *
+     * @param  string|float  $amount  The decimal amount to add
      */
     public function deposit(string|float $amount): void
     {
@@ -128,6 +133,8 @@ class Account extends Model
 
     /**
      * Takes the given decimal amount out of the balance.
+     *
+     * @param  string|float  $amount  The decimal amount to take out
      */
     public function withdraw(string|float $amount): void
     {
@@ -135,8 +142,9 @@ class Account extends Model
     }
 
     /**
-     * Whether the balance, plus an amount about to come back, covers the given amount.
+     * Whether the balance, plus money about to come back, is enough to take out the given amount.
      *
+     * @param  string|float  $amount  The decimal amount to take out
      * @param  string|float  $returning  Money about to return to the account
      */
     public function hasEnoughBalanceFor(string|float $amount, string|float $returning = 0): bool
@@ -163,6 +171,7 @@ class Account extends Model
     /**
      * Gets the latest incomes, expenses and transfers of this account, newest first.
      *
+     * @param  int  $limit  The maximum number of entries to return
      * @return Collection<int, array{type: string, concept: string, date: CarbonInterface, category: string, amount: float}>
      */
     public function recentActivity(int $limit = 20): Collection
@@ -190,7 +199,8 @@ class Account extends Model
     /**
      * Sums the incomes or expenses of this account received in the given month.
      *
-     * @param  'incomes'|'expenses'  $relation
+     * @param  'incomes'|'expenses'  $relation  Which entries to sum
+     * @param  CarbonInterface|null  $month  Any date within the month; the current month if empty
      */
     public function monthTotal(string $relation, ?CarbonInterface $month = null): float
     {
@@ -204,6 +214,7 @@ class Account extends Model
     /**
      * Income and expenses of each of the last months, oldest first, empty months included.
      *
+     * @param  int  $months  How many months to include, counting back from the current one
      * @return Collection<int, array{label: string, name: string, income: float, expenses: float, net: float, surplus: bool}>
      */
     public function monthlyFlow(int $months = 6): Collection
@@ -229,6 +240,7 @@ class Account extends Model
     /**
      * Expenses of a month by category, biggest first.
      *
+     * @param  CarbonInterface|null  $month  Any date within the month; the current month if empty
      * @return Collection<int, array{name: string, amount: float}>
      */
     public function monthSpendingByCategory(?CarbonInterface $month = null): Collection
@@ -253,6 +265,8 @@ class Account extends Model
     /**
      * Shapes an income or expense as an activity entry.
      *
+     * @param  string  $type  The entry label, 'income' or 'expense'
+     * @param  Income|Expense  $entry  The income or expense to shape
      * @return array{id: int, type: string, concept: string, date: CarbonInterface, category: string, amount: float}
      */
     private function activityEntry(string $type, Income|Expense $entry): array
@@ -270,6 +284,9 @@ class Account extends Model
     /**
      * Shapes a transfer as an activity entry; the note replaces the category.
      *
+     * @param  string  $type  The entry label, 'transfer-in' or 'transfer-out'
+     * @param  string  $concept  The text shown as the entry's title
+     * @param  Transfer  $transfer  The transfer to shape
      * @return array{id: int, type: string, concept: string, date: CarbonInterface, category: string, amount: float}
      */
     private function transferEntry(string $type, string $concept, Transfer $transfer): array
@@ -287,8 +304,8 @@ class Account extends Model
     /**
      * Totals incomes or expenses per month, in cents, with a single query.
      *
-     * @param  HasMany<Income|Expense, $this>  $entries
-     * @param  Collection<int, CarbonInterface>  $months
+     * @param  HasMany<Income|Expense, $this>  $entries  The incomes or expenses of this account
+     * @param  Collection<int, CarbonInterface>  $months  The months to total, oldest first
      * @return list<int>
      */
     private function monthlyTotalsInCents(HasMany $entries, Collection $months): array
@@ -305,6 +322,8 @@ class Account extends Model
 
     /**
      * Converts a decimal amount (12.34) into whole cents (1234).
+     *
+     * @param  string|float  $decimal  The decimal amount, such as 12.34
      */
     private function toCents(string|float $decimal): int
     {
@@ -313,6 +332,8 @@ class Account extends Model
 
     /**
      * Converts whole cents (1234) into a decimal amount (12.34).
+     *
+     * @param  int  $cents  The amount in whole cents, such as 1234
      */
     private function toDecimal(int $cents): float
     {

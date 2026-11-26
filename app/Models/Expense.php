@@ -66,6 +66,9 @@ class Expense extends Model
 
     /**
      * Whether the given account can pay the new amount, counting this expense's own money as available.
+     *
+     * @param  Account  $account  The account picked in the form, the one that would pay
+     * @param  string|float  $amount  The new amount from the form
      */
     public function canBeChangedTo(Account $account, string|float $amount): bool
     {
@@ -77,7 +80,7 @@ class Expense extends Model
     /**
      * Saves the changes and moves the balances (old amount back, new amount out) in one transaction.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $attributes  The validated form data to save
      */
     public function updateAndSyncBalance(array $attributes): void
     {

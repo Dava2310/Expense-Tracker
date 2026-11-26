@@ -68,7 +68,7 @@ class Transfer extends Model
     /**
      * Creates the transfer and moves its amount from one balance to the other, both or neither.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $attributes  The validated form data of the new transfer
      */
     public static function createAndSyncBalances(array $attributes): self
     {
@@ -85,7 +85,7 @@ class Transfer extends Model
     /**
      * Saves the change and the balances in one transaction; rolls back if an account ends below zero.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $attributes  The validated form data to save
      *
      * @throws ValidationException
      */
