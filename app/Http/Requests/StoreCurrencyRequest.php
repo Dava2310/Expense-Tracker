@@ -27,4 +27,35 @@ class StoreCurrencyRequest extends FormRequest
             'symbol' => ['required', 'string', 'max:10'],
         ];
     }
+
+    /**
+     * The plain-words names of the fields, used by the messages of both the create and the edit form.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'name' => 'currency name',
+            'symbol' => 'currency symbol',
+        ];
+    }
+
+    /**
+     * Messages written for people, shared with the edit form (UpdateCurrencyRequest extends this class).
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Enter the currency name, like Euro.',
+            'name.string' => 'The :attribute must be text.',
+            'name.max' => 'The :attribute can have at most :max characters.',
+
+            'symbol.required' => 'Enter the currency symbol, like €.',
+            'symbol.string' => 'The :attribute must be text.',
+            'symbol.max' => 'The :attribute can have at most :max characters.',
+        ];
+    }
 }

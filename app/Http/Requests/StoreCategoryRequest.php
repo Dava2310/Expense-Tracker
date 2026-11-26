@@ -28,4 +28,35 @@ class StoreCategoryRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:255'],
         ];
     }
+
+    /**
+     * The plain-words names of the fields, used by the messages of both the create and the edit form.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'name' => 'category name',
+            'description' => 'details',
+        ];
+    }
+
+    /**
+     * Messages written for people, shared with the edit form (UpdateCategoryRequest extends this class).
+     * The message for a repeated name is written in the UniqueCategoryName rule.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Enter the category name.',
+            'name.string' => 'The :attribute must be text.',
+            'name.max' => 'The :attribute can have at most :max characters.',
+
+            'description.string' => 'The :attribute must be text.',
+            'description.max' => 'The :attribute can have at most :max characters.',
+        ];
+    }
 }
