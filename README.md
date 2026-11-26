@@ -84,3 +84,86 @@ composer test            # run the test suite
 vendor/bin/pint          # fix the code style
 vendor/bin/pint --test   # report style problems without changing anything
 ```
+
+## Data model
+
+The diagram shows the seven models, their main columns and methods, and how they relate. Money is stored as whole cents (`*_in_cents`) and read as decimals through an `amount` or `balance` property. Accounts are never deleted, only deactivated (`deleted_at`).
+
+```mermaid
+classDiagram
+    direction LR
+
+    class User {
+        name
+        email
+        password
+        setProfilePhoto()
+        removeProfilePhoto()
+    }
+    class Currency {
+        name
+        symbol
+        totalBalance()
+        canBeDeleted()
+    }
+    class Category {
+        name
+        description
+        isInUse()
+    }
+    class Account {
+        name
+        bank
+        details
+        balance_in_cents
+        min_balance_in_cents
+        deleted_at
+        deposit()
+        withdraw()
+        hasEnoughBalanceFor()
+        isBelowMinimum()
+        recentActivity()
+    }
+    class Income {
+        amount_in_cents
+        concept
+        date
+        updateAndSyncBalance()
+        deleteAndRestoreBalance()
+        canBeDeleted()
+    }
+    class Expense {
+        amount_in_cents
+        concept
+        date
+        updateAndSyncBalance()
+        deleteAndRestoreBalance()
+    }
+    class Transfer {
+        amount_in_cents
+        date
+        note
+        createAndSyncBalances()
+        updateAndSyncBalances()
+        deleteAndRestoreBalances()
+        canBeDeleted()
+    }
+
+    User "1" --> "*" Account : owns
+    User "1" --> "*" Currency : owns
+    User "1" --> "*" Category : owns
+    Currency "1" --> "*" Account : denominates
+    Account "1" --> "*" Income : receives
+    Account "1" --> "*" Expense : pays
+    Category "1" --> "*" Income : classifies
+    Category "1" --> "*" Expense : classifies
+    Account "1" --> "*" Transfer : from_account
+    Account "1" --> "*" Transfer : to_account
+```
+
+Profile photos are stored by the Spatie Media Library in its own `media` table, linked to the user.
+
+## Documentation
+
+- [Entity-relationship diagram](docs/Entity-Relationship-Diagram.drawio.png) (editable source: [`.drawio`](docs/Entity-Relationship-Diagram.drawio))
+- [Functional requirements](docs/functional-requirements-mvp.md)
