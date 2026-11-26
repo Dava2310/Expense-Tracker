@@ -6,7 +6,7 @@ The balances are the heart of the app: every income, expense and transfer update
 
 ## Features
 
-- **Accounts:** each account has a bank, a currency, optional details and an optional minimum balance. The dashboard warns you when a balance falls under that minimum. An account is deactivated instead of deleted, so its history is never lost.
+- **Accounts:** each account has a bank, a currency, optional details and an optional minimum balance. The dashboard warns you, and an email is sent, when a balance falls under that minimum. An account is deactivated instead of deleted, so its history is never lost.
 - **Incomes and expenses:** each entry has an amount, a date, a concept, an account and a category. The balance follows automatically. Entries can be corrected (every field) or deleted, and the lists are grouped by month and can be filtered by account, category and period.
 - **Transfers:** move money between two of your own accounts of the same currency. A transfer shows in the history of both accounts and is never counted as an income or an expense.
 - **Categories and currencies:** each user keeps their own. A category that is already used by an entry, and a currency that is already used by an account, cannot be deleted.
@@ -75,7 +75,7 @@ php artisan migrate:fresh --seed
 composer dev
 ```
 
-This starts the web server at <http://localhost:8000> together with the queue listener, the log viewer and Vite. It needs the `pcntl` PHP extension (available on Linux, macOS and WSL). To only browse the app, `php artisan serve` is enough.
+This starts the web server at <http://localhost:8000> together with the queue listener, the log viewer and Vite. It needs the `pcntl` PHP extension (available on Linux, macOS and WSL). To only browse the app, `php artisan serve` is enough. In development the emails are written to `storage/logs/laravel.log`.
 
 ### Test and check the code style
 
@@ -245,11 +245,19 @@ APP_DEBUG=false
 APP_URL=https://your-domain.com
 LOG_LEVEL=warning
 DB_CONNECTION=sqlite
+QUEUE_CONNECTION=database
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.your-provider.com
+MAIL_PORT=587
+MAIL_USERNAME=your-smtp-username
+MAIL_PASSWORD=your-smtp-password
+MAIL_FROM_ADDRESS=alerts@your-domain.com
+MAIL_FROM_NAME=Saldo
 ```
 
 With SQLite the database is the file `database/database.sqlite`, so no other database setting is needed. Without a domain, use `APP_URL=http://EC2_PUBLIC_IP`. Photos are stored on the server (`MEDIA_DISK=public`). To keep them on Amazon S3 instead, set `MEDIA_DISK=s3` and the `AWS_*` values in the same file.
 
-Saldo does not use a queue worker, so there is nothing to keep running besides the web server and PHP-FPM.
+The `MAIL_*` values tell Saldo how to send its emails (for example the low-balance alert) through your email provider's SMTP server. The emails are queued in the database, so a queue worker has to be running (step 8).
 
 #### Using MySQL or PostgreSQL instead of SQLite
 
@@ -319,7 +327,39 @@ sudo -u www-data php artisan event:cache
 
 `php artisan optimize` runs all four at once. Run these again after every change to `.env`.
 
-### 8. Set up the web server
+### 8. Run the queue worker
+
+The emails are sent in the background by a worker that must always be running. Create a service for it:
+
+```bash
+sudo nano /etc/systemd/system/saldo-queue.service
+```
+
+```ini
+[Unit]
+Description=Saldo queue worker
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+Restart=always
+RestartSec=5
+ExecStart=/usr/bin/php /var/www/saldo/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now saldo-queue
+sudo systemctl status saldo-queue
+```
+
+The service starts with the server and restarts if it stops. A job that fails three times is kept in the `failed_jobs` table: list them with `php artisan queue:failed`.
+
+### 9. Set up the web server
 
 Use **either** Caddy **or** nginx, not both: they would fight for ports 80 and 443. PHP-FPM must be running for both: `sudo systemctl enable --now php8.5-fpm`.
 
@@ -396,9 +436,9 @@ sudo apt install -y certbot python3-certbot-nginx
 sudo certbot --nginx -d your-domain.com
 ```
 
-### 9. Check it works
+### 10. Check it works
 
-Open `https://your-domain.com` (or `http://EC2_PUBLIC_IP`), register the first user and add an account. If you get an error page, read `/var/www/saldo/storage/logs/laravel.log`.
+Open `https://your-domain.com` (or `http://EC2_PUBLIC_IP`), register the first user and add an account. To test the alert, give an account a minimum balance and register an expense that takes it below. If you get an error page or no email arrives, read `/var/www/saldo/storage/logs/laravel.log` and `sudo journalctl -u saldo-queue`.
 
 ### Deploying an update
 
@@ -412,6 +452,7 @@ npm ci && npm run build
 sudo chown -R www-data:www-data storage bootstrap/cache database
 sudo -u www-data php artisan migrate --force
 sudo -u www-data php artisan optimize
+sudo -u www-data php artisan queue:restart
 sudo systemctl reload php8.5-fpm
 sudo -u www-data php artisan up
 ```
