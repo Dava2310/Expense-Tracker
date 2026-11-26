@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Image\Enums\Fit;
 use Spatie\Image\Enums\ImageDriver;
@@ -177,5 +178,25 @@ class User extends Authenticatable implements HasMedia
             ['name' => 'Freelance', 'description' => 'Income from side jobs or clients'],
             ['name' => 'Other', 'description' => 'Anything that does not fit another category'],
         ]);
+    }
+
+    /**
+     * Deletes the user and everything they own, all or nothing; the photo is removed after the commit.
+     */
+    public function deleteWithData(): void
+    {
+        DB::transaction(function (): void {
+            $accountIds = $this->accounts()->withTrashed()->pluck('id');
+
+            Transfer::whereIn('from_account_id', $accountIds)->orWhereIn('to_account_id', $accountIds)->delete();
+            Income::whereIn('account_id', $accountIds)->delete();
+            Expense::whereIn('account_id', $accountIds)->delete();
+            $this->accounts()->withTrashed()->forceDelete();
+            $this->categories()->delete();
+            $this->currencies()->delete();
+            $this->deletePreservingMedia();
+        });
+
+        $this->deleteAllMedia();
     }
 }
