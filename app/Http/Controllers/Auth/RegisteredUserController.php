@@ -13,6 +13,9 @@ use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+/**
+ * Handles registering a new user.
+ */
 class RegisteredUserController extends Controller
 {
     /**

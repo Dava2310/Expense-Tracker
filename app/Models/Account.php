@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
 
+/**
+ * A bank account, cash or card of a user, with its balance in cents and its history.
+ */
 class Account extends Model
 {
     /** @use HasFactory<AccountFactory> */
@@ -50,8 +53,7 @@ class Account extends Model
     }
 
     /**
-     * The minimum balance is read and written as a decimal but stored as whole cents.
-     * It is optional; an empty value means no minimum (0).
+     * Minimum balance as a decimal, stored as whole cents; empty means no minimum.
      */
     protected function minBalance(): Attribute
     {
@@ -94,7 +96,9 @@ class Account extends Model
     }
 
     /**
-     * Determines whether the balance, plus an amount that is about to come back to it, is enough to pay the given amount.
+     * Whether the balance, plus an amount about to come back, covers the given amount.
+     *
+     * @param  string|float  $returning  Money about to return to the account
      */
     public function hasEnoughBalanceFor(string|float $amount, string|float $returning = 0): bool
     {
@@ -110,8 +114,7 @@ class Account extends Model
     }
 
     /**
-     * Gets how far the balance is from the minimum balance as a decimal, whether above or below it.
-     * Use isBelowMinimum() to know which side the balance is on.
+     * How far the balance is from the minimum, always positive.
      */
     public function distanceToMinimum(): float
     {
@@ -160,8 +163,7 @@ class Account extends Model
     }
 
     /**
-     * Totals the incomes and expenses of this account in each of the last months, oldest first.
-     * Months without movements are included with zero totals.
+     * Income and expenses of each of the last months, oldest first, empty months included.
      *
      * @return Collection<int, array{label: string, name: string, income: float, expenses: float, net: float, surplus: bool}>
      */
@@ -186,7 +188,7 @@ class Account extends Model
     }
 
     /**
-     * Totals the expenses of this account in the given month (the current one by default) by category, biggest first.
+     * Expenses of a month by category, biggest first.
      *
      * @return Collection<int, array{name: string, amount: float}>
      */
@@ -258,7 +260,7 @@ class Account extends Model
     }
 
     /**
-     * Totals the given incomes or expenses of each month in cents with a single query, in the order of the months.
+     * Totals incomes or expenses per month, in cents, with a single query.
      *
      * @param  HasMany<Income|Expense, $this>  $entries
      * @param  Collection<int, CarbonInterface>  $months
@@ -277,7 +279,7 @@ class Account extends Model
     }
 
     /**
-     * Converts a decimal amount (12.34) into whole cents (1234). The only place that knows how many cents make a unit.
+     * Converts a decimal amount (12.34) into whole cents (1234).
      */
     private function toCents(string|float $decimal): int
     {
@@ -293,7 +295,7 @@ class Account extends Model
     }
 
     /**
-     * Builds a display-ready activity entry from an income or an expense.
+     * Shapes an income or expense as an activity entry.
      *
      * @return array{id: int, type: string, concept: string, date: CarbonInterface, category: string, amount: float}
      */
@@ -310,7 +312,7 @@ class Account extends Model
     }
 
     /**
-     * Shapes a transfer like an income or expense for the activity list. The note, if any, takes the place of the category.
+     * Shapes a transfer as an activity entry; the note replaces the category.
      *
      * @return array{id: int, type: string, concept: string, date: CarbonInterface, category: string, amount: float}
      */

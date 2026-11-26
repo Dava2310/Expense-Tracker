@@ -5,6 +5,9 @@ namespace App\Policies;
 use App\Models\Category;
 use App\Models\User;
 
+/**
+ * Decides who can create, see, change and delete categories.
+ */
 class CategoryPolicy
 {
     /**
@@ -32,7 +35,7 @@ class CategoryPolicy
     }
 
     /**
-     * Only the owner can delete a category. Whether it is still in use is checked by the controller.
+     * Only the owner can delete a category.
      */
     public function delete(User $user, Category $category): bool
     {

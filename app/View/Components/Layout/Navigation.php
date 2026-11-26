@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\View\Component;
 use Illuminate\View\View;
 
+/**
+ * Builds the application menu shown in the header and the footer.
+ */
 class Navigation extends Component
 {
     /**
@@ -22,9 +25,7 @@ class Navigation extends Component
     public array $items;
 
     /**
-     * The single definition of the application menu, shared by the header and the footer.
-     *
-     * Items are tagged with who sees them: `auth` for signed-in users, `guest` for visitors.
+     * The application menu; items are tagged `auth` for signed-in users or `guest` for visitors.
      *
      * @return list<array{label: string, route: string, pattern: string, icon: string|null}>
      */

@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * A currency a user holds accounts in.
+ */
 class Currency extends Model
 {
     /** @use HasFactory<CurrencyFactory> */
@@ -21,7 +24,7 @@ class Currency extends Model
         'symbol',
     ];
 
-    /***
+    /**
      * Gets the user that owns this currency.
      *
      * @return BelongsTo<User, $this>
@@ -31,9 +34,8 @@ class Currency extends Model
         return $this->belongsTo(User::class);
     }
 
-    /***
-     * Gets the accounts held in this currency. Inactive (soft-deleted) accounts are
-     * left out unless the query uses withTrashed().
+    /**
+     * Gets the accounts held in this currency, active ones unless withTrashed() is used.
      *
      * @return HasMany<Account, $this>
      */
@@ -42,22 +44,16 @@ class Currency extends Model
         return $this->hasMany(Account::class);
     }
 
-    /***
-     * Gets the total balance of the accounts held in this currency, inactive accounts included,
-     * as a decimal.
-     *
-     * @return string
+    /**
+     * Gets the total balance of the accounts in this currency, inactive ones included.
      */
     public function totalBalance(): float
     {
         return (int) $this->accounts()->withTrashed()->sum('balance_in_cents') / 100;
     }
 
-    /***
-     * Determines whether the currency can be deleted, which is only when no account
-     * (active or inactive) uses it.
-     *
-     * @return bool
+    /**
+     * Whether no account, active or inactive, uses this currency.
      */
     public function canBeDeleted(): bool
     {

@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * A user's category for classifying incomes and expenses.
+ */
 class Category extends Model
 {
     /** @use HasFactory<CategoryFactory> */
@@ -27,7 +30,7 @@ class Category extends Model
     }
 
     /**
-     * Whether any income or expense uses this category, which stops it from being deleted.
+     * Whether any income or expense uses this category.
      */
     public function isInUse(): bool
     {

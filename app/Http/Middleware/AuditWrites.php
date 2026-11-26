@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Writes an audit log entry for every write a signed-in user makes.
+ */
 class AuditWrites
 {
     /**
-     * Records every write (POST, PUT, PATCH, DELETE) made by a signed-in user in the audit log,
-     * with who made it, where, how it ended and from which address. Form contents are never logged.
+     * Logs each write (user, route, status, address), never the form data.
      *
      * @param  Closure(Request): (Response)  $next
      */

@@ -5,10 +5,13 @@ namespace App\Policies;
 use App\Models\Income;
 use App\Models\User;
 
+/**
+ * Decides who can record, see, change and delete incomes.
+ */
 class IncomePolicy
 {
     /**
-     * Any signed-in user can record incomes. The form only accepts their own accounts.
+     * Any signed-in user can record incomes.
      */
     public function create(User $user): bool
     {

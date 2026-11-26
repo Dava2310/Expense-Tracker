@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
+/**
+ * Sends a new email verification link.
+ */
 class EmailVerificationNotificationController extends Controller
 {
     /**

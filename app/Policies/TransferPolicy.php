@@ -5,10 +5,13 @@ namespace App\Policies;
 use App\Models\Transfer;
 use App\Models\User;
 
+/**
+ * Decides who can create, change and delete transfers.
+ */
 class TransferPolicy
 {
     /**
-     * Any signed-in user can move money between their own accounts. The form only accepts their own accounts.
+     * Any signed-in user can move money between their own accounts.
      */
     public function create(User $user): bool
     {
@@ -16,7 +19,7 @@ class TransferPolicy
     }
 
     /**
-     * Only the owner of the account the money leaves can change a transfer. Both accounts belong to the same user.
+     * Only the owner of the source account can change a transfer.
      */
     public function update(User $user, Transfer $transfer): bool
     {
@@ -24,7 +27,7 @@ class TransferPolicy
     }
 
     /**
-     * Only the owner of the account the money leaves can delete a transfer.
+     * Only the owner of the source account can delete a transfer.
      */
     public function delete(User $user, Transfer $transfer): bool
     {
