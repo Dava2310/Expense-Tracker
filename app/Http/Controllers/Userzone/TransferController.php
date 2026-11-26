@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTransferRequest;
 use App\Http\Requests\UpdateTransferRequest;
 use App\Models\Transfer;
+use App\Notifications\LowBalanceNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -37,7 +38,9 @@ class TransferController extends Controller
     {
         Gate::authorize('create', Transfer::class);
 
-        Transfer::createAndSyncBalances($request->validated());
+        $transfer = Transfer::createAndSyncBalances($request->validated());
+
+        $request->user()->notify(new LowBalanceNotification($transfer->fromAccount, $transfer->amount));
 
         return redirect()->route('accounts.index')->with('status', 'transfer-created');
     }
