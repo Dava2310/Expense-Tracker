@@ -1,0 +1,81 @@
+name: Deploy
+
+# Deploys main to the EC2 instance once the CI workflow has passed on a push to main.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+# One deployment at a time; a newer one waits for the running one to finish.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    # Shows each run under Deployments in the repository, with a link to the site.
+    environment:
+      name: production
+      url: ${{ vars.APP_URL }}
+    steps:
+      - name: Prepare the SSH connection
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          KNOWN_HOSTS: ${{ vars.EC2_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Update the server
+        env:
+          EC2_HOST: ${{ vars.EC2_HOST }}
+          EC2_USER: ${{ vars.EC2_USER }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            "$EC2_USER@$EC2_HOST" bash -s -- "$DEPLOY_PATH" "$SHA" <<'REMOTE'
+          set -Eeuo pipefail
+          APP_DIR="$1"
+          SHA="$2"
+          cd "$APP_DIR"
+
+          artisan() { sudo -u www-data php artisan "$@"; }
+          restore() { sudo chown -R www-data:www-data storage bootstrap/cache database; artisan up; }
+
+          echo "Deploying $SHA"
+          artisan down --retry=60
+          trap 'echo "Deploy failed: bringing the site back up"; restore' ERR
+
+          sudo chown -R ubuntu:ubuntu "$APP_DIR"
+          git fetch --quiet origin main
+          git merge --ff-only "$SHA"
+          composer install --no-dev --optimize-autoloader --no-interaction
+          npm ci
+          npm run build
+
+          sudo chown -R www-data:www-data storage bootstrap/cache database
+          artisan migrate --force
+          artisan optimize
+          artisan queue:restart
+          sudo systemctl reload php8.5-fpm
+
+          trap - ERR
+          artisan up
+          echo "Deployed $SHA"
+          REMOTE
+
+      - name: Check that the site answers
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: curl --fail --silent --show-error --retry 10 --retry-delay 3 --retry-all-errors "$APP_URL/up" > /dev/null
