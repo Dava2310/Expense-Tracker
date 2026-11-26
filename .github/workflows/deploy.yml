@@ -57,7 +57,7 @@ jobs:
           artisan down --retry=60
           trap 'echo "Deploy failed: bringing the site back up"; restore' ERR
 
-          sudo chown -R ubuntu:ubuntu "$APP_DIR"
+          sudo chown -R ubuntu:ubuntu bootstrap/cache
           git fetch --quiet origin main
           git merge --ff-only "$SHA"
           composer install --no-dev --optimize-autoloader --no-interaction
@@ -65,6 +65,8 @@ jobs:
           npm run build
 
           sudo chown -R www-data:www-data storage bootstrap/cache database
+          sudo chgrp www-data .env
+          sudo chmod 640 .env
           artisan migrate --force
           artisan optimize
           artisan queue:restart
@@ -78,4 +80,4 @@ jobs:
       - name: Check that the site answers
         env:
           APP_URL: ${{ vars.APP_URL }}
-        run: curl --fail --silent --show-error --retry 10 --retry-delay 3 --retry-all-errors "$APP_URL/up" > /dev/null
+        run: curl --fail --silent --show-error --retry 10 --retry-delay 3 --retry-all-errors "$APP_URL/login" > /dev/null
