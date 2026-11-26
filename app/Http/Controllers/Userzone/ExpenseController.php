@@ -7,6 +7,7 @@ use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\Account;
 use App\Models\Expense;
+use App\Notifications\LowBalanceNotification;
 use App\Support\PeriodFilter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -105,11 +106,16 @@ class ExpenseController extends Controller
         $data = $request->validated();
 
         // The expense and the balance update succeed or fail together
-        DB::transaction(function () use ($data): void {
+        $account = DB::transaction(function () use ($data): Account {
             Expense::create($data);
 
-            Account::findOrFail($data['account_id'])->withdraw($data['amount']);
+            $account = Account::findOrFail($data['account_id']);
+            $account->withdraw($data['amount']);
+
+            return $account;
         });
+
+        $request->user()->notify(new LowBalanceNotification($account, $data['amount']));
 
         return redirect()->route('expenses.index')->with('status', 'expense-created');
     }
