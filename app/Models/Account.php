@@ -31,13 +31,12 @@ class Account extends Model
     ];
 
     /**
-     * New accounts start with an empty balance, no details and no minimum balance.
+     * New accounts start with an empty balance and no minimum balance.
      *
-     * @var array<string, int|string>
+     * @var array<string, int>
      */
     protected $attributes = [
         'balance_in_cents' => 0,
-        'details' => '',
         'min_balance_in_cents' => 0,
     ];
 
@@ -61,14 +60,6 @@ class Account extends Model
             get: fn (mixed $value, array $attributes): float => $this->toDecimal($attributes['min_balance_in_cents']),
             set: fn (string|float|null $decimal): array => ['min_balance_in_cents' => $this->toCents($decimal ?? 0)],
         );
-    }
-
-    /**
-     * Details are optional; an empty value is stored as an empty string.
-     */
-    protected function details(): Attribute
-    {
-        return Attribute::set(fn (?string $value): string => $value ?? '');
     }
 
     /**
