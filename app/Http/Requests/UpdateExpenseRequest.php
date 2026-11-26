@@ -3,10 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateExpenseRequest extends FormRequest
+class UpdateExpenseRequest extends StoreExpenseRequest
 {
     /**
      * Who can update an expense is decided by the expense policy, which the controller asks.
@@ -40,5 +39,15 @@ class UpdateExpenseRequest extends FormRequest
                 Rule::exists('categories', 'id')->where('user_id', $this->user()->id),
             ],
         ];
+    }
+
+    /**
+     * Not the balance check of StoreExpenseRequest: on an edit it runs in the controller, after the authorization check.
+     *
+     * @return array<int, callable>
+     */
+    public function after(): array
+    {
+        return [];
     }
 }
