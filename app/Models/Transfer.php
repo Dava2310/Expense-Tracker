@@ -27,6 +27,18 @@ class Transfer extends Model
     ];
 
     /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'date' => 'date',
+        ];
+    }
+
+    /**
      * The amount is read and written as a decimal (12.34) but stored as whole cents (1234).
      */
     protected function amount(): Attribute
@@ -38,15 +50,19 @@ class Transfer extends Model
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Gets the account the money leaves.
      */
-    protected function casts(): array
+    public function fromAccount(): BelongsTo
     {
-        return [
-            'date' => 'date',
-        ];
+        return $this->belongsTo(Account::class, 'from_account_id')->withTrashed();
+    }
+
+    /**
+     * Gets the account the money arrives in.
+     */
+    public function toAccount(): BelongsTo
+    {
+        return $this->belongsTo(Account::class, 'to_account_id')->withTrashed();
     }
 
     /**
@@ -119,21 +135,5 @@ class Transfer extends Model
 
             $this->delete();
         });
-    }
-
-    /**
-     * Gets the account the money leaves.
-     */
-    public function fromAccount(): BelongsTo
-    {
-        return $this->belongsTo(Account::class, 'from_account_id')->withTrashed();
-    }
-
-    /**
-     * Gets the account the money arrives in.
-     */
-    public function toAccount(): BelongsTo
-    {
-        return $this->belongsTo(Account::class, 'to_account_id')->withTrashed();
     }
 }

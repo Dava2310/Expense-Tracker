@@ -72,6 +72,54 @@ class Account extends Model
     }
 
     /**
+     * Gets the information of the user that owns this account.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Gets the currency this bank account is held in.
+     */
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class);
+    }
+
+    /**
+     * Gets all expenses associated to this bank account.
+     */
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    /**
+     * Gets all incomes associated to this bank account.
+     */
+    public function incomes(): HasMany
+    {
+        return $this->hasMany(Income::class);
+    }
+
+    /**
+     * Gets the transfers that take money out of this bank account.
+     */
+    public function outgoingTransfers(): HasMany
+    {
+        return $this->hasMany(Transfer::class, 'from_account_id');
+    }
+
+    /**
+     * Gets the transfers that bring money into this bank account.
+     */
+    public function incomingTransfers(): HasMany
+    {
+        return $this->hasMany(Transfer::class, 'to_account_id');
+    }
+
+    /**
      * Formats an amount with the symbol of the currency this account is held in.
      */
     public function formatMoney(float $amount, int $precision = 2): string
@@ -212,51 +260,37 @@ class Account extends Model
     }
 
     /**
-     * Gets the information of the user that owns this account.
+     * Shapes an income or expense as an activity entry.
+     *
+     * @return array{id: int, type: string, concept: string, date: CarbonInterface, category: string, amount: float}
      */
-    public function user(): BelongsTo
+    private function activityEntry(string $type, Income|Expense $entry): array
     {
-        return $this->belongsTo(User::class);
+        return [
+            'id' => $entry->id,
+            'type' => $type,
+            'concept' => $entry->concept,
+            'date' => $entry->date,
+            'category' => $entry->category->name,
+            'amount' => $entry->amount,
+        ];
     }
 
     /**
-     * Gets the currency this bank account is held in.
+     * Shapes a transfer as an activity entry; the note replaces the category.
+     *
+     * @return array{id: int, type: string, concept: string, date: CarbonInterface, category: string, amount: float}
      */
-    public function currency(): BelongsTo
+    private function transferEntry(string $type, string $concept, Transfer $transfer): array
     {
-        return $this->belongsTo(Currency::class);
-    }
-
-    /**
-     * Gets all expenses associated to this bank account.
-     */
-    public function expenses(): HasMany
-    {
-        return $this->hasMany(Expense::class);
-    }
-
-    /**
-     * Gets all incomes associated to this bank account.
-     */
-    public function incomes(): HasMany
-    {
-        return $this->hasMany(Income::class);
-    }
-
-    /**
-     * Gets the transfers that take money out of this bank account.
-     */
-    public function outgoingTransfers(): HasMany
-    {
-        return $this->hasMany(Transfer::class, 'from_account_id');
-    }
-
-    /**
-     * Gets the transfers that bring money into this bank account.
-     */
-    public function incomingTransfers(): HasMany
-    {
-        return $this->hasMany(Transfer::class, 'to_account_id');
+        return [
+            'id' => $transfer->id,
+            'type' => $type,
+            'concept' => $concept,
+            'date' => $transfer->date,
+            'category' => $transfer->note ?? 'Transfer',
+            'amount' => $transfer->amount,
+        ];
     }
 
     /**
@@ -292,39 +326,5 @@ class Account extends Model
     private function toDecimal(int $cents): float
     {
         return $cents / 100;
-    }
-
-    /**
-     * Shapes an income or expense as an activity entry.
-     *
-     * @return array{id: int, type: string, concept: string, date: CarbonInterface, category: string, amount: float}
-     */
-    private function activityEntry(string $type, Income|Expense $entry): array
-    {
-        return [
-            'id' => $entry->id,
-            'type' => $type,
-            'concept' => $entry->concept,
-            'date' => $entry->date,
-            'category' => $entry->category->name,
-            'amount' => $entry->amount,
-        ];
-    }
-
-    /**
-     * Shapes a transfer as an activity entry; the note replaces the category.
-     *
-     * @return array{id: int, type: string, concept: string, date: CarbonInterface, category: string, amount: float}
-     */
-    private function transferEntry(string $type, string $concept, Transfer $transfer): array
-    {
-        return [
-            'id' => $transfer->id,
-            'type' => $type,
-            'concept' => $concept,
-            'date' => $transfer->date,
-            'category' => $transfer->note ?? 'Transfer',
-            'amount' => $transfer->amount,
-        ];
     }
 }

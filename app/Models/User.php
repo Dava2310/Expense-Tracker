@@ -49,13 +49,16 @@ class User extends Authenticatable implements HasMedia
     ];
 
     /**
-     * The profile photo is a single WebP file: a new photo replaces the old one.
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
      */
-    public function registerMediaCollections(): void
+    protected function casts(): array
     {
-        $this->addMediaCollection('avatar')
-            ->singleFile()
-            ->acceptsMimeTypes(['image/webp']);
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
     }
 
     /**
@@ -77,47 +80,6 @@ class User extends Authenticatable implements HasMedia
     protected function profilePhotoUrl(): Attribute
     {
         return Attribute::get(fn (): ?string => $this->getFirstMediaUrl('avatar') ?: null);
-    }
-
-    /**
-     * Replaces the profile photo with a centred 256 px WebP square; the upload itself is not kept.
-     */
-    public function setProfilePhoto(UploadedFile $photo): void
-    {
-        $processed = sys_get_temp_dir().'/'.Str::uuid().'.webp';
-
-        Image::useImageDriver(ImageDriver::Gd)
-            ->loadFile($photo->getRealPath())
-            ->fit(Fit::Crop, 256, 256)
-            ->quality(85)
-            ->format('webp')
-            ->save($processed);
-
-        $this->addMedia($processed)
-            ->usingFileName(Str::uuid().'.webp')
-            ->usingName('Profile photo')
-            ->toMediaCollection('avatar');
-    }
-
-    /**
-     * Removes the profile photo, so the initials are shown again.
-     */
-    public function removeProfilePhoto(): void
-    {
-        $this->clearMediaCollection('avatar');
-    }
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
     }
 
     /**
@@ -158,6 +120,44 @@ class User extends Authenticatable implements HasMedia
     public function expenses(): HasManyThrough
     {
         return $this->hasManyThrough(Expense::class, Account::class)->withTrashedParents();
+    }
+
+    /**
+     * The profile photo is a single WebP file: a new photo replaces the old one.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/webp']);
+    }
+
+    /**
+     * Replaces the profile photo with a centred 256 px WebP square; the upload itself is not kept.
+     */
+    public function setProfilePhoto(UploadedFile $photo): void
+    {
+        $processed = sys_get_temp_dir().'/'.Str::uuid().'.webp';
+
+        Image::useImageDriver(ImageDriver::Gd)
+            ->loadFile($photo->getRealPath())
+            ->fit(Fit::Crop, 256, 256)
+            ->quality(85)
+            ->format('webp')
+            ->save($processed);
+
+        $this->addMedia($processed)
+            ->usingFileName(Str::uuid().'.webp')
+            ->usingName('Profile photo')
+            ->toMediaCollection('avatar');
+    }
+
+    /**
+     * Removes the profile photo, so the initials are shown again.
+     */
+    public function removeProfilePhoto(): void
+    {
+        $this->clearMediaCollection('avatar');
     }
 
     /**

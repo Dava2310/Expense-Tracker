@@ -26,6 +26,18 @@ class Income extends Model
     ];
 
     /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'date' => 'date',
+        ];
+    }
+
+    /**
      * The amount is read and written as a decimal (12.34) but stored as whole cents (1234).
      */
     protected function amount(): Attribute
@@ -37,15 +49,19 @@ class Income extends Model
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Gets the associated account for the Income.
      */
-    protected function casts(): array
+    public function account(): BelongsTo
     {
-        return [
-            'date' => 'date',
-        ];
+        return $this->belongsTo(Account::class)->withTrashed();
+    }
+
+    /**
+     * Gets the associated category for the Income.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     /**
@@ -93,21 +109,5 @@ class Income extends Model
 
             $this->delete();
         });
-    }
-
-    /**
-     * Gets the associated account for the Income.
-     */
-    public function account(): BelongsTo
-    {
-        return $this->belongsTo(Account::class)->withTrashed();
-    }
-
-    /**
-     * Gets the associated category for the Income.
-     */
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
     }
 }
