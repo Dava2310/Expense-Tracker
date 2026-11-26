@@ -7,10 +7,13 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
+/**
+ * Validates the form that edits a transfer.
+ */
 class UpdateTransferRequest extends StoreTransferRequest
 {
     /**
-     * Who can update a transfer is decided by the transfer policy, which the controller asks.
+     * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
@@ -41,7 +44,7 @@ class UpdateTransferRequest extends StoreTransferRequest
     }
 
     /**
-     * Both accounts must use the same currency. The balances are checked by the transfer itself, once it knows the net effect.
+     * Both accounts must share a currency.
      *
      * @return array<int, callable(Validator): void>
      */

@@ -5,10 +5,13 @@ namespace App\Http\Requests;
 use App\Rules\UniqueCategoryName;
 use Illuminate\Contracts\Validation\ValidationRule;
 
+/**
+ * Validates the form that edits a category.
+ */
 class UpdateCategoryRequest extends StoreCategoryRequest
 {
     /**
-     * Who can update a category is decided by the category policy, which the controller asks.
+     * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {

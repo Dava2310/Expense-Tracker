@@ -7,6 +7,9 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
+/**
+ * Validates the form that registers an expense.
+ */
 class StoreExpenseRequest extends FormRequest
 {
     /**
@@ -18,7 +21,7 @@ class StoreExpenseRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Rules for an expense; amounts have at most two decimals because they are stored as cents.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -42,7 +45,7 @@ class StoreExpenseRequest extends FormRequest
     }
 
     /**
-     * The account must have enough balance to pay the expense.
+     * The account must have enough balance, so it never goes below zero.
      *
      * @return array<int, callable(Validator): void>
      */
@@ -67,7 +70,7 @@ class StoreExpenseRequest extends FormRequest
     }
 
     /**
-     * The plain-words names of the fields, used by the messages of both the create and the edit form.
+     * Plain-words names of the fields, used in the messages.
      *
      * @return array<string, string>
      */
@@ -83,8 +86,7 @@ class StoreExpenseRequest extends FormRequest
     }
 
     /**
-     * Messages written for people, shared with the edit form (UpdateExpenseRequest extends this class).
-     * The message for an account without enough balance is written in after().
+     * Messages shown next to a field when one of its rules fails.
      *
      * @return array<string, string>
      */

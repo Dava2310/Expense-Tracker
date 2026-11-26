@@ -6,6 +6,9 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * Validates the form that creates an account.
+ */
 class StoreAccountRequest extends FormRequest
 {
     /**
@@ -33,7 +36,7 @@ class StoreAccountRequest extends FormRequest
     }
 
     /**
-     * The plain-words names of the fields, used by the messages of both the create and the edit form.
+     * Plain-words names of the fields, used in the messages.
      *
      * @return array<string, string>
      */
@@ -49,7 +52,7 @@ class StoreAccountRequest extends FormRequest
     }
 
     /**
-     * Messages written for people, shared with the edit form (UpdateAccountRequest extends this class).
+     * Messages shown next to a field when one of its rules fails.
      *
      * @return array<string, string>
      */

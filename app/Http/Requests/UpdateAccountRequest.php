@@ -4,10 +4,13 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 
+/**
+ * Validates the form that edits an account.
+ */
 class UpdateAccountRequest extends StoreAccountRequest
 {
     /**
-     * Who can update an account is decided by the account policy, which the controller asks.
+     * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {

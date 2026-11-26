@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Shows the account balances and the two charts of the dashboard.
+ */
 class DashboardController extends Controller
 {
     /**
-     * Handle the incoming request.
+     * Loads the balances and the charts of the account chosen in each filter.
      */
     public function __invoke(Request $request): View
     {

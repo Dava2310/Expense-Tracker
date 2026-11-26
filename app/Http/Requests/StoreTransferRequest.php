@@ -7,6 +7,9 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
+/**
+ * Validates the form that moves money between two accounts.
+ */
 class StoreTransferRequest extends FormRequest
 {
     /**
@@ -37,7 +40,7 @@ class StoreTransferRequest extends FormRequest
     }
 
     /**
-     * The plain-words names of the fields, used by the messages of both the create and the edit form.
+     * Plain-words names of the fields, used in the messages.
      *
      * @return array<string, string>
      */
@@ -53,8 +56,7 @@ class StoreTransferRequest extends FormRequest
     }
 
     /**
-     * Messages written for people, shared with the edit form (UpdateTransferRequest extends this class).
-     * The messages for different currencies and for a source without enough balance are written in after().
+     * Messages shown next to a field when one of its rules fails.
      *
      * @return array<string, string>
      */
@@ -83,7 +85,7 @@ class StoreTransferRequest extends FormRequest
     }
 
     /**
-     * Both accounts must use the same currency and the source must have enough balance.
+     * Both accounts must share a currency and the source must cover the amount.
      *
      * @return array<int, callable(Validator): void>
      */

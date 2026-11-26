@@ -14,14 +14,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
+/**
+ * Handles listing, registering, correcting and deleting the user's expenses.
+ */
 class ExpenseController extends Controller
 {
-    /***
-     * Lists the expenses paid from the logged-in user's accounts, grouped by month
-     * and optionally filtered by account, category and period
-     *
-     * @param Request $request
-     * @return View
+    /**
+     * Lists the expenses grouped by month, filtered by account, category and period.
      */
     public function index(Request $request): View
     {
@@ -80,11 +79,8 @@ class ExpenseController extends Controller
         ]);
     }
 
-    /***
+    /**
      * Renders the form to register a new expense
-     *
-     * @param Request $request
-     * @return View
      */
     public function create(Request $request): View
     {
@@ -99,11 +95,8 @@ class ExpenseController extends Controller
         ]);
     }
 
-    /***
-     * Handles the creation of the new Expense and deducts its amount from the account balance
-     *
-     * @param StoreExpenseRequest $request
-     * @return RedirectResponse
+    /**
+     * Creates the expense and deducts its amount from the account in one transaction.
      */
     public function store(StoreExpenseRequest $request): RedirectResponse
     {
@@ -121,12 +114,8 @@ class ExpenseController extends Controller
         return redirect()->route('expenses.index')->with('status', 'expense-created');
     }
 
-    /***
-     * Shows one of the user's expenses and the form to edit all of its details
-     *
-     * @param Request $request
-     * @param Expense $expense
-     * @return View
+    /**
+     * Shows the edit form; the expense's own account is offered even if deactivated.
      */
     public function edit(Request $request, Expense $expense): View
     {
@@ -150,12 +139,8 @@ class ExpenseController extends Controller
         ]);
     }
 
-    /***
-     * Handles the update of an expense and keeps the balances of the accounts right
-     *
-     * @param UpdateExpenseRequest $request
-     * @param Expense $expense
-     * @return RedirectResponse
+    /**
+     * Updates the expense and its balances, refusing a change that would leave an account negative.
      */
     public function update(UpdateExpenseRequest $request, Expense $expense): RedirectResponse
     {
@@ -164,7 +149,7 @@ class ExpenseController extends Controller
         $data = $request->validated();
         $account = Account::withTrashed()->findOrFail($data['account_id']);
 
-        // Checked here, after the Gate, so the message about an account is only ever shown to its owner
+        // Refuse the change if the account could not cover it
         if (! $expense->canBeChangedTo($account, $data['amount'])) {
             return back()->withInput()->withErrors(['amount' => $account->name.' doesn’t have enough balance for this amount.']);
         }
@@ -174,11 +159,8 @@ class ExpenseController extends Controller
         return redirect()->route('expenses.index')->with('status', 'expense-updated');
     }
 
-    /***
-     * Deletes one of the user's expenses and gives its amount back to the account
-     *
-     * @param Expense $expense
-     * @return RedirectResponse
+    /**
+     * Deletes the expense and gives its amount back to the account.
      */
     public function destroy(Expense $expense): RedirectResponse
     {

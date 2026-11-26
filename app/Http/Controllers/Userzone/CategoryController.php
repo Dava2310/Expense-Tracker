@@ -11,13 +11,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
+/**
+ * Handles listing, creating, editing and deleting the user's categories.
+ */
 class CategoryController extends Controller
 {
-    /***
+    /**
      * Lists the categories of the logged-in user with the number of incomes and expenses using each one
-     *
-     * @param Request $request
-     * @return View
      */
     public function index(Request $request): View
     {
@@ -30,10 +30,8 @@ class CategoryController extends Controller
         ]);
     }
 
-    /***
+    /**
      * Renders the form to create a new category
-     *
-     * @return View
      */
     public function create(): View
     {
@@ -42,11 +40,8 @@ class CategoryController extends Controller
         return view('userzone.categories.create');
     }
 
-    /***
+    /**
      * Handles the creation of the new Category
-     *
-     * @param StoreCategoryRequest $request
-     * @return RedirectResponse
      */
     public function store(StoreCategoryRequest $request): RedirectResponse
     {
@@ -57,11 +52,8 @@ class CategoryController extends Controller
         return redirect()->route('categories.index')->with('status', 'category-created');
     }
 
-    /***
+    /**
      * Renders the form to edit one of the user's categories
-     *
-     * @param Category $category
-     * @return View
      */
     public function edit(Category $category): View
     {
@@ -72,12 +64,8 @@ class CategoryController extends Controller
         ]);
     }
 
-    /***
+    /**
      * Handles the update of a category
-     *
-     * @param UpdateCategoryRequest $request
-     * @param Category $category
-     * @return RedirectResponse
      */
     public function update(UpdateCategoryRequest $request, Category $category): RedirectResponse
     {
@@ -88,17 +76,14 @@ class CategoryController extends Controller
         return redirect()->route('categories.index')->with('status', 'category-updated');
     }
 
-    /***
-     * Deletes one of the user's categories, unless an income or an expense uses it
-     *
-     * @param Category $category
-     * @return RedirectResponse
+    /**
+     * Deletes a category unless an income or an expense uses it.
      */
     public function destroy(Category $category): RedirectResponse
     {
         Gate::authorize('delete', $category);
 
-        // The page already hides the option, but the category may have been used since it was loaded
+        // Checked again in case the category was used since the page loaded
         if ($category->isInUse()) {
             return redirect()->route('categories.index')
                 ->withErrors(['category' => $category->name.' is in use, so it can’t be deleted.']);
