@@ -445,11 +445,12 @@ Open `https://your-domain.com` (or `http://EC2_PUBLIC_IP`), register the first u
 ```bash
 cd /var/www/saldo
 sudo -u www-data php artisan down
-sudo chown -R ubuntu:ubuntu /var/www/saldo
+sudo chown -R ubuntu:ubuntu bootstrap/cache
 git pull
 composer install --no-dev --optimize-autoloader
 npm ci && npm run build
 sudo chown -R www-data:www-data storage bootstrap/cache database
+sudo chgrp www-data .env && sudo chmod 640 .env
 sudo -u www-data php artisan migrate --force
 sudo -u www-data php artisan optimize
 sudo -u www-data php artisan queue:restart
