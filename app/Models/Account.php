@@ -46,8 +46,8 @@ class Account extends Model
     protected function balance(): Attribute
     {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes): float => $this->toDecimal($attributes['balance_in_cents']),
-            set: fn (string|float $decimal): array => ['balance_in_cents' => $this->toCents($decimal)],
+            get: fn (mixed $value, array $attributes) => $this->toDecimal($attributes['balance_in_cents']),
+            set: fn (string|float $decimal) => ['balance_in_cents' => $this->toCents($decimal)],
         );
     }
 
@@ -57,8 +57,8 @@ class Account extends Model
     protected function minBalance(): Attribute
     {
         return Attribute::make(
-            get: fn (mixed $value, array $attributes): float => $this->toDecimal($attributes['min_balance_in_cents']),
-            set: fn (string|float|null $decimal): array => ['min_balance_in_cents' => $this->toCents($decimal ?? 0)],
+            get: fn (mixed $value, array $attributes) => $this->toDecimal($attributes['min_balance_in_cents']),
+            set: fn (string|float|null $decimal) => ['min_balance_in_cents' => $this->toCents($decimal ?? 0)],
         );
     }
 
