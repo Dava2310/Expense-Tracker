@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateAccountRequest extends FormRequest
+class UpdateAccountRequest extends StoreAccountRequest
 {
     /**
      * Who can update an account is decided by the account policy, which the controller asks.
