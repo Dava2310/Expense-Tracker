@@ -40,8 +40,8 @@ class DatabaseSeeder extends Seeder
             $categories = Category::factory(random_int(1, 3))->for($user)->create();
 
             // Creating between 1-5 incomes and expenses for this user
-            Income::factory(random_int(1, 5))->recycle($categories)->for($account)->create();
-            Expense::factory(random_int(1, 5))->recycle($categories)->for($account)->create();
+            Income::factory(30)->recycle($categories)->for($account)->create();
+            Expense::factory(30)->recycle($categories)->for($account)->create();
 
             // Creating between 0-2 transfers from the first account to the second one
             Transfer::factory(random_int(0, 2))->create([
