@@ -65,22 +65,10 @@ class StoreTransferRequest extends FormRequest
         return [
             'from_account_id.required' => 'Choose the account the money comes from.',
             'from_account_id.exists' => 'Choose one of your active accounts.',
-
             'to_account_id.required' => 'Choose the account the money goes to.',
-            'to_account_id.different' => 'Choose a different account from the source account.',
             'to_account_id.exists' => 'Choose one of your active accounts.',
-
-            'amount.required' => 'Enter the amount.',
-            'amount.numeric' => 'Enter the :attribute as a number, like 25.50.',
-            'amount.gt' => 'Enter an amount greater than 0.',
             'amount.decimal' => 'Use at most 2 decimals in the :attribute, like 25.50.',
-            'amount.max' => 'The :attribute can’t be more than :max.',
-
-            'date.required' => 'Choose the date.',
             'date.date_format' => 'Enter the date as year-month-day, like 2026-11-25.',
-
-            'note.string' => 'The :attribute must be text.',
-            'note.max' => 'The :attribute can have at most :max characters.',
         ];
     }
 

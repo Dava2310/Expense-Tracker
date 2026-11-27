@@ -174,7 +174,7 @@ test('a transfer from an account to itself is refused', function () {
 
     $this->actingAs($user)
         ->post(route('transfers.store'), ['from_account_id' => $account->id, 'to_account_id' => $account->id, 'amount' => '10', 'date' => '2026-11-25'])
-        ->assertSessionHasErrors(['to_account_id' => 'Choose a different account from the source account.']);
+        ->assertSessionHasErrors(['to_account_id' => 'The destination account field and source account must be different.']);
 
     expect(Transfer::count())->toBe(0)
         ->and($account->fresh()->balance)->toEqual(100);

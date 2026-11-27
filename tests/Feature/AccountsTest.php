@@ -36,7 +36,7 @@ test('creating an account without a name, a bank or a currency shows what to fix
     $this->actingAs($user)
         ->post(route('accounts.store'), [])
         ->assertSessionHasErrors([
-            'name' => 'Enter the account name.',
+            'name' => 'The account name field is required.',
             'bank' => 'Enter the name of the bank, or “Cash”.',
             'currency_id' => 'Choose the currency of the account.',
         ]);
