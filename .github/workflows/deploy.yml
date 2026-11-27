@@ -57,7 +57,7 @@ jobs:
           artisan down --retry=60
           trap 'echo "Deploy failed: bringing the site back up"; restore' ERR
 
-          sudo chown -R ubuntu:ubuntu bootstrap/cache
+          sudo chown -R ubuntu:ubuntu bootstrap/cache database
           git fetch --quiet origin main
           git merge --ff-only "$SHA"
           composer install --no-dev --optimize-autoloader --no-interaction
