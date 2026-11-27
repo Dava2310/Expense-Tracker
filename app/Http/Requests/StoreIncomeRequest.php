@@ -67,23 +67,11 @@ class StoreIncomeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'amount.required' => 'Enter the amount.',
-            'amount.numeric' => 'Enter the :attribute as a number, like 25.50.',
-            'amount.gt' => 'Enter an amount greater than 0.',
             'amount.decimal' => 'Use at most 2 decimals in the :attribute, like 25.50.',
-            'amount.max' => 'The :attribute can’t be more than :max.',
-
             'concept.required' => 'Enter a concept, like “Monthly salary”.',
-            'concept.string' => 'The :attribute must be text.',
-            'concept.max' => 'The :attribute can have at most :max characters.',
-
-            'date.required' => 'Choose the date.',
             'date.date_format' => 'Enter the date as year-month-day, like 2026-11-25.',
-
             'account_id.required' => 'Choose the account the income is added to.',
             'account_id.exists' => 'Choose one of your active accounts.',
-
-            'category_id.required' => 'Choose a category.',
             'category_id.exists' => 'Choose one of your own categories.',
         ];
     }

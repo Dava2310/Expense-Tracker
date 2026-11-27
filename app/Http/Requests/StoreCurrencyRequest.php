@@ -53,12 +53,7 @@ class StoreCurrencyRequest extends FormRequest
     {
         return [
             'name.required' => 'Enter the currency name, like Euro.',
-            'name.string' => 'The :attribute must be text.',
-            'name.max' => 'The :attribute can have at most :max characters.',
-
             'symbol.required' => 'Enter the currency symbol, like €.',
-            'symbol.string' => 'The :attribute must be text.',
-            'symbol.max' => 'The :attribute can have at most :max characters.',
         ];
     }
 }

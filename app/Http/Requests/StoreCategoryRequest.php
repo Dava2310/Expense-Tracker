@@ -45,21 +45,4 @@ class StoreCategoryRequest extends FormRequest
             'description' => 'details',
         ];
     }
-
-    /**
-     * Messages shown next to a field when one of its rules fails.
-     *
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'name.required' => 'Enter the category name.',
-            'name.string' => 'The :attribute must be text.',
-            'name.max' => 'The :attribute can have at most :max characters.',
-
-            'description.string' => 'The :attribute must be text.',
-            'description.max' => 'The :attribute can have at most :max characters.',
-        ];
-    }
 }
